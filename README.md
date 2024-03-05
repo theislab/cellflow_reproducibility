@@ -7,7 +7,8 @@
 [link-tests]: ot_pert/actions/workflows/test.yml
 [badge-docs]: https://img.shields.io/readthedocs/ot_pert_reproducibility
 
-ot perturbation
+## Data directory
+Save and write the data to `/lustre/groups/ml01/workspace/ot_perturbation/`
 
 ## Getting started
 
