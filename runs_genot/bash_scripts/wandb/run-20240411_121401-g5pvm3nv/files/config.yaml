@@ -1,0 +1,75 @@
+wandb_version: 1
+
+model:
+  desc: null
+  value:
+    num_heads: 2
+    qkv_feature_dim: 64
+    max_seq_length: 2
+    hidden_dims:
+    - 512
+    - 512
+    - 512
+    output_dims:
+    - 512
+    - 512
+    condition_dims:
+    - 32
+    - 32
+    time_n_freqs: 1024
+    flow_noise: 0.0
+    learning_rate: 0.0001
+    multi_steps: 10
+training:
+  desc: null
+  value:
+    valid_freq: 1000
+    num_iterations: 1000000
+dataset:
+  desc: null
+  value:
+    adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_train.h5ad
+    adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_test.h5ad
+    adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood.h5ad
+    obsm_key_data: X_pca
+    obsm_key_cond_1: ecfp_drug_1
+    obsm_key_cond_2: ecfp_drug_2
+logger:
+  desc: null
+  value:
+    name: wandb_logger
+    project: combosciplex
+_wandb:
+  desc: null
+  value:
+    python_version: 3.12.2
+    cli_version: 0.16.6
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1712830441.0
+    t:
+      1:
+      - 1
+      - 5
+      - 12
+      - 45
+      - 50
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 12
+      - 45
+      - 50
+      - 53
+      - 55
+      3:
+      - 16
+      - 23
+      4: 3.12.2
+      5: 0.16.6
+      8:
+      - 8
+      13: linux-x86_64

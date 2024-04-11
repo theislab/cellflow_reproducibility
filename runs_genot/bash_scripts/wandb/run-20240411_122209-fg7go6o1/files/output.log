@@ -1,0 +1,92 @@
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/anndata/__init__.py:51: FutureWarning: `anndata.read` is deprecated, use `anndata.read_h5ad` instead. `ad.read` will be removed in mid 2024.
+  warnings.warn(
+[2024-04-11 12:22:32,060][jax._src.xla_bridge][INFO] - Unable to initialize backend 'cuda': jaxlib/cuda/versions_helpers.cc:98: operation cuInit(0) failed: Unknown CUDA error 303; cuGetErrorName failed. This probably means that JAX was unable to load the CUDA libraries.
+[2024-04-11 12:22:32,064][jax._src.xla_bridge][INFO] - Unable to initialize backend 'rocm': NOT_FOUND: Could not find registered platform with name: "rocm". Available platform names are: CUDA
+[2024-04-11 12:22:32,080][jax._src.xla_bridge][INFO] - Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/anndata/__init__.py:51: FutureWarning: `anndata.read` is deprecated, use `anndata.read_h5ad` instead. `ad.read` will be removed in mid 2024.
+  warnings.warn(
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/anndata/__init__.py:51: FutureWarning: `anndata.read` is deprecated, use `anndata.read_h5ad` instead. `ad.read` will be removed in mid 2024.
+  warnings.warn(
+
+
+
+
+
+
+
+
+
+
+
+
+
+  0%|▏                                                                                                                                                                | 1000/1000000 [32:23<539:16:41,  1.94s/it]
+Traceback (most recent call last):
+  File "/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/train_combosciplex.py", line 220, in <module>
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/main.py", line 94, in decorated_main
+    _run_hydra(
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/_internal/utils.py", line 394, in _run_hydra
+    _run_app(
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/_internal/utils.py", line 457, in _run_app
+    run_and_report(
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
+    return func()
+           ^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/_internal/utils.py", line 458, in <lambda>
+    lambda: hydra.run(
+            ^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/_internal/hydra.py", line 119, in run
+    ret = run_job(
+          ^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/core/utils.py", line 186, in run_job
+    ret.return_value = task_function(task_cfg)
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/train_combosciplex.py", line 216, in main
+    print(OmegaConf.to_yaml(cfg))
+    ^^^^^^^^
+  File "/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/train_combosciplex.py", line 179, in run
+    training_logs["loss"].append(float(loss))
+                                ^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/tree_util.py", line 321, in tree_map
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/tree_util.py", line 321, in <genexpr>
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+                             ^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/ott/neural/methods/flows/otfm.py", line 199, in transport
+    return jax.jit(jax.vmap(solve_ode, in_axes))(x, condition)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/pjit.py", line 298, in cache_miss
+    outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+                                                                ^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/pjit.py", line 176, in _python_pjit_helper
+    out_flat = pjit_p.bind(*args_flat, **params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/core.py", line 2788, in bind
+    return self.bind_with_trace(top_trace, args, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/core.py", line 425, in bind_with_trace
+    out = trace.process_primitive(self, map(trace.full_raise, args), params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/core.py", line 913, in process_primitive
+    return primitive.impl(*tracers, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/pjit.py", line 1488, in _pjit_call_impl
+    return xc._xla.pjit(
+           ^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/pjit.py", line 1471, in call_impl_cache_miss
+    out_flat, compiled = _pjit_call_impl_python(
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/pjit.py", line 1427, in _pjit_call_impl_python
+    return compiled.unsafe_call(*args), compiled
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/profiler.py", line 335, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/interpreters/pxla.py", line 1205, in __call__
+    results = self.xla_executable.execute_sharded(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

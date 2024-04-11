@@ -1,0 +1,220 @@
+2024-04-10 19:32:38,572 INFO    StreamThr :4051906 [internal.py:wandb_internal():86] W&B internal server running at pid: 4051906, started at: 2024-04-10 19:32:38.571444
+2024-04-10 19:32:38,573 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status
+2024-04-10 19:32:38,642 INFO    WriterThread:4051906 [datastore.py:open_for_write():87] open: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/run-n4a03m10.wandb
+2024-04-10 19:32:38,651 DEBUG   SenderThread:4051906 [sender.py:send():379] send: header
+2024-04-10 19:32:38,669 DEBUG   SenderThread:4051906 [sender.py:send():379] send: run
+2024-04-10 19:32:39,113 INFO    SenderThread:4051906 [dir_watcher.py:__init__():211] watching files in: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files
+2024-04-10 19:32:39,113 INFO    SenderThread:4051906 [sender.py:_start_run_threads():1124] run started: n4a03m10 with start time 1712770358.639988
+2024-04-10 19:32:39,118 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: check_version
+2024-04-10 19:32:39,118 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: check_version
+2024-04-10 19:32:39,203 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: run_start
+2024-04-10 19:32:39,244 DEBUG   HandlerThread:4051906 [system_info.py:__init__():26] System info init
+2024-04-10 19:32:39,244 DEBUG   HandlerThread:4051906 [system_info.py:__init__():41] System info init done
+2024-04-10 19:32:39,244 INFO    HandlerThread:4051906 [system_monitor.py:start():194] Starting system monitor
+2024-04-10 19:32:39,244 INFO    SystemMonitor:4051906 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-04-10 19:32:39,244 INFO    HandlerThread:4051906 [system_monitor.py:probe():214] Collecting system info
+2024-04-10 19:32:39,245 INFO    SystemMonitor:4051906 [interfaces.py:start():190] Started cpu monitoring
+2024-04-10 19:32:39,245 INFO    SystemMonitor:4051906 [interfaces.py:start():190] Started disk monitoring
+2024-04-10 19:32:39,245 INFO    SystemMonitor:4051906 [interfaces.py:start():190] Started gpu monitoring
+2024-04-10 19:32:39,246 INFO    SystemMonitor:4051906 [interfaces.py:start():190] Started memory monitoring
+2024-04-10 19:32:39,247 INFO    SystemMonitor:4051906 [interfaces.py:start():190] Started network monitoring
+2024-04-10 19:32:39,295 DEBUG   HandlerThread:4051906 [system_info.py:probe():150] Probing system
+2024-04-10 19:32:39,297 DEBUG   HandlerThread:4051906 [system_info.py:_probe_git():135] Probing git
+2024-04-10 19:32:39,311 DEBUG   HandlerThread:4051906 [system_info.py:_probe_git():143] Probing git done
+2024-04-10 19:32:39,311 DEBUG   HandlerThread:4051906 [system_info.py:probe():198] Probing system done
+2024-04-10 19:32:39,311 DEBUG   HandlerThread:4051906 [system_monitor.py:probe():223] {'os': 'Linux-4.18.0-513.11.1.el8_9.x86_64-x86_64-with-glibc2.28', 'python': '3.12.2', 'heartbeatAt': '2024-04-10T17:32:39.295919', 'startedAt': '2024-04-10T17:32:38.542255', 'docker': None, 'cuda': None, 'args': ('+logger=wandb',), 'state': 'running', 'program': '/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/train_combosciplex.py', 'codePathLocal': None, 'git': {'remote': 'https://github.com/theislab/ot_pert_reproducibility.git', 'commit': '3ba71357c89b345d8401938ebcadccded2e84c92'}, 'email': 'domin.klein@gmail.com', 'root': '/ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility', 'host': 'supergpu03.scidom.de', 'username': 'dominik.klein', 'executable': '/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/bin/python', 'cpu_count': 56, 'cpu_count_logical': 112, 'cpu_freq': {'current': 3.9724375000000003, 'min': 4000.0, 'max': 4000.0}, 'cpu_freq_per_core': [{'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 3.735, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 3.717, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}, {'current': 4.0, 'min': 4000.0, 'max': 4000.0}], 'disk': {'/': {'total': 99.951171875, 'used': 54.95122146606445}}, 'gpu': 'Tesla V100-SXM3-32GB', 'gpu_count': 1, 'gpu_devices': [{'name': 'Tesla V100-SXM3-32GB', 'memory_total': 34359738368}], 'memory': {'total': 1510.028377532959}}
+2024-04-10 19:32:39,311 INFO    HandlerThread:4051906 [system_monitor.py:probe():224] Finished collecting system info
+2024-04-10 19:32:39,311 INFO    HandlerThread:4051906 [system_monitor.py:probe():227] Publishing system info
+2024-04-10 19:32:39,312 DEBUG   HandlerThread:4051906 [system_info.py:_save_conda():207] Saving list of conda packages installed into the current environment
+2024-04-10 19:32:40,115 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_created():271] file/dir created: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/conda-environment.yaml
+2024-04-10 19:32:54,352 ERROR   HandlerThread:4051906 [system_info.py:_save_conda():221] Error saving conda packages: Command '['conda', 'env', 'export']' timed out after 15 seconds
+Traceback (most recent call last):
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/wandb/sdk/internal/system/system_info.py", line 214, in _save_conda
+    subprocess.call(
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/subprocess.py", line 391, in call
+    return p.wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/subprocess.py", line 1264, in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/subprocess.py", line 2043, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['conda', 'env', 'export']' timed out after 15 seconds
+2024-04-10 19:32:54,388 DEBUG   HandlerThread:4051906 [system_info.py:_save_conda():222] Saving conda packages done
+2024-04-10 19:32:54,399 INFO    HandlerThread:4051906 [system_monitor.py:probe():229] Finished publishing system info
+2024-04-10 19:32:54,496 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:32:54,496 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: keepalive
+2024-04-10 19:32:54,496 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:32:54,497 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: keepalive
+2024-04-10 19:32:54,497 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:32:54,497 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: keepalive
+2024-04-10 19:32:54,497 DEBUG   SenderThread:4051906 [sender.py:send():379] send: files
+2024-04-10 19:32:54,497 INFO    SenderThread:4051906 [sender.py:_save_file():1390] saving file wandb-metadata.json with policy now
+2024-04-10 19:32:55,081 INFO    wandb-upload_0:4051906 [upload_job.py:push():131] Uploaded file /tmp/tmpeca0jjs_wandb/rhjkvhos-wandb-metadata.json
+2024-04-10 19:32:55,124 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_created():271] file/dir created: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/wandb-metadata.json
+2024-04-10 19:32:59,498 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:32:59,891 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: python_packages
+2024-04-10 19:32:59,891 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: python_packages
+2024-04-10 19:32:59,892 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-10 19:32:59,893 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-10 19:32:59,893 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: stop_status
+2024-04-10 19:33:00,034 DEBUG   SenderThread:4051906 [sender.py:send():379] send: telemetry
+2024-04-10 19:33:00,128 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_created():271] file/dir created: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/requirements.txt
+2024-04-10 19:33:00,128 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_created():271] file/dir created: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:02,130 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:05,050 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:10,881 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:11,137 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:11,137 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/config.yaml
+2024-04-10 19:33:14,892 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-10 19:33:14,892 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-10 19:33:14,892 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: stop_status
+2024-04-10 19:33:16,136 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:20,143 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:21,244 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:26,147 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:26,768 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:29,892 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-10 19:33:29,892 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: stop_status
+2024-04-10 19:33:29,893 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: stop_status
+2024-04-10 19:33:31,797 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:32,151 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:34,152 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:36,153 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:36,247 DEBUG   SenderThread:4051906 [sender.py:send():379] send: exit
+2024-04-10 19:33:36,247 INFO    SenderThread:4051906 [sender.py:send_exit():586] handling exit code: 1
+2024-04-10 19:33:36,247 INFO    SenderThread:4051906 [sender.py:send_exit():588] handling runtime: 57
+2024-04-10 19:33:36,249 INFO    SenderThread:4051906 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-04-10 19:33:36,249 INFO    SenderThread:4051906 [sender.py:send_exit():594] send defer
+2024-04-10 19:33:36,249 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,249 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 0
+2024-04-10 19:33:36,249 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,249 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 0
+2024-04-10 19:33:36,249 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 1
+2024-04-10 19:33:36,249 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,249 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 1
+2024-04-10 19:33:36,249 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,249 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 1
+2024-04-10 19:33:36,249 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 2
+2024-04-10 19:33:36,250 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,250 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 2
+2024-04-10 19:33:36,250 INFO    HandlerThread:4051906 [system_monitor.py:finish():203] Stopping system monitor
+2024-04-10 19:33:36,250 DEBUG   SystemMonitor:4051906 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-04-10 19:33:36,250 DEBUG   SystemMonitor:4051906 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-04-10 19:33:36,250 INFO    HandlerThread:4051906 [interfaces.py:finish():202] Joined cpu monitor
+2024-04-10 19:33:36,250 DEBUG   SystemMonitor:4051906 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-04-10 19:33:36,250 INFO    HandlerThread:4051906 [interfaces.py:finish():202] Joined disk monitor
+2024-04-10 19:33:36,383 INFO    HandlerThread:4051906 [interfaces.py:finish():202] Joined gpu monitor
+2024-04-10 19:33:36,383 INFO    HandlerThread:4051906 [interfaces.py:finish():202] Joined memory monitor
+2024-04-10 19:33:36,383 INFO    HandlerThread:4051906 [interfaces.py:finish():202] Joined network monitor
+2024-04-10 19:33:36,384 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,384 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 2
+2024-04-10 19:33:36,384 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 3
+2024-04-10 19:33:36,384 DEBUG   SenderThread:4051906 [sender.py:send():379] send: stats
+2024-04-10 19:33:36,384 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,384 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 3
+2024-04-10 19:33:36,384 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,384 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 3
+2024-04-10 19:33:36,384 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 4
+2024-04-10 19:33:36,385 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,385 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 4
+2024-04-10 19:33:36,385 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,385 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 4
+2024-04-10 19:33:36,385 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 5
+2024-04-10 19:33:36,385 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,385 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 5
+2024-04-10 19:33:36,385 DEBUG   SenderThread:4051906 [sender.py:send():379] send: summary
+2024-04-10 19:33:36,386 INFO    SenderThread:4051906 [sender.py:_save_file():1390] saving file wandb-summary.json with policy end
+2024-04-10 19:33:36,386 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,386 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 5
+2024-04-10 19:33:36,386 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 6
+2024-04-10 19:33:36,386 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,386 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 6
+2024-04-10 19:33:36,386 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,386 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 6
+2024-04-10 19:33:36,386 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 7
+2024-04-10 19:33:36,387 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: status_report
+2024-04-10 19:33:36,387 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:36,387 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 7
+2024-04-10 19:33:36,387 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:36,387 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 7
+2024-04-10 19:33:37,154 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_created():271] file/dir created: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/wandb-summary.json
+2024-04-10 19:33:37,247 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-10 19:33:38,155 INFO    Thread-12 :4051906 [dir_watcher.py:_on_file_modified():288] file/dir modified: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:38,859 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 8
+2024-04-10 19:33:38,859 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: poll_exit
+2024-04-10 19:33:38,859 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:38,859 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 8
+2024-04-10 19:33:38,859 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:38,859 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 8
+2024-04-10 19:33:38,859 INFO    SenderThread:4051906 [job_builder.py:build():318] Attempting to build job artifact
+2024-04-10 19:33:38,860 INFO    SenderThread:4051906 [job_builder.py:_get_source_type():455] is repo sourced job
+2024-04-10 19:33:38,860 WARNING SenderThread:4051906 [job_builder.py:_log_if_verbose():210] No program path found, not creating job artifact. See https://docs.wandb.ai/guides/launch/create-job
+2024-04-10 19:33:38,860 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 9
+2024-04-10 19:33:38,860 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:38,860 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 9
+2024-04-10 19:33:38,860 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:38,860 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 9
+2024-04-10 19:33:38,860 INFO    SenderThread:4051906 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-04-10 19:33:39,156 INFO    SenderThread:4051906 [dir_watcher.py:finish():388] scan: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files
+2024-04-10 19:33:39,156 INFO    SenderThread:4051906 [dir_watcher.py:finish():402] scan save: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/wandb-summary.json wandb-summary.json
+2024-04-10 19:33:39,157 INFO    SenderThread:4051906 [dir_watcher.py:finish():402] scan save: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/wandb-metadata.json wandb-metadata.json
+2024-04-10 19:33:39,157 INFO    SenderThread:4051906 [dir_watcher.py:finish():402] scan save: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/requirements.txt requirements.txt
+2024-04-10 19:33:39,157 INFO    SenderThread:4051906 [dir_watcher.py:finish():402] scan save: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/conda-environment.yaml conda-environment.yaml
+2024-04-10 19:33:39,159 INFO    SenderThread:4051906 [dir_watcher.py:finish():402] scan save: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log output.log
+2024-04-10 19:33:39,159 INFO    SenderThread:4051906 [dir_watcher.py:finish():402] scan save: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/config.yaml config.yaml
+2024-04-10 19:33:39,160 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 10
+2024-04-10 19:33:39,160 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:39,161 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 10
+2024-04-10 19:33:39,162 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:39,162 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 10
+2024-04-10 19:33:39,162 INFO    SenderThread:4051906 [file_pusher.py:finish():172] shutting down file pusher
+2024-04-10 19:33:39,248 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-10 19:33:39,248 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: poll_exit
+2024-04-10 19:33:39,524 INFO    wandb-upload_0:4051906 [upload_job.py:push():131] Uploaded file /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/wandb-summary.json
+2024-04-10 19:33:39,743 INFO    wandb-upload_3:4051906 [upload_job.py:push():131] Uploaded file /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/config.yaml
+2024-04-10 19:33:39,748 INFO    wandb-upload_1:4051906 [upload_job.py:push():131] Uploaded file /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/requirements.txt
+2024-04-10 19:33:39,748 INFO    wandb-upload_2:4051906 [upload_job.py:push():131] Uploaded file /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/files/output.log
+2024-04-10 19:33:39,948 INFO    Thread-11 (_thread_body):4051906 [sender.py:transition_state():614] send defer: 11
+2024-04-10 19:33:39,949 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:39,949 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 11
+2024-04-10 19:33:39,949 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:39,949 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 11
+2024-04-10 19:33:39,949 INFO    SenderThread:4051906 [file_pusher.py:join():178] waiting for file pusher
+2024-04-10 19:33:39,949 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 12
+2024-04-10 19:33:39,949 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:39,949 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 12
+2024-04-10 19:33:39,949 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:39,949 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 12
+2024-04-10 19:33:39,949 INFO    SenderThread:4051906 [file_stream.py:finish():614] file stream finish called
+2024-04-10 19:33:40,094 INFO    SenderThread:4051906 [file_stream.py:finish():618] file stream finish is done
+2024-04-10 19:33:40,094 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 13
+2024-04-10 19:33:40,094 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:40,094 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 13
+2024-04-10 19:33:40,094 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:40,094 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 13
+2024-04-10 19:33:40,094 INFO    SenderThread:4051906 [sender.py:transition_state():614] send defer: 14
+2024-04-10 19:33:40,095 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: defer
+2024-04-10 19:33:40,095 DEBUG   SenderThread:4051906 [sender.py:send():379] send: final
+2024-04-10 19:33:40,095 INFO    HandlerThread:4051906 [handler.py:handle_request_defer():172] handle defer: 14
+2024-04-10 19:33:40,095 DEBUG   SenderThread:4051906 [sender.py:send():379] send: footer
+2024-04-10 19:33:40,095 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: defer
+2024-04-10 19:33:40,095 INFO    SenderThread:4051906 [sender.py:send_request_defer():610] handle sender defer: 14
+2024-04-10 19:33:40,095 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-10 19:33:40,095 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: poll_exit
+2024-04-10 19:33:40,111 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: poll_exit
+2024-04-10 19:33:40,111 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: server_info
+2024-04-10 19:33:40,111 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: get_summary
+2024-04-10 19:33:40,111 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: poll_exit
+2024-04-10 19:33:40,111 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: sampled_history
+2024-04-10 19:33:40,112 DEBUG   SenderThread:4051906 [sender.py:send_request():406] send_request: server_info
+2024-04-10 19:33:40,112 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: internal_messages
+2024-04-10 19:33:40,244 INFO    MainThread:4051906 [wandb_run.py:_footer_history_summary_info():3936] rendering history
+2024-04-10 19:33:40,244 INFO    MainThread:4051906 [wandb_run.py:_footer_history_summary_info():3968] rendering summary
+2024-04-10 19:33:40,244 INFO    MainThread:4051906 [wandb_run.py:_footer_sync_info():3895] logging synced files
+2024-04-10 19:33:40,246 DEBUG   HandlerThread:4051906 [handler.py:handle_request():146] handle_request: shutdown
+2024-04-10 19:33:40,246 INFO    HandlerThread:4051906 [handler.py:finish():866] shutting down handler
+2024-04-10 19:33:41,111 INFO    WriterThread:4051906 [datastore.py:close():296] close: /ictstr01/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/bash_scripts/wandb/run-20240410_193238-n4a03m10/run-n4a03m10.wandb
+2024-04-10 19:33:41,244 INFO    SenderThread:4051906 [sender.py:finish():1546] shutting down sender
+2024-04-10 19:33:41,244 INFO    SenderThread:4051906 [file_pusher.py:finish():172] shutting down file pusher
+2024-04-10 19:33:41,244 INFO    SenderThread:4051906 [file_pusher.py:join():178] waiting for file pusher

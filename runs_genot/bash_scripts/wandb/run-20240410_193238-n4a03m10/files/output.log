@@ -1,0 +1,89 @@
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/anndata/__init__.py:51: FutureWarning: `anndata.read` is deprecated, use `anndata.read_h5ad` instead. `ad.read` will be removed in mid 2024.
+  warnings.warn(
+[2024-04-10 19:33:08,851][jax._src.xla_bridge][INFO] - Unable to initialize backend 'rocm': NOT_FOUND: Could not find registered platform with name: "rocm". Available platform names are: CUDA
+[2024-04-10 19:33:08,878][jax._src.xla_bridge][INFO] - Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/anndata/__init__.py:51: FutureWarning: `anndata.read` is deprecated, use `anndata.read_h5ad` instead. `ad.read` will be removed in mid 2024.
+  warnings.warn(
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/anndata/__init__.py:51: FutureWarning: `anndata.read` is deprecated, use `anndata.read_h5ad` instead. `ad.read` will be removed in mid 2024.
+  warnings.warn(
+
+
+
+  0%|          | 1000/1000000 [00:11<3:09:10, 88.01it/s]
+Error executing job with overrides: ['+logger=wandb']
+Traceback (most recent call last):
+  File "/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/train_combosciplex.py", line 216, in main
+    run(cfg)
+  File "/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/runs_genot/train_combosciplex.py", line 179, in run
+    predicted_target_test = jax.tree_util.tree_map(model.transport, test_data_source, test_data_conditions)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/tree_util.py", line 321, in tree_map
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/jax/_src/tree_util.py", line 321, in <genexpr>
+    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
+                             ^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/ott/neural/methods/flows/otfm.py", line 199, in transport
+    return jax.jit(jax.vmap(solve_ode, in_axes))(x, condition)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/ott/neural/methods/flows/otfm.py", line 182, in solve_ode
+    result = diffrax.diffeqsolve(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_integrate.py", line 916, in diffeqsolve
+    final_state, aux_stats = adjoint.loop(
+                             ^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_adjoint.py", line 288, in loop
+    final_state = self._loop(
+                  ^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_integrate.py", line 439, in loop
+    _, traced_jump, traced_result = eqx.filter_eval_shape(body_fun_aux, init_state)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_integrate.py", line 240, in body_fun_aux
+    (y, y_error, dense_info, solver_state, solver_result) = solver.step(
+                                                            ^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_solver/runge_kutta.py", line 1149, in step
+    final_val = eqxi.while_loop(
+                ^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/equinox/internal/_loop/loop.py", line 107, in while_loop
+    return checkpointed_while_loop(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/equinox/internal/_loop/checkpointed.py", line 247, in checkpointed_while_loop
+    body_fun_ = filter_closure_convert(body_fun_, init_val_)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/equinox/internal/_loop/common.py", line 453, in new_body_fun
+    buffer_val2 = body_fun(buffer_val)
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_solver/runge_kutta.py", line 1025, in rk_stage
+    fi = vf(ti, yi, implicit_val=implicit_fi)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_solver/runge_kutta.py", line 651, in vf
+    out = t_map(_vf, terms, t, implicit_val=implicit_val)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_solver/runge_kutta.py", line 604, in t_map
+    return jtu.tree_map(_fn, tableaus, *trees)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_solver/runge_kutta.py", line 602, in _fn
+    return fn(*_trees)
+           ^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_solver/runge_kutta.py", line 650, in <lambda>
+    _vf = lambda term_i, t_i: term_i.vf(t_i, y, args)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_term.py", line 445, in vf
+    return self.term.vf(t, y, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/diffrax/_term.py", line 178, in vf
+    out = self.vector_field(t, y, args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/ott/neural/methods/flows/otfm.py", line 178, in vf
+    return self.vf_state.apply_fn({"params": params}, t, x, cond)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/git_repos/ot_pert_reproducibility/src/ot_pert/nets/nets.py", line 79, in __call__
+    x = self.act_fn(nn.Dense(hidden_dim)(x))
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/flax/linen/linear.py", line 254, in __call__
+    kernel = self.param(
+             ^^^^^^^^^^^
+flax.errors.ScopeParamShapeError: Initializer expected to generate shape (30, 512) but got shape (50, 512) instead for parameter "kernel" in "/Dense_3". (https://flax.readthedocs.io/en/latest/api_reference/flax.errors.html#flax.errors.ScopeParamShapeError)
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
