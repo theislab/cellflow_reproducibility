@@ -26,3 +26,10 @@ __pycache__/
 # IDEs
 /.idea/
 /.vscode/
+
+**/*.h5ad
+**/*.pkl
+wandb/
+outputs/
+runs_genot/bash_scripts/outputs/
+runs_genot/bash_scripts/wandb/
