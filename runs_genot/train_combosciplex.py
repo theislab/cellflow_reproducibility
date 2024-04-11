@@ -68,6 +68,12 @@ def run(cfg: DictConfig):
     # Load data
     adata_train = sc.read(cfg.dataset.adata_train_path)
     dls = []
+
+    train_data_source = {}
+    train_data_target = {}
+    train_data_conditions = {}
+
+
     source = adata_train[adata_train.obs["condition"]=="control"].obsm[cfg.dataset.obsm_key_data]
     for cond in adata_train.obs["condition"].cat.categories:
         if cond == "control":
@@ -83,6 +89,9 @@ def run(cfg: DictConfig):
             lin=source,
             condition=conds,
         ), datasets.OTData(lin=target)), batch_size=cfg.training.batch_size))
+        train_data_source[cond] = source
+        train_data_target[cond] = target
+        train_data_conditions[cond] = conds
     
     train_loader = ConditionalLoader(dls, seed=0)
 
@@ -178,6 +187,29 @@ def run(cfg: DictConfig):
 
         training_logs["loss"].append(float(loss))
         if (it % cfg.training.valid_freq == 0) and (it>0):
+            valid_losses = []
+            for cond in test_data_source.keys():
+                src = test_data_source[cond]
+                tgt = test_data_target[cond]
+                src_cond = test_data_conditions[cond]
+                if model.match_fn is not None:
+                    tmat = model.match_fn(src, tgt)
+                    src_ixs, tgt_ixs = solver_utils.sample_joint(rng_resample, tmat)
+                    src, tgt = src[src_ixs], tgt[tgt_ixs]
+                    src_cond = None if src_cond is None else src_cond[src_ixs]
+                _, valid_loss = model.step_fn(
+                    rng,
+                    model.vf_state,
+                    src,
+                    tgt,
+                    src_cond,
+                )
+                valid_losses.append(valid_loss)
+            
+            predicted_target_train = jax.tree_util.tree_map(model.transport, train_data_source, train_data_conditions)
+            train_metrics = jax.tree_util.tree_map(compute_metrics, predicted_target_train, train_data_target)
+            mean_train_metrics = compute_mean_metrics(train_metrics, prefix="train_")
+
             predicted_target_test = jax.tree_util.tree_map(model.transport, test_data_source, test_data_conditions)
             test_metrics = jax.tree_util.tree_map(compute_metrics, predicted_target_test, test_data_target)
             mean_test_metrics = compute_mean_metrics(test_metrics, prefix="test_")
@@ -186,9 +218,10 @@ def run(cfg: DictConfig):
             ood_metrics = jax.tree_util.tree_map(compute_metrics, predicted_target_ood, ood_data_target)
             mean_ood_metrics = compute_mean_metrics(ood_metrics, prefix="ood_")
             
-            loss_dict = {"train_loss": np.mean(training_logs["loss"][-cfg.training.valid_freq:])}
+            loss_dict = {"train_loss": np.mean(training_logs["loss"][-cfg.training.valid_freq:]), "valid_loss": np.mean(valid_losses)}
             loss_dict.update(mean_test_metrics)
             loss_dict.update(mean_ood_metrics)
+            loss_dict.update(mean_train_metrics)
             wandb.log(loss_dict)
 
     
