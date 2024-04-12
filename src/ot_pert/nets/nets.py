@@ -10,21 +10,18 @@ from flax.training import train_state
 from ott.neural.networks.layers import time_encoder
 import functools
 
-def get_masks(dataset: List[jnp.ndarray], max_seq_length: int, pad_max_dim: Optional[int] = None, pad_token=0):
-    # dataset should be of size [batch_size, max_seq_length, dim_concatenated_conditions]
-    # and the first `pad_max_dim` dimensions of `dim_concatenated_conditions` should contain 0.0
-    # if an element of the sequence is considered to be `None`
+def get_masks(dataset: List[jnp.ndarray]):
     attention_mask = []
     for data in dataset:
         if data.ndim<2:
             data = data[None, :]
         if data.ndim<3:
             data = data[None, :]
-        mask = jnp.all(data[:, :pad_max_dim, 0] == 0.0, axis=1)
+        mask = jnp.all(data == 0.0, axis=-1)
         mask = 1-mask
         mask = jnp.outer(mask, mask)
         attention_mask.append(mask)
-    return jnp.expand_dims(jnp.array(attention_mask), 1)
+    return jnp.expand_dims(jnp.equal(jnp.array(attention_mask),1.0), 1)
 
 
 
@@ -42,7 +39,7 @@ class VelocityFieldWithAttention(nn.Module):
     pad_max_dim: int = -1
 
     def __post_init__(self):
-        self.get_masks = jax.jit(functools.partial(get_masks, max_seq_length=self.max_seq_length+1, pad_max_dim=self.pad_max_dim))
+        self.get_masks = jax.jit(get_masks)
         super().__post_init__()
 
 
