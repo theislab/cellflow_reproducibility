@@ -39,4 +39,4 @@ class ConditionalLoader:
     return self
 
   def __len__(self) -> int:
-    return 100000
+    return len(self.dataloaders)

@@ -22,6 +22,8 @@ from ott.neural.networks import velocity_field
 from ott.solvers import utils as solver_utils
 import jax.tree_util as jtu
 from ott.neural.networks.layers import time_encoder
+import pandas as pd
+import os
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -88,7 +90,7 @@ def run(cfg: DictConfig):
         dls.append(DataLoader(datasets.OTDataset(datasets.OTData(
             lin=source,
             condition=conds,
-        ), datasets.OTData(lin=target)), batch_size=cfg.training.batch_size))
+        ), datasets.OTData(lin=target)), batch_size=cfg.training.batch_size, shuffle=True))
         train_data_source[cond] = source
         train_data_target[cond] = target
         train_data_conditions[cond] = conds
@@ -105,7 +107,7 @@ def run(cfg: DictConfig):
             continue
         target = adata_test[adata_test.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_data]
         condition_1 = adata_test[adata_test.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_1]
-        condition_2 = adata_test[adata_test.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_1]
+        condition_2 = adata_test[adata_test.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_2]
         assert np.all(np.all(condition_1 == condition_1[0], axis=1))
         assert np.all(np.all(condition_2 == condition_2[0], axis=1))
         expanded_arr = np.expand_dims(np.concatenate((condition_1[0,:][None,:],condition_2[0,:][None,:]), axis=0), axis=0)
@@ -124,7 +126,7 @@ def run(cfg: DictConfig):
             continue
         target = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_data]
         condition_1 = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_1]
-        condition_2 = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_1]
+        condition_2 = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_2]
         assert np.all(np.all(condition_1 == condition_1[0], axis=1))
         assert np.all(np.all(condition_2 == condition_2[0], axis=1))
         expanded_arr = np.expand_dims(np.concatenate((condition_1[0,:][None,:],condition_2[0,:][None,:]), axis=0), axis=0)
@@ -223,7 +225,11 @@ def run(cfg: DictConfig):
             loss_dict.update(mean_ood_metrics)
             loss_dict.update(mean_train_metrics)
             wandb.log(loss_dict)
-
+    
+    pd.DataFrame.from_dict(train_metrics).to_csv(os.path.join(cfg.training.out_dir, "train_metrics_new.csv"))
+    pd.DataFrame.from_dict(test_metrics).to_csv(os.path.join(cfg.training.out_dir, "test_metrics_new.csv"))
+    pd.DataFrame.from_dict(ood_metrics).to_csv(os.path.join(cfg.training.out_dir, "ood_metrics_new.csv"))
+    
     
     
 def setup_logger(cfg):
