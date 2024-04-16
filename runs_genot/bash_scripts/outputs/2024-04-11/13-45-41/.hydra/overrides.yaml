@@ -1,3 +1,0 @@
-- +logger=wandb
-- model.qkv_feature_dim=4
-
