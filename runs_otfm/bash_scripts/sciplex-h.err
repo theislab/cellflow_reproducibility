@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py", line 36, in <module>
+    from ot_pert.metrics import compute_metrics, compute_mean_metrics
+  File "/home/icb/dominik.klein/git_repos/ot_pert_new/src/ot_pert/__init__.py", line 3, in <module>
+    from . import metrics
+  File "/home/icb/dominik.klein/git_repos/ot_pert_new/src/ot_pert/metrics.py", line 26, in <module>
+    def compute_e_distance(x: np.ndarray, y: np.darray) -> float:
+                                             ^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/numpy/__init__.py", line 333, in __getattr__
+    raise AttributeError("module {!r} has no attribute "
+AttributeError: module 'numpy' has no attribute 'darray'. Did you mean: 'array'?

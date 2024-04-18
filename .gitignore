@@ -31,5 +31,5 @@ __pycache__/
 **/*.pkl
 wandb/
 outputs/
-runs_genot/bash_scripts/outputs/
-runs_genot/bash_scripts/wandb/
+runs_otfm/bash_scripts/outputs/
+runs_otfm/bash_scripts/wandb/

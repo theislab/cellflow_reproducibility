@@ -1,14 +1,14 @@
 #!/bin/bash
 
-#SBATCH -o hsearch2.out
+#SBATCH -o hsearch30.out
 
-#SBATCH -e hsearch2.err
+#SBATCH -e hsearch30.err
 
-#SBATCH -J hsearch2
+#SBATCH -J hsearch30
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_short
+#SBATCH --qos=gpu_normal
 
 #SBATCH --gres=gpu:1
 
@@ -16,7 +16,7 @@
 
 #SBATCH --mem=90G
 
-#SBATCH -t 2-00:00
+#SBATCH -t 1-00:00
 
 #SBATCH --nice=1
 

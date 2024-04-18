@@ -77,7 +77,9 @@ Traceback (most recent call last):
 FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = '/lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood.h5ad', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
 
 Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
-wandb: - 0.012 MB of 0.012 MB uploadedwandb: \ 0.012 MB of 0.020 MB uploadedwandb: 🚀 View run clean-river-7 at: https://wandb.ai/modality_translation/genot_combosciplex/runs/67stj2pl
+wandb: - 0.012 MB of 0.012 MB uploaded
+wandb: \ 0.012 MB of 0.020 MB uploaded
+wandb: 🚀 View run clean-river-7 at: https://wandb.ai/modality_translation/genot_combosciplex/runs/67stj2pl
 wandb: ⭐️ View project at: https://wandb.ai/modality_translation/genot_combosciplex
 wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
 wandb: Find logs at: ./wandb/run-20240410_180926-67stj2pl/logs
