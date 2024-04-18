@@ -3,6 +3,7 @@ from typing import Dict
 import numpy as np
 from ott.geometry import costs, pointcloud
 from ott.tools.sinkhorn_divergence import sinkhorn_divergence
+from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.metrics import pairwise_distances, r2_score
 
 
@@ -37,7 +38,7 @@ def compute_metrics(x: np.ndarray, y: np.ndarray) -> Dict[str, float]:
     metrics["sinkhorn_div_10"] = compute_sinkhorn_div(x, y, epsilon=10.0)
     metrics["sinkhorn_div_100"] = compute_sinkhorn_div(x, y, epsilon=100.0)
     metrics["e_distance"] = compute_e_distance(x, y)
-    metrics["mmd"] = compute_sinkhorn_div(x, y, epsilon=1_000_000)
+    metrics["mmd"] = compute_scalar_mmd(x, y)
     return metrics
 
 
@@ -50,3 +51,32 @@ def compute_mean_metrics(metrics: Dict[str, Dict[str, float]], prefix: str = "")
             stat += vals[met]
         metric_dict[prefix + met] = stat / len(metrics)
     return metric_dict
+
+def mmd_distance(x, y, gamma):
+    xx = rbf_kernel(x, x, gamma)
+    xy = rbf_kernel(x, y, gamma)
+    yy = rbf_kernel(y, y, gamma)
+
+    return xx.mean() + yy.mean() - 2 * xy.mean()
+
+
+def compute_scalar_mmd(target, transport, gammas=None): # from CellOT repo
+    if gammas is None:
+        gammas = [2, 1, 0.5, 0.1, 0.01, 0.005]
+
+    def safe_mmd(*args):
+        try:
+            mmd = mmd_distance(*args)
+        except ValueError:
+            mmd = np.nan
+        return mmd
+
+    return np.mean(list(map(lambda x: safe_mmd(target, transport, x), gammas)))
+
+
+def compute_metrics_fast(x: np.ndarray, y: np.ndarray) -> Dict[str, float]:
+    metrics = {}
+    metrics["r_squared"] = compute_r_squared(x, y)
+    metrics["e_distance"] = compute_e_distance(x, y)
+    metrics["mmd_distance"] = compute_scalar_mmd(x, y)
+    return metrics

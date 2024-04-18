@@ -19,7 +19,7 @@ from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from ot_pert.metrics import compute_mean_metrics, compute_metrics
+from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
 from ot_pert.utils import ConditionalLoader
 
 
@@ -277,12 +277,12 @@ def run(cfg: DictConfig):
             # train_deg_target_decoded = jax.tree_util.tree_map(get_mask, train_data_target_decoded, test_deg_dict)
 
             predicted_target_test = jax.tree_util.tree_map(model.transport, test_data_source_tmp, test_data_conditions_tmp)
-            test_metrics = jax.tree_util.tree_map(compute_metrics, test_data_target_tmp, predicted_target_test)
+            test_metrics = jax.tree_util.tree_map(compute_metrics_fast, test_data_target_tmp, predicted_target_test)
             mean_test_metrics = compute_mean_metrics(test_metrics, prefix="test_")
 
             predicted_target_test_decoded = jax.tree_util.tree_map(reconstruct_data_fn, predicted_target_test)
             test_metrics_decoded = jax.tree_util.tree_map(
-                compute_metrics, test_data_target_decoded_tmp, predicted_target_test_decoded
+                compute_metrics_fast, test_data_target_decoded_tmp, predicted_target_test_decoded
             )
             mean_test_metrics_decoded = compute_mean_metrics(test_metrics_decoded, prefix="decoded_test_")
 
@@ -291,17 +291,17 @@ def run(cfg: DictConfig):
             )
             test_deg_target_decoded = jax.tree_util.tree_map(get_mask, test_data_target_decoded_tmp, test_deg_dict_tmp)
             deg_test_metrics_encoded = jax.tree_util.tree_map(
-                compute_metrics, test_deg_target_decoded, test_deg_target_decoded_predicted
+                compute_metrics_fast, test_deg_target_decoded, test_deg_target_decoded_predicted
             )
             deg_mean_test_metrics_encoded = compute_mean_metrics(deg_test_metrics_encoded, prefix="deg_test_")
 
             predicted_target_ood = jax.tree_util.tree_map(model.transport, ood_data_source, ood_data_conditions)
-            ood_metrics = jax.tree_util.tree_map(compute_metrics, ood_data_target, predicted_target_ood)
+            ood_metrics = jax.tree_util.tree_map(compute_metrics_fast, ood_data_target, predicted_target_ood)
             mean_ood_metrics = compute_mean_metrics(ood_metrics, prefix="ood_")
 
             predicted_target_ood_decoded = jax.tree_util.tree_map(reconstruct_data_fn, predicted_target_ood)
             ood_metrics_decoded = jax.tree_util.tree_map(
-                compute_metrics, ood_data_target_decoded, predicted_target_ood_decoded
+                compute_metrics_fast, ood_data_target_decoded, predicted_target_ood_decoded
             )
             mean_ood_metrics_decoded = compute_mean_metrics(ood_metrics_decoded, prefix="decoded_ood_")
 
@@ -310,7 +310,7 @@ def run(cfg: DictConfig):
             )
             ood_deg_target_decoded = jax.tree_util.tree_map(get_mask, ood_data_target_decoded, ood_deg_dict)
             deg_ood_metrics_encoded = jax.tree_util.tree_map(
-                compute_metrics, ood_deg_target_decoded, ood_deg_target_decoded_predicted
+                compute_metrics_fast, ood_deg_target_decoded, ood_deg_target_decoded_predicted
             )
             deg_mean_ood_metrics_encoded = compute_mean_metrics(deg_ood_metrics_encoded, prefix="deg_ood_")
 
