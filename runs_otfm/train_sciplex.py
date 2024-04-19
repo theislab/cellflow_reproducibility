@@ -149,6 +149,8 @@ def run(cfg: DictConfig):
         assert len(src_str) == 1
         source = adata_ood[adata_ood.obs["condition"] == src_str[0] + "_Vehicle_0.0"].obsm[cfg.dataset.obsm_key_data]
         source_decoded = adata_ood[adata_ood.obs["condition"] == src_str[0] + "_Vehicle_0.0"].X.A
+        target = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_data]
+        target_decoded = adata_ood[adata_ood.obs["condition"]==cond].X.A
         conds = adata_ood[adata_ood.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
         assert np.all(np.all(conds == conds[0], axis=1))
         conds = np.tile(conds[0], (len(source), 1))
