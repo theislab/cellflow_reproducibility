@@ -24,4 +24,4 @@ source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate /home/icb/dominik.klein/mambaforge/envs/ot_pert_genot
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex_fast.py --multirun hydra/launcher=submitit_slurm dataset=sciplex_30 hparams_search=hparams_sciplex model=default training=training
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py --multirun hydra/launcher=submitit_slurm dataset=sciplex_30 hparams_search=hparams_sciplex model=default training=training

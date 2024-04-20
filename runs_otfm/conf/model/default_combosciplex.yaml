@@ -1,3 +1,6 @@
+num_heads: 4
+qkv_feature_dim: 32
+max_seq_length: 2
 hidden_dims: [512, 512, 512]
 output_dims: [1024, 1024, 1024]
 condition_dims: [64, 64]
