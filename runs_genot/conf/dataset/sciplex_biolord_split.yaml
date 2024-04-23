@@ -3,4 +3,4 @@ adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adat
 adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_ood_biolord_split_30.h5ad
 obsm_key_data: X_pca
 obsm_key_cond: ecfp_cell_line_logdose
-wandb_project: otfm_sciplex
+wandb_project: genot_sciplex

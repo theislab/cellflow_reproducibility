@@ -22,6 +22,7 @@ from tqdm import tqdm
 
 from ot_pert.metrics import compute_mean_metrics, compute_metrics
 from ot_pert.utils import ConditionalLoader
+from ot_pert.nets.nets import GENOTVelocityFieldWithAttention
 
 
 def reconstruct_data(embedding: np.ndarray, projection_matrix: np.ndarray, mean_to_add: np.ndarray) -> np.ndarray:
@@ -186,7 +187,7 @@ def run(cfg: DictConfig):
 
     source_dim = source.shape[1]
     target_dim = source_dim
-    condition_dim = condition_1.shape[1]
+    condition_dim = condition_1.shape[-1]
 
     source_dim = source.shape[1]
     target_dim = source_dim
@@ -194,7 +195,7 @@ def run(cfg: DictConfig):
 
     print(cfg)
 
-    vf = VelocityFieldWithAttention(
+    vf = GENOTVelocityFieldWithAttention(
         num_heads=cfg.model.num_heads,
         qkv_feature_dim=cfg.model.qkv_feature_dim,
         max_seq_length=cfg.model.max_seq_length,

@@ -1,7 +1,7 @@
 import functools
 import sys
 import traceback
-from typing import Optional, Literal
+from typing import Optional, Literal, Tuple, Dict
 import hydra
 import jax
 import jax.numpy as jnp
@@ -12,7 +12,7 @@ import scanpy as sc
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from ott.neural import datasets
-from ott.neural.methods.flows import dynamics, otfm
+from ott.neural.methods.flows import dynamics, genot
 from ott.neural.networks.layers import time_encoder
 from ott.neural.networks.velocity_field import VelocityField
 from ott.solvers import utils as solver_utils
@@ -21,7 +21,6 @@ from tqdm import tqdm
 
 from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
 from ot_pert.utils import ConditionalLoader
-from ot_pert.nets.nets import VelocityFieldWithAttention
 
 
 def reconstruct_data(embedding, projection_matrix, mean_to_add):
@@ -48,22 +47,18 @@ def load_data(adata, cfg, *, return_dl: bool):
     data_source_decoded = {}
     data_target_decoded = {}
     data_conditions = {}
-    source = adata[adata.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_data]
-    source_decoded = adata[adata.obs["condition"] == "control"].X
-    
     for cond in adata.obs["condition"].cat.categories:
-        if cond != "control":
+        if "Vehicle" not in cond:
+            src_str_unique = list(adata[adata.obs["condition"] == cond].obs["cell_type"].unique())
+            assert len(src_str_unique) == 1
+            src_str = src_str_unique[0] + "_Vehicle_0.0"
+            source = adata[adata.obs["condition"] == src_str].obsm[cfg.dataset.obsm_key_data]
+            source_decoded = adata[adata.obs["condition"] == src_str].X.A
             target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
             target_decoded = adata[adata.obs["condition"] == cond].X.A
-            condition_1 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_1]
-            condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2]
-            assert np.all(np.all(condition_1 == condition_1[0], axis=1))
-            assert np.all(np.all(condition_2 == condition_2[0], axis=1))
-            expanded_arr = np.expand_dims(
-                np.concatenate((condition_1[0, :][None, :], condition_2[0, :][None, :]), axis=0), axis=0
-            )
-            conds = np.tile(expanded_arr, (len(source), 1, 1))
-            
+            conds = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
+            assert np.all(np.all(conds == conds[0], axis=1))
+            conds = np.tile(conds[0], (len(source), 1))
             if return_dl:
                 dls.append(
                     DataLoader(
@@ -98,6 +93,31 @@ def load_data(adata, cfg, *, return_dl: bool):
         "deg_dict": deg_dict,
     }
 
+def prepare_data(
+    batch: Dict[str, jnp.ndarray]
+    ) -> Tuple[Tuple[jnp.ndarray, Optional[jnp.ndarray], jnp.ndarray],
+            Tuple[jnp.ndarray, jnp.ndarray, Optional[jnp.ndarray],
+                    Optional[jnp.ndarray]]]:
+    src_lin, src_quad = batch.get("src_lin"), batch.get("src_quad")
+    tgt_lin, tgt_quad = batch.get("tgt_lin"), batch.get("tgt_quad")
+
+    if src_quad is None and tgt_quad is None:  # lin
+        src, tgt = src_lin, tgt_lin
+        arrs = src_lin, tgt_lin
+    elif src_lin is None and tgt_lin is None:  # quad
+        src, tgt = src_quad, tgt_quad
+        arrs = src_quad, tgt_quad
+    elif all(
+        arr is not None for arr in (src_lin, tgt_lin, src_quad, tgt_quad)
+    ):  # fused quad
+        src = jnp.concatenate([src_lin, src_quad], axis=1)
+        tgt = jnp.concatenate([tgt_lin, tgt_quad], axis=1)
+        arrs = src_quad, tgt_quad, src_lin, tgt_lin
+    else:
+        raise RuntimeError("Cannot infer OT problem type from data.")
+
+    return (src, batch.get("src_condition"), tgt), arrs
+
 def data_match_fn(
     src_lin: Optional[jnp.ndarray],
     tgt_lin: Optional[jnp.ndarray],
@@ -131,10 +151,10 @@ def run(cfg: DictConfig):
     adata_train = sc.read_h5ad(cfg.dataset.adata_train_path) 
     adata_test = sc.read_h5ad(cfg.dataset.adata_test_path) 
     adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path) 
+    dl = load_data(adata_train, cfg, return_dl=True)
     train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
     test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
     ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
-    dl = load_data(adata_train, cfg, return_dl=True)
     comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
 
     reconstruct_data_fn = functools.partial(
@@ -143,24 +163,22 @@ def run(cfg: DictConfig):
     mask_fn = functools.partial(get_mask, var_names=adata_train.var_names)
 
     batch = next(dl)
-    output_dim = batch["tgt_lin"].shape[1]
-    condition_dim = batch["src_condition"].shape[-1]
+    source_dim = batch["tgt_lin"].shape[1]
+    target_dim = batch["tgt_lin"].shape[1]
+    condition_dim = batch["src_condition"].shape[1]
 
-    vf = VelocityFieldWithAttention(
-        num_heads=cfg.model.num_heads,
-        qkv_feature_dim=cfg.model.qkv_feature_dim,
-        max_seq_length=cfg.model.max_seq_length,
+    vf = VelocityField(
         hidden_dims=cfg.model.hidden_dims,
         time_dims=cfg.model.time_dims,
-        output_dims=cfg.model.output_dims + [output_dim],
+        output_dims=cfg.model.output_dims + [target_dim],
         condition_dims=cfg.model.condition_dims,
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
 
-    model = otfm.OTFlowMatching(
+    model = genot.GENOT(
         vf,
         flow=dynamics.ConstantNoiseFlow(cfg.model.flow_noise),
-        match_fn=jax.jit(
+        data_match_fn=jax.jit(
             functools.partial(
                 data_match_fn,
                 typ="lin",
@@ -171,6 +189,8 @@ def run(cfg: DictConfig):
                 tau_b=cfg.model.tau_b,
             )
         ),
+        source_dim=source_dim,
+        target_dim=target_dim,
         condition_dim=condition_dim,
         rng=jax.random.PRNGKey(13),
         optimizer=optax.MultiSteps(optax.adam(cfg.model.learning_rate), cfg.model.multi_steps),
@@ -178,29 +198,46 @@ def run(cfg: DictConfig):
 
     training_logs = {"loss": []}
     rng = jax.random.PRNGKey(0)
-
+    
     for it in tqdm(range(cfg.training.num_iterations)):
-        rng, rng_resample, rng_step_fn = jax.random.split(rng, 3)
-        batch = next(dl)
+        batch = next(iter(dl))
         batch = jtu.tree_map(jnp.asarray, batch)
-
-        src, tgt = batch["src_lin"], batch["tgt_lin"]
-        src_cond = batch.get("src_condition")
-
-        if model.match_fn is not None:
-            tmat = model.match_fn(src, tgt)
-            src_ixs, tgt_ixs = solver_utils.sample_joint(rng_resample, tmat)
-            src, tgt = src[src_ixs], tgt[tgt_ixs]
-            src_cond = None if src_cond is None else src_cond[src_ixs]
-
-        model.vf_state, loss = model.step_fn(
-            rng_step_fn,
-            model.vf_state,
-            src,
-            tgt,
-            src_cond,
+        rng = jax.random.split(rng, 5)
+        rng, rng_resample, rng_noise, rng_time, rng_step_fn = rng
+        
+        batch = jtu.tree_map(jnp.asarray, batch)
+        (src, src_cond, tgt), matching_data = prepare_data(batch)
+        
+        n = src.shape[0]
+        time = model.time_sampler(rng_time, n * model.n_samples_per_src)
+        latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
+        
+        tmat = model.data_match_fn(*matching_data)  # (n, m)
+        src_ixs, tgt_ixs = solver_utils.sample_conditional(  # (n, k), (m, k)
+        rng_resample,
+        tmat,
+        k=model.n_samples_per_src,
         )
+        
+        src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
+        if src_cond is not None:
+            src_cond = src_cond[src_ixs]
+        
+        if model.latent_match_fn is not None:
+            src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
+        
+        src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
+        tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
+        latent = latent.reshape(-1, *latent.shape[2:])
+        if src_cond is not None:
+            src_cond = src_cond.reshape(-1, *src_cond.shape[2:])
 
+        
+        
+        loss, model.vf_state = model.step_fn(
+        rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond
+        )
+        
         training_logs["loss"].append(float(loss))
         if (it % cfg.training.valid_freq == 0) and (it > 0):
             train_loss = np.mean(training_logs["loss"][-cfg.training.valid_freq :])
