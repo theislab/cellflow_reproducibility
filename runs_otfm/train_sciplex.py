@@ -1,7 +1,7 @@
 import functools
 import sys
-from typing import Literal, Optional
-
+import traceback
+from typing import Optional, Literal
 import hydra
 import jax
 import jax.numpy as jnp
@@ -18,177 +18,135 @@ from ott.neural.networks.velocity_field import VelocityField
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import orbax
+import os
 
-from ot_pert.metrics import compute_mean_metrics, compute_metrics
+from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
 from ot_pert.utils import ConditionalLoader
 
 
-def reconstruct_data(embedding: np.ndarray, projection_matrix: np.ndarray, mean_to_add: np.ndarray) -> np.ndarray:
+def reconstruct_data(embedding, projection_matrix, mean_to_add):
+    """Reconstructs data from projections."""
     return np.matmul(embedding, projection_matrix.T) + mean_to_add
 
 
-@hydra.main(config_path="conf", config_name="train", version_base=None)
-def run(cfg: DictConfig):
-    """
-    Main training function using Hydra.
+def setup_logger(cfg):
+    """Initialize and return a Weights & Biases logger."""
+    wandb.login()
+    return wandb.init(
+        project=cfg.dataset.wandb_project,
+        config=OmegaConf.to_container(cfg, resolve=True),
+        dir="/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts",
+        settings=wandb.Settings(start_method="thread"),
+    )
 
-    Args:
-        cfg (DictConfig): Configuration parameters.
 
-    Raises
-    ------
-        Exception: Any exception during training.
-
-    Returns
-    -------
-        None
-    """
-    experiment_logger = setup_logger(cfg=cfg)
-
-    def data_match_fn(
-        src_lin: Optional[jnp.ndarray],
-        tgt_lin: Optional[jnp.ndarray],
-        src_quad: Optional[jnp.ndarray],
-        tgt_quad: Optional[jnp.ndarray],
-        *,
-        typ: Literal["lin", "quad", "fused"],
-        epsilon: float = 1e-2,
-        tau_a: float = 1.0,
-        tau_b: float = 1.0,
-    ) -> jnp.ndarray:
-        if typ == "lin":
-            return solver_utils.match_linear(
-                x=src_lin, y=tgt_lin, scale_cost="mean", epsilon=epsilon, tau_a=tau_a, tau_b=tau_b
-            )
-        if typ == "quad":
-            return solver_utils.match_quadratic(xx=src_quad, yy=tgt_quad)
-        if typ == "fused":
-            return solver_utils.match_quadratic(xx=src_quad, yy=tgt_quad, x=src_lin, y=tgt_lin)
-        raise NotImplementedError(f"Unknown type: {typ}.")
-
-    # Load data
-    adata_train = sc.read(cfg.dataset.adata_train_path)
+def load_data(adata, cfg, *, return_dl: bool):
+    """Loads data and preprocesses it based on configuration."""
     dls = []
+    data_source = {}
+    data_target = {}
+    data_source_decoded = {}
+    data_target_decoded = {}
+    data_conditions = {}
+    for cond in adata.obs["condition"].cat.categories:
+        if "Vehicle" not in cond:
+            src_str_unique = list(adata[adata.obs["condition"] == cond].obs["cell_type"].unique())
+            assert len(src_str_unique) == 1
+            src_str = src_str_unique[0] + "_Vehicle_0.0"
+            source = adata[adata.obs["condition"] == src_str].obsm[cfg.dataset.obsm_key_data]
+            source_decoded = adata[adata.obs["condition"] == src_str].X.A
+            target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
+            target_decoded = adata[adata.obs["condition"] == cond].X.A
+            conds = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
+            assert np.all(np.all(conds == conds[0], axis=1))
+            conds = np.tile(conds[0], (len(source), 1))
+            if return_dl:
+                dls.append(
+                    DataLoader(
+                        datasets.OTDataset(
+                            datasets.OTData(
+                                lin=source,
+                                condition=conds,
+                            ),
+                            datasets.OTData(lin=target),
+                        ),
+                        batch_size=cfg.training.batch_size,
+                        shuffle=True,
+                    )
+                )
+            else:
+                data_source[cond] = source
+                data_target[cond] = target
+                data_source_decoded[cond] = source_decoded
+                data_target_decoded[cond] = target_decoded
+                data_conditions[cond] = conds
+    if return_dl:
+        return ConditionalLoader(dls, seed=0)
 
-    train_data_source = {}
-    train_data_target = {}
-    train_data_source_decoded = {}
-    train_data_target_decoded = {}
-    train_data_conditions = {}
+    deg_dict = {k: v for k, v in adata.uns["rank_genes_groups_cov_all"].items() if k in data_conditions.keys()}
 
-    for cond in adata_train.obs["condition"].cat.categories:
-        if "Vehicle" in cond:
-            continue
-        src_str = list(adata_train[adata_train.obs["condition"] == cond].obs["cell_type"].unique())
-        assert len(src_str) == 1
-        source = adata_train[adata_train.obs["condition"] == src_str[0] + "_Vehicle_0.0"].obsm[
-            cfg.dataset.obsm_key_data
-        ]
-        source_decoded = adata_train[adata_train.obs["condition"] == src_str[0] + "_Vehicle_0.0"].X.A
-        target = adata_train[adata_train.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
-        target_decoded = adata_train[adata_train.obs["condition"] == cond].X.A
-        conds = adata_train[adata_train.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
-        assert np.all(np.all(conds == conds[0], axis=1))
-        conds = np.tile(conds[0], (len(source), 1))
-        dls.append(
-            DataLoader(
-                datasets.OTDataset(
-                    datasets.OTData(
-                        lin=source,
-                        condition=conds,
-                    ),
-                    datasets.OTData(lin=target),
-                ),
-                batch_size=cfg.training.batch_size,
-                shuffle=True,
-            )
+    return {
+        "source": data_source,
+        "target": data_target,
+        "source_decoded": data_source_decoded,
+        "target_decoded": data_target_decoded,
+        "conditions": data_conditions,
+        "deg_dict": deg_dict,
+    }
+
+def data_match_fn(
+    src_lin: Optional[jnp.ndarray],
+    tgt_lin: Optional[jnp.ndarray],
+    src_quad: Optional[jnp.ndarray],
+    tgt_quad: Optional[jnp.ndarray],
+    *,
+    typ: Literal["lin", "quad", "fused"],
+    epsilon: float = 1e-2,
+    tau_a: float = 1.0,
+    tau_b: float = 1.0,
+) -> jnp.ndarray:
+    if typ == "lin":
+        return solver_utils.match_linear(
+            x=src_lin, y=tgt_lin, scale_cost="mean", epsilon=epsilon, tau_a=tau_a, tau_b=tau_b
         )
-        train_data_source[cond] = source
-        train_data_target[cond] = target
-        train_data_conditions[cond] = conds
-        train_data_source_decoded[cond] = source_decoded
-        train_data_target_decoded[cond] = target_decoded
+    if typ == "quad":
+        return solver_utils.match_quadratic(xx=src_quad, yy=tgt_quad)
+    if typ == "fused":
+        return solver_utils.match_quadratic(xx=src_quad, yy=tgt_quad, x=src_lin, y=tgt_lin)
+    raise NotImplementedError(f"Unknown type: {typ}.")
 
-    train_loader = ConditionalLoader(dls, seed=0)
 
-    test_data_source = {}
-    test_data_target = {}
-    test_data_source_decoded = {}
-    test_data_target_decoded = {}
-    test_data_conditions = {}
-    adata_test = sc.read(cfg.dataset.adata_test_path)
-    for cond in adata_test.obs["condition"].cat.categories:
-        if "Vehicle" in cond:
-            continue
-        src_str = list(adata_test[adata_test.obs["condition"] == cond].obs["cell_type"].unique())
-        assert len(src_str) == 1
-        source = adata_test[adata_test.obs["condition"] == src_str[0] + "_Vehicle_0.0"].obsm[cfg.dataset.obsm_key_data]
-        source_decoded = adata_test[adata_test.obs["condition"] == src_str[0] + "_Vehicle_0.0"].X.A
+def get_mask(x, y, var_names):
+    return x[:, [gene in y for gene in var_names]]
 
-        target = adata_test[adata_test.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
-        target_decoded = adata_test[adata_test.obs["condition"] == cond].X.A
-        conds = adata_test[adata_test.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
-        assert np.all(np.all(conds == conds[0], axis=1))
-        conds = np.tile(conds[0], (len(source), 1))
-        # test_data_source[cond] = source
-        # test_data_target[cond] = target
-        # test_data_source_decoded[cond] = source_decoded
-        # test_data_target_decoded[cond] = target_decoded
-        # test_data_conditions[cond] = conds
 
-    ood_data_source = {}
-    ood_data_target = {}
-    ood_data_source_decoded = {}
-    ood_data_target_decoded = {}
-    ood_data_conditions = {}
-    adata_ood = sc.read(cfg.dataset.adata_ood_path)
-    for cond in adata_ood.obs["condition"].cat.categories:
-        if "Vehicle" in cond:
-            continue
-        src_str = list(adata_ood[adata_ood.obs["condition"] == cond].obs["cell_type"].unique())
-        assert len(src_str) == 1
-        source = adata_ood[adata_ood.obs["condition"] == src_str[0] + "_Vehicle_0.0"].obsm[cfg.dataset.obsm_key_data]
-        source_decoded = adata_ood[adata_ood.obs["condition"] == src_str[0] + "_Vehicle_0.0"].X.A
-        target = adata_ood[adata_ood.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
-        target_decoded = adata_ood[adata_ood.obs["condition"] == cond].X.A
-        conds = adata_ood[adata_ood.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
-        assert np.all(np.all(conds == conds[0], axis=1))
-        conds = np.tile(conds[0], (len(source), 1))
-        ood_data_source[cond] = source
-        ood_data_target[cond] = target
-        ood_data_source_decoded[cond] = source_decoded
-        ood_data_target_decoded[cond] = target_decoded
-        ood_data_conditions[cond] = conds
+@hydra.main(config_path="conf", config_name="train")
+def run(cfg: DictConfig):
+    """Main function to handle model training and evaluation."""
+    logger = setup_logger(cfg)
+    adata_train = sc.read_h5ad(cfg.dataset.adata_train_path) 
+    adata_test = sc.read_h5ad(cfg.dataset.adata_test_path) 
+    adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path) 
+    dl = load_data(adata_train, cfg, return_dl=True)
+    train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
+    test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
+    ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
+    comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
 
     reconstruct_data_fn = functools.partial(
         reconstruct_data, projection_matrix=adata_train.varm["PCs"], mean_to_add=adata_train.varm["X_train_mean"].T
     )
+    mask_fn = functools.partial(get_mask, var_names=adata_train.var_names)
 
-    train_deg_dict = {
-        k: v for k, v in adata_train.uns["rank_genes_groups_cov_all"].items() if k in train_data_conditions.keys()
-    }
-    test_deg_dict = {
-        k: v for k, v in adata_train.uns["rank_genes_groups_cov_all"].items() if k in test_data_conditions.keys()
-    }
-    ood_deg_dict = {
-        k: v for k, v in adata_train.uns["rank_genes_groups_cov_all"].items() if k in ood_data_conditions.keys()
-    }
-
-    def get_mask(x, y):
-        return x[:, [gene in y for gene in adata_train.var_names]]
-
-    source_dim = source.shape[1]
-    target_dim = source_dim
-    condition_dim = conds.shape[1]
-
-    source_dim = source.shape[1]
-    target_dim = source_dim
-    condition_dim = conds.shape[1]
+    batch = next(dl)
+    output_dim = batch["tgt_lin"].shape[1]
+    condition_dim = batch["src_condition"].shape[1]
 
     vf = VelocityField(
         hidden_dims=cfg.model.hidden_dims,
         time_dims=cfg.model.time_dims,
-        output_dims=cfg.model.output_dims + [target_dim],
+        output_dims=cfg.model.output_dims + [output_dim],
         condition_dims=cfg.model.condition_dims,
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
@@ -209,15 +167,15 @@ def run(cfg: DictConfig):
         ),
         condition_dim=condition_dim,
         rng=jax.random.PRNGKey(13),
-        optimizer=optax.MultiSteps(optax.adam(learning_rate=cfg.model.learning_rate), cfg.model.multi_steps),
+        optimizer=optax.MultiSteps(optax.adam(cfg.model.learning_rate), cfg.model.multi_steps),
     )
 
     training_logs = {"loss": []}
-
     rng = jax.random.PRNGKey(0)
+    print("starting trainng")
     for it in tqdm(range(cfg.training.num_iterations)):
         rng, rng_resample, rng_step_fn = jax.random.split(rng, 3)
-        batch = next(train_loader)
+        batch = next(dl)
         batch = jtu.tree_map(jnp.asarray, batch)
 
         src, tgt = batch["src_lin"], batch["tgt_lin"]
@@ -239,125 +197,72 @@ def run(cfg: DictConfig):
 
         training_logs["loss"].append(float(loss))
         if (it % cfg.training.valid_freq == 0) and (it > 0):
-            idcs = np.random.choice(list(test_data_source.keys()), 20)
-            test_data_source_tmp = {k: v for k, v in test_data_source.items() if k in idcs}
-            test_data_target_tmp = {k: v for k, v in test_data_target.items() if k in idcs}
-            test_data_conditions_tmp = {k: v for k, v in test_data_conditions.items() if k in idcs}
-            test_deg_dict_tmp = {k: v for k, v in test_deg_dict.items() if k in idcs}
-            test_data_target_decoded_tmp = {k: v for k, v in test_data_target_decoded.items() if k in idcs}
-            test_data_source
-            valid_losses = []
-            for cond in test_data_source_tmp.keys():
-                src = test_data_source_tmp[cond]
-                tgt = test_data_target_tmp[cond]
-                src_cond = test_data_conditions_tmp[cond]
-                if model.match_fn is not None:
-                    tmat = model.match_fn(src, tgt)
-                    src_ixs, tgt_ixs = solver_utils.sample_joint(rng_resample, tmat)
-                    src, tgt = src[src_ixs], tgt[tgt_ixs]
-                    src_cond = None if src_cond is None else src_cond[src_ixs]
-                _, valid_loss = model.step_fn(
-                    rng,
-                    model.vf_state,
-                    src,
-                    tgt,
-                    src_cond,
-                )
-                valid_losses.append(valid_loss)
-
-            # predicted_target_train = jax.tree_util.tree_map(model.transport, train_data_source, train_data_conditions)
-            # train_metrics = jax.tree_util.tree_map(compute_metrics, train_data_target, predicted_target_train)
-            # mean_train_metrics = compute_mean_metrics(train_metrics, prefix="train_")
-
-            # predicted_target_train_decoded = jax.tree_util.tree_map(reconstruct_data_fn, predicted_target_train)
-            # train_metrics_decoded = jax.tree_util.tree_map(compute_metrics, train_data_target_decoded, predicted_target_train_decoded)
-            # mean_train_metrics_decoded = compute_mean_metrics(train_metrics_decoded, prefix="decoded_train_")
-
-            # train_deg_target_decoded_predicted = jax.tree_util.tree_map(get_mask, predicted_target_train_decoded, train_deg_dict)
-            # train_deg_target_decoded = jax.tree_util.tree_map(get_mask, train_data_target_decoded, test_deg_dict)
-
-            predicted_target_test = jax.tree_util.tree_map(
-                model.transport, test_data_source_tmp, test_data_conditions_tmp
+            train_loss = np.mean(training_logs["loss"][-cfg.training.valid_freq :])
+            log_metrics = {"train_loss": train_loss}
+            eval_step(
+                cfg,
+                model,
+                {"train": train_data, "test": test_data, "ood": ood_data},
+                log_metrics,
+                reconstruct_data_fn,
+                comp_metrics_fn,
+                mask_fn,
             )
-            test_metrics = jax.tree_util.tree_map(compute_metrics, test_data_target_tmp, predicted_target_test)
-            mean_test_metrics = compute_mean_metrics(test_metrics, prefix="test_")
+    if cfg.training.save_model:
+        checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+        checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
+    
 
-            predicted_target_test_decoded = jax.tree_util.tree_map(reconstruct_data_fn, predicted_target_test)
-            test_metrics_decoded = jax.tree_util.tree_map(
-                compute_metrics, test_data_target_decoded_tmp, predicted_target_test_decoded
-            )
-            mean_test_metrics_decoded = compute_mean_metrics(test_metrics_decoded, prefix="decoded_test_")
-
-            test_deg_target_decoded_predicted = jax.tree_util.tree_map(
-                get_mask, predicted_target_test_decoded, test_deg_dict_tmp
-            )
-            test_deg_target_decoded = jax.tree_util.tree_map(get_mask, test_data_target_decoded_tmp, test_deg_dict_tmp)
-            deg_test_metrics_encoded = jax.tree_util.tree_map(
-                compute_metrics, test_deg_target_decoded, test_deg_target_decoded_predicted
-            )
-            deg_mean_test_metrics_encoded = compute_mean_metrics(deg_test_metrics_encoded, prefix="deg_test_")
-
-            predicted_target_ood = jax.tree_util.tree_map(model.transport, ood_data_source, ood_data_conditions)
-            ood_metrics = jax.tree_util.tree_map(compute_metrics, ood_data_target, predicted_target_ood)
-            mean_ood_metrics = compute_mean_metrics(ood_metrics, prefix="ood_")
-
-            predicted_target_ood_decoded = jax.tree_util.tree_map(reconstruct_data_fn, predicted_target_ood)
-            ood_metrics_decoded = jax.tree_util.tree_map(
-                compute_metrics, ood_data_target_decoded, predicted_target_ood_decoded
-            )
-            mean_ood_metrics_decoded = compute_mean_metrics(ood_metrics_decoded, prefix="decoded_ood_")
-
-            ood_deg_target_decoded_predicted = jax.tree_util.tree_map(
-                get_mask, predicted_target_ood_decoded, ood_deg_dict
-            )
-            ood_deg_target_decoded = jax.tree_util.tree_map(get_mask, ood_data_target_decoded, ood_deg_dict)
-            deg_ood_metrics_encoded = jax.tree_util.tree_map(
-                compute_metrics, ood_deg_target_decoded, ood_deg_target_decoded_predicted
-            )
-            deg_mean_ood_metrics_encoded = compute_mean_metrics(deg_ood_metrics_encoded, prefix="deg_ood_")
-
-            loss_dict = {
-                "train_loss": np.mean(training_logs["loss"][-cfg.training.valid_freq :]),
-                "valid_loss": np.mean(valid_losses),
-            }
-            loss_dict.update(mean_test_metrics)
-            loss_dict.update(mean_ood_metrics)
-            # loss_dict.update(mean_train_metrics)
-            # loss_dict.update(mean_train_metrics_decoded)
-            loss_dict.update(mean_test_metrics_decoded)
-            loss_dict.update(mean_ood_metrics_decoded)
-            loss_dict.update(deg_mean_ood_metrics_encoded)
-            loss_dict.update(deg_mean_test_metrics_encoded)
-            wandb.log(loss_dict)
-
-    return mean_ood_metrics["ood_sinkhorn_div_1"]  # for hyperparameter tuning
+    return 1.0
 
 
-def setup_logger(cfg):
-    import wandb
-
-    wandb.login()
-
-    wandb.init(
-        project="otfm_sciplex",
-        settings=wandb.Settings(
-            start_method="thread"
-        ),  # avoid hanging at start-up, see: https://docs.wandb.ai/guides/integrations/hydra
-        config=OmegaConf.to_container(
-            cfg,
-            resolve=True,
-            throw_on_missing=True,
-        ),
-        dir="/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts",
-    )
-    return wandb
+def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_fn, mask_fn):
+    for k, dat in data.items():
+        if k == "test":
+            n_samples = cfg.training.n_test_samples 
+        if k == "train":
+            n_samples = cfg.training.n_train_samples 
+        if k == "ood":
+            n_samples = cfg.training.n_ood_samples 
+                
+        if n_samples != 0:
+            if n_samples > 0: 
+                idcs = np.random.choice(list(list(dat.values())[0]), n_samples)
+                dat_source = {k: v for k, v in dat["source"].items() if k in idcs}
+                dat_target = {k: v for k, v in dat["target"].items() if k in idcs}
+                dat_conditions = {k: v for k, v in dat["conditions"].items() if k in idcs}
+                dat_deg_dict = {k: v for k, v in dat["deg_dict"].items() if k in idcs}
+                dat_target_decoded = {k: v for k, v in dat["target_decoded"].items() if k in idcs}
+            else:
+                dat_source = dat["source"]
+                dat_target = dat["target"]
+                dat_conditions = dat["conditions"]
+                dat_deg_dict = dat["deg_dict"]
+                dat_target_decoded = dat["target_decoded"]
+            
+            prediction = jtu.tree_map(model.transport, dat_source, dat_conditions)
+            metrics = jtu.tree_map(comp_metrics_fn, dat_target, prediction)
+            mean_metrics = compute_mean_metrics(metrics, prefix=f"{k}_")
+            log_metrics.update(mean_metrics)
+    
+            prediction_decoded = jtu.tree_map(reconstruct_data_fn, prediction)
+            metrics_decoded = jtu.tree_map(comp_metrics_fn, dat_target_decoded, prediction_decoded)
+            mean_metrics_decoded = compute_mean_metrics(metrics_decoded, prefix=f"decoded_{k}_")
+            log_metrics.update(mean_metrics_decoded)
+    
+            prediction_decoded_deg = jtu.tree_map(mask_fn, prediction_decoded, dat_deg_dict)
+            target_decoded_deg = jax.tree_util.tree_map(mask_fn, dat_target_decoded, dat_deg_dict)
+            metrics_deg = jtu.tree_map(comp_metrics_fn, target_decoded_deg, prediction_decoded_deg)
+            mean_metrics_deg = compute_mean_metrics(metrics_deg, prefix=f"deg_{k}_")
+            log_metrics.update(mean_metrics_deg)
+            
+    wandb.log(log_metrics)
 
 
 if __name__ == "__main__":
-    import traceback
-
     try:
         run()
-    except Exception:
-        traceback.print_exc(file=sys.stderr)
-        raise
+    except Exception as e:
+        print(f"An error occurred: {e}", file=sys.stderr)
+        traceback.print_exc()
+        sys.exit(1)
