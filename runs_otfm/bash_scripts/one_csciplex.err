@@ -1,0 +1,43 @@
+/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_combosciplex_clean.py:127: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train")
+/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+wandb: Currently logged in as: mucdk (modality_translation). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.16.6
+wandb: Run data is saved locally in /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts/wandb/run-20240423_085250-pnfwrjyz
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run iconic-river-1517
+wandb: ⭐️ View project at https://wandb.ai/modality_translation/otfm_combosciplex
+wandb: 🚀 View run at https://wandb.ai/modality_translation/otfm_combosciplex/runs/pnfwrjyz
+2024-04-23 08:53:08.020858: W external/xla/xla/service/gpu/nvptx_compiler.cc:718] The NVIDIA driver's CUDA version is 12.3 which is older than the ptxas CUDA version (12.4.131). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
+  0%|          | 0/10000 [00:00<?, ?it/s]  0%|          | 0/10000 [00:01<?, ?it/s]
+Error executing job with overrides: ['dataset=combosciplex_30', 'model=combosciplex', 'training=training_combosciplex']
+Traceback (most recent call last):
+  File "/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_combosciplex_clean.py", line 199, in run
+    model.vf_state, loss = model.step_fn(
+                           ^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/ott/neural/methods/flows/otfm.py", line 94, in step_fn
+    loss, grads = grad_fn(
+                  ^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/ott/neural/methods/flows/otfm.py", line 85, in loss_fn
+    v_t = vf_state.apply_fn({"params": params}, t, x_t, source_conditions)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/git_repos/ot_pert_new/src/ot_pert/nets/nets.py", line 78, in __call__
+    class_token = nn.Embed(num_embeddings=1, features=condition.shape[-1])(jnp.int32(jnp.zeros(token_shape)))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/dominik.klein/mambaforge/envs/ot_pert_genot/lib/python3.12/site-packages/flax/linen/linear.py", line 976, in setup
+    self.embedding = self.param(
+                     ^^^^^^^^^^^
+flax.errors.ScopeParamShapeError: Initializer expected to generate shape (1, 2) but got shape (1, 1024) instead for parameter "embedding" in "/Embed_0". (https://flax.readthedocs.io/en/latest/api_reference/flax.errors.html#flax.errors.ScopeParamShapeError)
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: - 0.013 MB of 0.013 MB uploadedwandb: \ 0.013 MB of 0.027 MB uploadedwandb: | 0.013 MB of 0.027 MB uploadedwandb: / 0.027 MB of 0.027 MB uploadedwandb: 🚀 View run iconic-river-1517 at: https://wandb.ai/modality_translation/otfm_combosciplex/runs/pnfwrjyz
+wandb: ⭐️ View project at: https://wandb.ai/modality_translation/otfm_combosciplex
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts/wandb/run-20240423_085250-pnfwrjyz/logs
