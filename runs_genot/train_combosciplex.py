@@ -19,6 +19,8 @@ from ott.neural.networks.layers import time_encoder
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import orbax
+import os
 
 from ot_pert.metrics import compute_mean_metrics, compute_metrics
 from ot_pert.utils import ConditionalLoader
@@ -334,10 +336,10 @@ def run(cfg: DictConfig):
             loss_dict.update(deg_mean_test_metrics_encoded)
             wandb.log(loss_dict)
 
-    output_dir = "/lustre/groups/ml01/workspace/ot_perturbation/models/"
-    pd.DataFrame.from_dict(ood_metrics).to_csv(os.path.join(output_dir, "ood_metrics_encoded.csv"))
-    pd.DataFrame.from_dict(ood_metrics_decoded).to_csv(os.path.join(output_dir, "ood_metrics_decoded.csv"))
-    pd.DataFrame.from_dict(deg_ood_metrics_encoded).to_csv(os.path.join(output_dir, "deg_metrics_decoded.csv"))
+    if cfg.training.save_model:
+        checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+        checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
+
     return mean_ood_metrics["ood_sinkhorn_div_1"]  # for hyperparameter tuning
 
 

@@ -18,6 +18,8 @@ from ott.neural.networks.velocity_field import VelocityField
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import orbax
+import os
 
 from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
 from ot_pert.utils import ConditionalLoader
@@ -251,6 +253,11 @@ def run(cfg: DictConfig):
                 comp_metrics_fn,
                 mask_fn,
             )
+
+    if cfg.training.save_model:
+        checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+        checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
+
 
     return 1.0
 

@@ -18,9 +18,12 @@ from ott.neural.networks.velocity_field import VelocityField
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import orbax
+import os
 
 from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
 from ot_pert.utils import ConditionalLoader
+from ot_pert.nets.nets import VelocityFieldWithAttention
 
 
 def reconstruct_data(embedding, projection_matrix, mean_to_add):
@@ -47,18 +50,22 @@ def load_data(adata, cfg, *, return_dl: bool):
     data_source_decoded = {}
     data_target_decoded = {}
     data_conditions = {}
+    source = adata[adata.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_data]
+    source_decoded = adata[adata.obs["condition"] == "control"].X
+    
     for cond in adata.obs["condition"].cat.categories:
-        if "Vehicle" not in cond:
-            src_str_unique = list(adata[adata.obs["condition"] == cond].obs["cell_type"].unique())
-            assert len(src_str_unique) == 1
-            src_str = src_str_unique[0] + "_Vehicle_0.0"
-            source = adata[adata.obs["condition"] == src_str].obsm[cfg.dataset.obsm_key_data]
-            source_decoded = adata[adata.obs["condition"] == src_str].X.A
+        if cond != "control":
             target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
             target_decoded = adata[adata.obs["condition"] == cond].X.A
-            conds = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
-            assert np.all(np.all(conds == conds[0], axis=1))
-            conds = np.tile(conds[0], (len(source), 1))
+            condition_1 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_1]
+            condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2]
+            assert np.all(np.all(condition_1 == condition_1[0], axis=1))
+            assert np.all(np.all(condition_2 == condition_2[0], axis=1))
+            expanded_arr = np.expand_dims(
+                np.concatenate((condition_1[0, :][None, :], condition_2[0, :][None, :]), axis=0), axis=0
+            )
+            conds = np.tile(expanded_arr, (len(source), 1, 1))
+            
             if return_dl:
                 dls.append(
                     DataLoader(
@@ -126,10 +133,10 @@ def run(cfg: DictConfig):
     adata_train = sc.read_h5ad(cfg.dataset.adata_train_path) 
     adata_test = sc.read_h5ad(cfg.dataset.adata_test_path) 
     adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path) 
-    dl = load_data(adata_train, cfg, return_dl=True)
     train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
     test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
     ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
+    dl = load_data(adata_train, cfg, return_dl=True)
     comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
 
     reconstruct_data_fn = functools.partial(
@@ -139,9 +146,12 @@ def run(cfg: DictConfig):
 
     batch = next(dl)
     output_dim = batch["tgt_lin"].shape[1]
-    condition_dim = batch["src_condition"].shape[1]
+    condition_dim = batch["src_condition"].shape[-1]
 
-    vf = VelocityField(
+    vf = VelocityFieldWithAttention(
+        num_heads=cfg.model.num_heads,
+        qkv_feature_dim=cfg.model.qkv_feature_dim,
+        max_seq_length=cfg.model.max_seq_length,
         hidden_dims=cfg.model.hidden_dims,
         time_dims=cfg.model.time_dims,
         output_dims=cfg.model.output_dims + [output_dim],
@@ -170,7 +180,7 @@ def run(cfg: DictConfig):
 
     training_logs = {"loss": []}
     rng = jax.random.PRNGKey(0)
-    print("starting trainng")
+
     for it in tqdm(range(cfg.training.num_iterations)):
         rng, rng_resample, rng_step_fn = jax.random.split(rng, 3)
         batch = next(dl)
@@ -207,6 +217,10 @@ def run(cfg: DictConfig):
                 mask_fn,
             )
 
+    if cfg.training.save_model:
+        checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+        checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
+    
     return 1.0
 
 
