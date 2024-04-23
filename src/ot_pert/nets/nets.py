@@ -124,3 +124,119 @@ class VelocityFieldWithAttention(nn.Module):
 
         params = self.init(rng, t, x, cond)["params"]
         return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=optimizer)
+
+
+class GENOTVelocityFieldWithAttention(nn.Module):
+    split_dim: int
+    num_heads: int
+    qkv_feature_dim: int
+    max_seq_length: int
+    hidden_dims: Sequence[int]
+    output_dims: Sequence[int]
+    condition_dims: Sequence[int]
+    condition_dims_forward: Sequence[int]
+    condition_dims_post_attention: Sequence[int]
+    time_dims: Optional[Sequence[int]] = None
+    time_encoder: Callable[[jnp.ndarray], jnp.ndarray] = time_encoder.cyclical_time_encoder
+    act_fn: Callable[[jnp.ndarray], jnp.ndarray] = nn.silu
+    pad_max_dim: int = -1
+
+    def __post_init__(self):
+        self.get_masks = jax.jit(get_masks)
+        super().__post_init__()
+
+    @nn.compact
+    def __call__(
+        self,
+        t: jnp.ndarray,
+        x: jnp.ndarray,
+        condition: Optional[jnp.ndarray] = None,
+    ) -> jnp.ndarray:
+        """Forward pass through the neural vector field.
+
+        Args:
+          t: Time of shape ``[batch, 1]``.
+          x: Data of shape ``[batch, ...]``.
+          condition: Conditioning vector of shape ``[batch, ...]``.
+
+        Returns
+        -------
+          Output of the neural vector field of shape ``[batch, output_dim]``.
+        """
+        squeeze_output = False
+        if x.ndim < 2:
+            x = x[None, :]
+            t = jnp.full(shape=(1, 1), fill_value=t)
+            condition = condition[None, :]
+            squeeze_output = True
+
+        time_dims = self.hidden_dims if self.time_dims is None else self.time_dims
+        t = self.time_encoder(t)
+        for time_dim in time_dims:
+            t = self.act_fn(nn.Dense(time_dim)(t))
+
+        for hidden_dim in self.hidden_dims:
+            x = self.act_fn(nn.Dense(hidden_dim)(x))
+
+        assert condition is not None, "No condition sequence was passed."
+        condition_forward = condition[:, 0, : self.split_dim]  # the first split_dim elements are the source data points
+        condition_attention = condition[..., self.split_dim :]  # the remaining elements are conditions
+
+        for cond_dim in self.condition_dims_forward:
+            condition_forward = self.act_fn(nn.Dense(cond_dim)(condition_forward))
+
+        token_shape = (len(condition_attention), 1) if condition_attention.ndim > 2 else (1,)
+        class_token = nn.Embed(num_embeddings=1, features=condition_attention.shape[-1])(
+            jnp.int32(jnp.zeros(token_shape))
+        )
+
+        condition_attention = jnp.concatenate((class_token, condition_attention), axis=-2)
+        mask = self.get_masks(condition_attention)
+
+        attention = nn.MultiHeadDotProductAttention(num_heads=self.num_heads, qkv_features=self.qkv_feature_dim)
+        emb = attention(condition_attention, mask=mask)
+        emb = emb[:, 0, :]  # only continue with token 0
+        for cond_dim in self.condition_dims_post_attention:
+            condition = self.act_fn(nn.Dense(cond_dim)(emb))
+
+        cond_all = jnp.concatenate((condition_forward, condition), axis=1)
+        for cond_dim in self.condition_dims:
+            condition = self.act_fn(nn.Dense(cond_dim)(cond_all))
+
+        feats = jnp.concatenate([t, x, condition], axis=1)
+
+        for output_dim in self.output_dims[:-1]:
+            feats = self.act_fn(nn.Dense(output_dim)(feats))
+
+        # no activation function for the final layer
+        out = nn.Dense(self.output_dims[-1])(feats)
+        return jnp.squeeze(out) if squeeze_output else out
+
+    def create_train_state(
+        self,
+        rng: jax.Array,
+        optimizer: optax.OptState,
+        input_dim: int,
+        condition_dim: Optional[int] = None,
+    ) -> train_state.TrainState:
+        """Create the training state.
+
+        Args:
+          rng: Random number generator.
+          optimizer: Optimizer.
+          input_dim: Dimensionality of the velocity field.
+          condition_dim: Dimensionality of the condition of the velocity field.
+
+        Returns
+        -------
+          The training state.
+        """
+        t, x = jnp.ones((1, 1)), jnp.ones((1, input_dim))
+        if self.condition_dims is None:
+            cond = None
+        else:
+            assert condition_dim > 0, "Condition dimension must be positive."
+            cond = jnp.ones((1, 1, condition_dim))
+
+        params = self.init(rng, t, x, cond)["params"]
+        return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=optimizer)

@@ -3,10 +3,10 @@
 # Default configurations
 defaults:
   - _self_
-  - dataset: sciplex_biolord_split
-  - hparams_search: hparams_sciplex
+  - dataset: sciplex_30
+  - hparams_search: null
   - hydra: conf
-  - model: default
+  - model: sciplex
   - launcher: slurm_icb
   - logger: default
-  - training: training
+  - training: training_sciplex

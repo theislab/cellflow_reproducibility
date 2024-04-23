@@ -3,8 +3,8 @@ from typing import Dict
 import numpy as np
 from ott.geometry import costs, pointcloud
 from ott.tools.sinkhorn_divergence import sinkhorn_divergence
-from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.metrics import pairwise_distances, r2_score
+from sklearn.metrics.pairwise import rbf_kernel
 
 
 def compute_r_squared(x: np.ndarray, y: np.ndarray) -> float:
@@ -52,6 +52,7 @@ def compute_mean_metrics(metrics: Dict[str, Dict[str, float]], prefix: str = "")
         metric_dict[prefix + met] = stat / len(metrics)
     return metric_dict
 
+
 def mmd_distance(x, y, gamma):
     xx = rbf_kernel(x, x, gamma)
     xy = rbf_kernel(x, y, gamma)
@@ -60,7 +61,7 @@ def mmd_distance(x, y, gamma):
     return xx.mean() + yy.mean() - 2 * xy.mean()
 
 
-def compute_scalar_mmd(target, transport, gammas=None): # from CellOT repo
+def compute_scalar_mmd(target, transport, gammas=None):  # from CellOT repo
     if gammas is None:
         gammas = [2, 1, 0.5, 0.1, 0.01, 0.005]
 

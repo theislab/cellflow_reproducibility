@@ -130,11 +130,11 @@ def run(cfg: DictConfig):
         conds = adata_test[adata_test.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
         assert np.all(np.all(conds == conds[0], axis=1))
         conds = np.tile(conds[0], (len(source), 1))
-        test_data_source[cond] = source
-        test_data_target[cond] = target
-        test_data_source_decoded[cond] = source_decoded
-        test_data_target_decoded[cond] = target_decoded
-        test_data_conditions[cond] = conds
+        # test_data_source[cond] = source
+        # test_data_target[cond] = target
+        # test_data_source_decoded[cond] = source_decoded
+        # test_data_target_decoded[cond] = target_decoded
+        # test_data_conditions[cond] = conds
 
     ood_data_source = {}
     ood_data_target = {}
@@ -149,8 +149,8 @@ def run(cfg: DictConfig):
         assert len(src_str) == 1
         source = adata_ood[adata_ood.obs["condition"] == src_str[0] + "_Vehicle_0.0"].obsm[cfg.dataset.obsm_key_data]
         source_decoded = adata_ood[adata_ood.obs["condition"] == src_str[0] + "_Vehicle_0.0"].X.A
-        target = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_data]
-        target_decoded = adata_ood[adata_ood.obs["condition"]==cond].X.A
+        target = adata_ood[adata_ood.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
+        target_decoded = adata_ood[adata_ood.obs["condition"] == cond].X.A
         conds = adata_ood[adata_ood.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
         assert np.all(np.all(conds == conds[0], axis=1))
         conds = np.tile(conds[0], (len(source), 1))
@@ -184,8 +184,6 @@ def run(cfg: DictConfig):
     source_dim = source.shape[1]
     target_dim = source_dim
     condition_dim = conds.shape[1]
-
-    print(cfg)
 
     vf = VelocityField(
         hidden_dims=cfg.model.hidden_dims,
@@ -242,11 +240,11 @@ def run(cfg: DictConfig):
         training_logs["loss"].append(float(loss))
         if (it % cfg.training.valid_freq == 0) and (it > 0):
             idcs = np.random.choice(list(test_data_source.keys()), 20)
-            test_data_source_tmp = {k:v for k,v in test_data_source.items() if k in idcs}
-            test_data_target_tmp = {k:v for k,v in test_data_target.items() if k in idcs}
-            test_data_conditions_tmp = {k:v for k,v in test_data_conditions.items() if k in idcs}
-            test_deg_dict_tmp = {k:v for k,v in test_deg_dict.items() if k in idcs}
-            test_data_target_decoded_tmp = {k:v for k,v in test_data_target_decoded.items() if k in idcs}
+            test_data_source_tmp = {k: v for k, v in test_data_source.items() if k in idcs}
+            test_data_target_tmp = {k: v for k, v in test_data_target.items() if k in idcs}
+            test_data_conditions_tmp = {k: v for k, v in test_data_conditions.items() if k in idcs}
+            test_deg_dict_tmp = {k: v for k, v in test_deg_dict.items() if k in idcs}
+            test_data_target_decoded_tmp = {k: v for k, v in test_data_target_decoded.items() if k in idcs}
             test_data_source
             valid_losses = []
             for cond in test_data_source_tmp.keys():
@@ -278,7 +276,9 @@ def run(cfg: DictConfig):
             # train_deg_target_decoded_predicted = jax.tree_util.tree_map(get_mask, predicted_target_train_decoded, train_deg_dict)
             # train_deg_target_decoded = jax.tree_util.tree_map(get_mask, train_data_target_decoded, test_deg_dict)
 
-            predicted_target_test = jax.tree_util.tree_map(model.transport, test_data_source_tmp, test_data_conditions_tmp)
+            predicted_target_test = jax.tree_util.tree_map(
+                model.transport, test_data_source_tmp, test_data_conditions_tmp
+            )
             test_metrics = jax.tree_util.tree_map(compute_metrics, test_data_target_tmp, predicted_target_test)
             mean_test_metrics = compute_mean_metrics(test_metrics, prefix="test_")
 
@@ -348,7 +348,7 @@ def setup_logger(cfg):
             resolve=True,
             throw_on_missing=True,
         ),
-        dir="/home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/bash_scripts",
+        dir="/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts",
     )
     return wandb
 

@@ -1,0 +1,12 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: combosciplex_30
+  - hparams_search: hparams_sciplex
+  - hydra: conf
+  - model: default_combosciplex
+  - launcher: slurm_icb
+  - logger: default
+  - training: training
