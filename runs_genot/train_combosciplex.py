@@ -184,6 +184,7 @@ def run(cfg: DictConfig):
         condition_dims=cfg.model.condition_dims,
         condition_dims_forward=cfg.model.condition_dims_forward,
         condition_dims_post_attention=cfg.model.condition_dims_post_attention,
+        dropout_rate=cfg.model.dropout_rate,
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
 

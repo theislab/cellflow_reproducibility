@@ -1,0 +1,16 @@
+/home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/train_combosciplex.py:153: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train")
+In 'train': Could not find 'dataset/combosciplex'
+
+Available options in 'dataset':
+	combosciplex_30
+	sciplex_biolord_split
+Config search path:
+	provider=hydra, path=pkg://hydra.conf
+	provider=main, path=file:///home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/conf
+	provider=schema, path=structured://
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
