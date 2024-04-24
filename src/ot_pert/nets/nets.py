@@ -327,12 +327,12 @@ class GENOTVelocityFieldWithAttention(nn.Module):
             x = nn.Dropout(rate=self.dropout_rate, deterministic=not train)(x)
 
         assert condition is not None, "No condition sequence was passed."
-        condition_forward = condition[:, 0, : self.split_dim]  # the first split_dim elements are the source data points
-        condition_attention = condition[..., self.split_dim :]  # the remaining elements are conditions
-
-        for cond_dim in self.condition_dims_forward:
-            condition_forward = self.act_fn(nn.Dense(cond_dim)(condition_forward))
-            condition_forward = nn.Dropout(rate=self.dropout_rate, deterministic=not train)(condition_forward)
+        if return_embedding: # in this case the input is only the condition without the source
+            condition_forward=None
+            condition_attention = condition
+        else:
+            condition_forward = condition[:, 0, : self.split_dim]  # the first split_dim elements are the source data points
+            condition_attention = condition[..., self.split_dim :]  # the remaining elements are conditions
 
         token_shape = (len(condition_attention), 1) if condition_attention.ndim > 2 else (1,)
         class_token = nn.Embed(num_embeddings=1, features=condition_attention.shape[-1])(
@@ -351,6 +351,10 @@ class GENOTVelocityFieldWithAttention(nn.Module):
             
         if return_embedding:
            return condition
+        
+        for cond_dim in self.condition_dims_forward:
+            condition_forward = self.act_fn(nn.Dense(cond_dim)(condition_forward))
+            condition_forward = nn.Dropout(rate=self.dropout_rate, deterministic=not train)(condition_forward)
 
         cond_all = jnp.concatenate((condition_forward, condition), axis=1)
         for cond_dim in self.condition_dims:
