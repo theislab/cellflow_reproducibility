@@ -33,6 +33,7 @@ hydra:
       model.epsilon: choice(1.0, 0.1, 0.01)
       model.tau_a: choice(1.0, 0.999, 0.99, 0.95)
       model.tau_b: choice(1.0, 0.999, 0.99, 0.95)
+      model.dropout_rate: choice(0.0, 0.1, 0.2, 0.5)
       training.num_iterations: choice(20000, 30000, 50000)
 
       training.batch_size: choice(512, 1024, 2048)

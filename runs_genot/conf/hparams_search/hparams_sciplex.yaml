@@ -12,9 +12,9 @@ hydra:
 
     direction: minimize
 
-    n_jobs: 100
+    n_jobs: 1000
 
-    n_trials: 100
+    n_trials: 1000
 
     sampler:
       _target_: optuna.samplers.RandomSampler
@@ -31,6 +31,7 @@ hydra:
       model.epsilon: choice(1.0, 0.1, 0.01)
       model.tau_a: choice(1.0, 0.999, 0.99)
       model.tau_b: choice(1.0, 0.999, 0.99)
+      model.dropout_rate: choice(0.0, 0.1, 0.2, 0.5)
       training.num_iterations: choice(200000, 500000, 1000000)
 
       training.batch_size: choice(512, 1024, 2048)

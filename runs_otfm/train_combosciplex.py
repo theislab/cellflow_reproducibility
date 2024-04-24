@@ -14,7 +14,6 @@ from omegaconf import DictConfig, OmegaConf
 from ott.neural import datasets
 from ott.neural.methods.flows import dynamics, otfm
 from ott.neural.networks.layers import time_encoder
-from ott.neural.networks.velocity_field import VelocityField
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -156,6 +155,7 @@ def run(cfg: DictConfig):
         time_dims=cfg.model.time_dims,
         output_dims=cfg.model.output_dims + [output_dim],
         condition_dims=cfg.model.condition_dims,
+        dropout_rate=cfg.model.dropout_rate,
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
 
