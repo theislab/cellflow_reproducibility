@@ -10,7 +10,7 @@
 
 #SBATCH --qos=gpu_normal
 
-#SBATCH --constraint=a100_80gb
+#SBATCH --constraint=a100_40gb|a100_80gb
 
 #SBATCH --gres=gpu:1
 
