@@ -1,27 +1,28 @@
 import functools
+import os
 import sys
 import traceback
-from typing import Optional, Literal, Tuple, Dict
+from typing import Dict, Literal, Optional, Tuple
+
 import hydra
 import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
 import numpy as np
 import optax
+import orbax
 import scanpy as sc
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from ott.neural import datasets
 from ott.neural.methods.flows import dynamics, genot
 from ott.neural.networks.layers import time_encoder
-from ot_pert.nets.nets import CondVelocityField
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-import orbax
-import os
 
 from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
+from ot_pert.nets.nets import CondVelocityField
 from ot_pert.utils import ConditionalLoader
 
 
@@ -95,11 +96,13 @@ def load_data(adata, cfg, *, return_dl: bool):
         "deg_dict": deg_dict,
     }
 
+
 def prepare_data(
-    batch: Dict[str, jnp.ndarray]
-    ) -> Tuple[Tuple[jnp.ndarray, Optional[jnp.ndarray], jnp.ndarray],
-            Tuple[jnp.ndarray, jnp.ndarray, Optional[jnp.ndarray],
-                    Optional[jnp.ndarray]]]:
+    batch: Dict[str, jnp.ndarray],
+) -> Tuple[
+    Tuple[jnp.ndarray, Optional[jnp.ndarray], jnp.ndarray],
+    Tuple[jnp.ndarray, jnp.ndarray, Optional[jnp.ndarray], Optional[jnp.ndarray]],
+]:
     src_lin, src_quad = batch.get("src_lin"), batch.get("src_quad")
     tgt_lin, tgt_quad = batch.get("tgt_lin"), batch.get("tgt_quad")
 
@@ -109,9 +112,7 @@ def prepare_data(
     elif src_lin is None and tgt_lin is None:  # quad
         src, tgt = src_quad, tgt_quad
         arrs = src_quad, tgt_quad
-    elif all(
-        arr is not None for arr in (src_lin, tgt_lin, src_quad, tgt_quad)
-    ):  # fused quad
+    elif all(arr is not None for arr in (src_lin, tgt_lin, src_quad, tgt_quad)):  # fused quad
         src = jnp.concatenate([src_lin, src_quad], axis=1)
         tgt = jnp.concatenate([tgt_lin, tgt_quad], axis=1)
         arrs = src_quad, tgt_quad, src_lin, tgt_lin
@@ -119,6 +120,7 @@ def prepare_data(
         raise RuntimeError("Cannot infer OT problem type from data.")
 
     return (src, batch.get("src_condition"), tgt), arrs
+
 
 def data_match_fn(
     src_lin: Optional[jnp.ndarray],
@@ -150,9 +152,9 @@ def get_mask(x, y, var_names):
 def run(cfg: DictConfig):
     """Main function to handle model training and evaluation."""
     logger = setup_logger(cfg)
-    adata_train = sc.read_h5ad(cfg.dataset.adata_train_path) 
-    adata_test = sc.read_h5ad(cfg.dataset.adata_test_path) 
-    adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path) 
+    adata_train = sc.read_h5ad(cfg.dataset.adata_train_path)
+    adata_test = sc.read_h5ad(cfg.dataset.adata_test_path)
+    adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path)
     dl = load_data(adata_train, cfg, return_dl=True)
     train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
     test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
@@ -201,46 +203,42 @@ def run(cfg: DictConfig):
 
     training_logs = {"loss": []}
     rng = jax.random.PRNGKey(0)
-    
+
     for it in tqdm(range(cfg.training.num_iterations)):
         batch = next(iter(dl))
         batch = jtu.tree_map(jnp.asarray, batch)
         rng = jax.random.split(rng, 5)
         rng, rng_resample, rng_noise, rng_time, rng_step_fn = rng
-        
+
         batch = jtu.tree_map(jnp.asarray, batch)
         (src, src_cond, tgt), matching_data = prepare_data(batch)
-        
+
         n = src.shape[0]
         time = model.time_sampler(rng_time, n * model.n_samples_per_src)
         latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
-        
+
         tmat = model.data_match_fn(*matching_data)  # (n, m)
         src_ixs, tgt_ixs = solver_utils.sample_conditional(  # (n, k), (m, k)
-        rng_resample,
-        tmat,
-        k=model.n_samples_per_src,
+            rng_resample,
+            tmat,
+            k=model.n_samples_per_src,
         )
-        
+
         src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
         if src_cond is not None:
             src_cond = src_cond[src_ixs]
-        
+
         if model.latent_match_fn is not None:
             src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
-        
+
         src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
         tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
         latent = latent.reshape(-1, *latent.shape[2:])
         if src_cond is not None:
             src_cond = src_cond.reshape(-1, *src_cond.shape[2:])
 
-        
-        
-        loss, model.vf_state = model.step_fn(
-        rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond
-        )
-        
+        loss, model.vf_state = model.step_fn(rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond)
+
         training_logs["loss"].append(float(loss))
         if (it % cfg.training.valid_freq == 0) and (it > 0):
             train_loss = np.mean(training_logs["loss"][-cfg.training.valid_freq :])
@@ -259,21 +257,20 @@ def run(cfg: DictConfig):
         checkpointer = orbax.checkpoint.PyTreeCheckpointer()
         checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
 
-
     return 1.0
 
 
 def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_fn, mask_fn):
     for k, dat in data.items():
         if k == "test":
-            n_samples = cfg.training.n_test_samples 
+            n_samples = cfg.training.n_test_samples
         if k == "train":
-            n_samples = cfg.training.n_train_samples 
+            n_samples = cfg.training.n_train_samples
         if k == "ood":
-            n_samples = cfg.training.n_ood_samples 
-                
+            n_samples = cfg.training.n_ood_samples
+
         if n_samples != 0:
-            if n_samples > 0: 
+            if n_samples > 0:
                 idcs = np.random.choice(list(list(dat.values())[0]), n_samples)
                 dat_source = {k: v for k, v in dat["source"].items() if k in idcs}
                 dat_target = {k: v for k, v in dat["target"].items() if k in idcs}
@@ -286,23 +283,23 @@ def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_f
                 dat_conditions = dat["conditions"]
                 dat_deg_dict = dat["deg_dict"]
                 dat_target_decoded = dat["target_decoded"]
-            
+
             prediction = jtu.tree_map(model.transport, dat_source, dat_conditions)
             metrics = jtu.tree_map(comp_metrics_fn, dat_target, prediction)
             mean_metrics = compute_mean_metrics(metrics, prefix=f"{k}_")
             log_metrics.update(mean_metrics)
-    
+
             prediction_decoded = jtu.tree_map(reconstruct_data_fn, prediction)
             metrics_decoded = jtu.tree_map(comp_metrics_fn, dat_target_decoded, prediction_decoded)
             mean_metrics_decoded = compute_mean_metrics(metrics_decoded, prefix=f"decoded_{k}_")
             log_metrics.update(mean_metrics_decoded)
-    
+
             prediction_decoded_deg = jtu.tree_map(mask_fn, prediction_decoded, dat_deg_dict)
             target_decoded_deg = jax.tree_util.tree_map(mask_fn, dat_target_decoded, dat_deg_dict)
             metrics_deg = jtu.tree_map(comp_metrics_fn, target_decoded_deg, prediction_decoded_deg)
             mean_metrics_deg = compute_mean_metrics(metrics_deg, prefix=f"deg_{k}_")
             log_metrics.update(mean_metrics_deg)
-            
+
     wandb.log(log_metrics)
 
 

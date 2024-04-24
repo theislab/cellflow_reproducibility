@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -o h-sciplex.out
+#SBATCH -o h-g-sciplex.out
 
 #SBATCH -e h-sciplex.err
 
