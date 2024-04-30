@@ -6,3 +6,4 @@ fast_metrics: True
 n_test_samples: 10
 n_train_samples: 0
 n_ood_samples: -1
+save_model: False
