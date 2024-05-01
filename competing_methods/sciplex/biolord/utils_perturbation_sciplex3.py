@@ -29,7 +29,7 @@ def compute_prediction(
     dataset,
     dataset_control
 ):
-    pert_categories_index = pd.Index(adata.obs["cov_drug_dose_name"].values, dtype="category")
+    pert_categories_index = pd.Index(adata.obs["condition"].values, dtype="category")
 
     cl_dict = {
         torch.Tensor([0.]): "A549",
