@@ -2,9 +2,9 @@
 
 #SBATCH -o h-g-sciplex.out
 
-#SBATCH -e h-sciplex.err
+#SBATCH -e h-g-sciplex.err
 
-#SBATCH -J h-sciplex
+#SBATCH -J h-g-sciplex
 
 #SBATCH -p gpu_p
 

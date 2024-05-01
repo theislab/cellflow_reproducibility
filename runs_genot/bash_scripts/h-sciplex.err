@@ -1,7 +1,0 @@
-/home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/train_sciplex.py:147: UserWarning:
-The version_base parameter is not specified.
-Please specify a compatability version level, or None.
-Will assume defaults for version 1.1
-  @hydra.main(config_path="conf", config_name="train")
-[32m[I 2024-04-23 11:23:33,272][0m A new study created in memory with name: no-name-95a74e9d-495c-4424-8fcf-3eb51e9c67dc[0m
-slurmstepd: error: *** JOB 20148907 ON gpusrv38 CANCELLED AT 2024-04-24T09:23:16 ***

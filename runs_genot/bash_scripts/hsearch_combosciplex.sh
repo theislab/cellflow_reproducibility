@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH -o h-sciplex.out
+#SBATCH -o h-g-csciplex.out
 
-#SBATCH -e h-sciplex.err
+#SBATCH -e h-g-csciplex.err
 
-#SBATCH -J h-sciplex
+#SBATCH -J h-g-csciplex
 
 #SBATCH -p gpu_p
 
