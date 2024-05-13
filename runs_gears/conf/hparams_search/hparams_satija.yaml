@@ -1,0 +1,26 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: ood_sinkhorn_div_1
+
+hydra:
+  sweeper:
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 9
+
+    n_trials: 18
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+
+    # define hyperparameter search space
+    params:
+      model.hidden_size: choice(32, 64, 128)
+      training.batch_size: choice(32, 128, 512)
+      training.num_iterations: choice(1000, 10000)

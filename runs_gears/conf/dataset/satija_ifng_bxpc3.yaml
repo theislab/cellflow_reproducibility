@@ -1,0 +1,8 @@
+base_path: /home/icb/lea.zimmermann/projects/pertot/gears/data/satija
+train_data: /home/icb/lea.zimmermann/projects/pertot/gears/data/satija/satija_ifng_bxpc3
+custom_split: /home/icb/lea.zimmermann/projects/pertot/gears/data/satija/satija_ifng_bxpc3/custom_split.pkl
+test_data: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/r2
+pathway: IFNG
+cell_type: BXPC3
+obsm_key_data: X_pca
+obsm_key_cond: cond_emb

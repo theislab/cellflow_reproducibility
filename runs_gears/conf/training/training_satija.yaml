@@ -1,0 +1,12 @@
+valid_freq: 10000
+num_iterations: 100000
+batch_size: 512
+out_dir: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/out/gears
+fast_metrics: True
+n_test_samples: 10
+n_train_samples: 0
+n_ood_samples: -1
+save_model: False
+seed: 1
+weight_decay: 5e-4
+learning_rate: 0.001

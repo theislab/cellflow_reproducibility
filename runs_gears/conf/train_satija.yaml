@@ -1,0 +1,12 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: satija_ifng_bxpc3
+  - hparams_search: null
+  - hydra: conf
+  - model: satija
+  - launcher: slurm_icb
+  - logger: satija_ifng
+  - training: training_satija
