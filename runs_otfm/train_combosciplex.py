@@ -220,8 +220,9 @@ def run(cfg: DictConfig):
             )
 
     if cfg.training.save_model:
-        checkpointer = orbax.checkpoint.PyTreeCheckpointer()
-        checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
+        import pickle
+        with open(f"{cfg.conf.run.dir}/model.pkl", 'wb') as f:
+            pickle.dump(model.vf_state.params, f)
 
     return 1.0
 

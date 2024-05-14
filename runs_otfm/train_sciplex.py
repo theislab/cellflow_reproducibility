@@ -199,7 +199,7 @@ def run(cfg: DictConfig):
         )
 
         training_logs["loss"].append(float(loss))
-        if (it % cfg.training.valid_freq == 0) and (it > 0):
+        if ((it-1) % cfg.training.valid_freq == 0) and (it > 1):
             train_loss = np.mean(training_logs["loss"][-cfg.training.valid_freq :])
             log_metrics = {"train_loss": train_loss}
             eval_step(
@@ -212,9 +212,9 @@ def run(cfg: DictConfig):
                 mask_fn,
             )
     if cfg.training.save_model:
-        checkpointer = orbax.checkpoint.PyTreeCheckpointer()
-        checkpointer.save(os.path.join(cfg.conf.run.dir, "model"), model.vf_state)
-
+        import pickle
+        with open(f"{cfg.conf.run.dir}/model.pkl", 'wb') as f:
+            pickle.dump(model.vf_state.params, f)
     return 1.0
 
 

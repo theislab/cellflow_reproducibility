@@ -4,7 +4,6 @@
 defaults:
   - _self_
   - dataset: sciplex_30
-  - hparams_search: null
   - hydra: conf
   - model: sciplex
   - launcher: slurm_icb
