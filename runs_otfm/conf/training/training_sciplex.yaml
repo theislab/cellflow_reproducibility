@@ -1,0 +1,10 @@
+valid_freq: 50000
+num_iterations: 2000000
+batch_size: 1024
+out_dir: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/out
+fast_metrics: True
+n_test_samples: 10
+n_train_samples: 0
+n_ood_samples: -1
+save_model: True
+save_path: /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/sciplex_biolord_split

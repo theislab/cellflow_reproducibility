@@ -1,0 +1,11 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: sciplex_30
+  - hydra: conf
+  - model: sciplex
+  - launcher: slurm_icb
+  - logger: default
+  - training: training_sciplex

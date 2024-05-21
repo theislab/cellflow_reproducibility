@@ -1,0 +1,39 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: ood_sinkhorn_div_1
+
+hydra:
+  sweeper:
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 1000
+
+    n_trials: 1000
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+
+    # define hyperparameter search space
+    params:
+      model.num_heads: choice(2, 4, 8)
+      model.qkv_feature_dim: choice(16, 32, 64, 128, 256)
+      model.output_dims: choice([512, 512, 512], [1024, 1024, 1024], [512, 512, 512, 512], [1024, 1024, 1024, 1024])
+      model.hidden_dims: choice([512, 512, 512], [1024, 1024, 1024], [512, 512, 512, 512], [1024, 1024, 1024, 1024])
+      model.time_dims: choice([256, 256, 256], [512, 512, 512], [1024, 1024, 1024])
+      model.condition_dims: choice([32, 32], [128, 128], [256, 256], [32, 32, 32], [128, 128, 128], [256, 256, 256])
+      model.flow_noise: choice(0.5, 1.0)
+      model.learning_rate: choice(0.0001, 0.00005)
+      model.multi_steps: choice(20, 50, 100)
+      model.epsilon: choice(1.0, 0.1, 0.01)
+      model.tau_a: choice(1.0, 0.999, 0.99, 0.95)
+      model.tau_b: choice(1.0, 0.999, 0.99, 0.95)
+      model.dropout_rate: choice(0.0, 0.1, 0.2)
+      training.num_iterations: choice(20000, 30000, 50000)
+
+      training.batch_size: choice(512, 1024, 2048)
