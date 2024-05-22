@@ -1,4 +1,4 @@
 run:
-  dir: /lustre/groups/ml01/workspace/ot_pert_new/output/${now:%Y-%m-%d}_${now:%H-%M-%S}
+  dir: /lustre/groups/ml01/workspace/ot_perturbation/output/${now:%Y-%m-%d}_${now:%H-%M-%S}
 sweep:
-  dir: /lustre/groups/ml01/workspace/ot_pert_new/output/${now:%Y-%m-%d}_${now:%H-%M-%S}
+  dir: /lustre/groups/ml01/workspace/ot_perturbation/output/${now:%Y-%m-%d}_${now:%H-%M-%S}

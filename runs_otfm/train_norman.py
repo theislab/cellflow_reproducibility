@@ -141,12 +141,12 @@ def run(cfg: DictConfig):
     ood_data_conditions = {}
     adata_ood = sc.read(cfg.dataset.adata_ood_path)
     source = adata_ood[adata_ood.obs["condition"]=="control"].obsm[cfg.dataset.obsm_key_data]
-    source_decoded = adata_ood[adata_test.obs["condition"]=="control"].X
+    source_decoded = adata_ood[adata_ood.obs["condition"]=="control"].X
     for cond in adata_ood.obs["condition"].cat.categories:
         if cond == "control":
             continue
         target = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_data]
-        target_decoded = adata_test[adata_ood.obs["condition"]==cond].X.A
+        target_decoded = adata_ood[adata_ood.obs["condition"]==cond].X.A
         condition_1 = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_1]
         condition_2 = adata_ood[adata_ood.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_cond_2]
         assert np.all(np.all(condition_1 == condition_1[0], axis=1))
@@ -286,7 +286,7 @@ def setup_logger(cfg):
             resolve=True,
             throw_on_missing=True,
         ),
-        dir = "/home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/bash_scripts",
+        #dir = "/home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/bash_scripts",
     )
     return wandb
     
