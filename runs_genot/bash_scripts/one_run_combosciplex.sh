@@ -8,13 +8,15 @@
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_normal
+#SBATCH --qos=gpu_long
+
+#SBATCH --constraint=a100_40gb|a100_80gb
 
 #SBATCH --gres=gpu:1
 
 #SBATCH --mem=160G
 
-#SBATCH -t 1-00:00
+#SBATCH -t 4-00:00
 
 #SBATCH --nice=1
 

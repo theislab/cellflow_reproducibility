@@ -1,9 +1,10 @@
 valid_freq: 5000
-num_iterations: 100000
+num_iterations: 300000
 batch_size: 1024
 out_dir: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/out
 fast_metrics: True
 n_test_samples: 10
 n_train_samples: 0
 n_ood_samples: -1
-save_model: False
+save_model: True
+save_path: /lustre/groups/ml01/workspace/ot_perturbation/models/genot/combosciplex
