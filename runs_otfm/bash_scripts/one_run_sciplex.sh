@@ -24,4 +24,4 @@ source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate /home/icb/dominik.klein/mambaforge/envs/ot_pert_genot
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py dataset=sciplex_biolord_split logger=sciplex training=training_sciplex training.save_model=True launcher=slurm_icb
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py dataset=sciplex_biolord_split_all logger=sciplex training=training_sciplex training.save_model=True launcher=slurm_icb
