@@ -1,0 +1,7 @@
+adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/adata_train_1_seen_genes.h5ad
+adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/adata_test_1_seen_genes.h5ad
+adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/adata_ood_1_seen_genes.h5ad
+obsm_key_data: X_pca
+obsm_key_cond_1: emb_1
+obsm_key_cond_2: emb_2
+wandb_project: otfm_norman_1seen

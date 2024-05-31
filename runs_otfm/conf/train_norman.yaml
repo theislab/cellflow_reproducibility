@@ -3,10 +3,10 @@
 # Default configurations
 defaults:
   - _self_
-  - dataset: norman 
-  - hparams_search: hparams_otfm
+  - dataset: norman_0seen
+  - hparams_search: hparams_norman
   - hydra: conf_norman
-  - model: default
+  - model: combosciplex
   - launcher: slurm_icb
   - logger: default_norman
   - training: training_norman
