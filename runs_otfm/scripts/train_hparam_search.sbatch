@@ -11,5 +11,4 @@
 source $HOME/.bashrc
 conda activate ot_pert_genot
 
-python ../train.py --multirun launcher=slurm_icb logger=hparam_search 
-
+python ../train.py --multirun launcher=slurm_icb logger=hparam_search

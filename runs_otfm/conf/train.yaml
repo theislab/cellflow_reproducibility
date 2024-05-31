@@ -3,11 +3,10 @@
 # Default configurations
 defaults:
   - _self_
-  - dataset: combosciplex 
+  - dataset: combosciplex
   - hparams_search: hparams_otfm
   - hydra: conf
   - model: default
   - launcher: slurm_icb
   - logger: default
   - training: training
-  

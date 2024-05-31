@@ -1,27 +1,23 @@
-import hydra
-import wandb
-import sys
-from omegaconf import DictConfig
-import jax.numpy as jnp
-from jax import random
-import jax
+import os
 import pathlib
-import optax
-import yaml
+import sys
 from datetime import datetime
+
+import hydra
+import jax
+import optax
+import scanpy as sc
+import wandb
+import yaml
+from omegaconf import DictConfig
 from ott.geometry import costs
-from ott.neural.flow_models.genot import GENOTLin, GENOTQuad
+from ott.neural.data import datasets
+from ott.neural.flow_models.genot import GENOTLin
 from ott.neural.flow_models.models import VelocityField
 from ott.neural.flow_models.samplers import uniform_sampler
 from ott.neural.models import base_solver
-from ott.neural.models.nets import RescalingMLP
-from ott.solvers.linear import sinkhorn, sinkhorn_lr
-from ott.solvers.quadratic import gromov_wasserstein, gromov_wasserstein_lr
-from torch.utils.data import DataLoader
-from ott.neural.data import datasets
-import os
+from ott.solvers.linear import sinkhorn
 
-import scanpy as sc
 from ot_pert.metrics import compute_metrics
 
 
@@ -33,10 +29,12 @@ def train(cfg: DictConfig):
     Args:
         cfg (DictConfig): Configuration parameters.
 
-    Raises:
+    Raises
+    ------
         Exception: Any exception during training.
 
-    Returns:
+    Returns
+    -------
         None
     """
     # initialize wandb
@@ -44,12 +42,12 @@ def train(cfg: DictConfig):
     full_save_path = pathlib.Path(cfg.data.output_dir, name_tag)
     if cfg.wandb.use_wandb:
         wandb.init(
-        project=cfg.wandb.project,
-        config=cfg,
-        name=name_tag,
-        entity="ot_pert",
-    )
-        
+            project=cfg.wandb.project,
+            config=cfg,
+            name=name_tag,
+            entity="ot_pert",
+        )
+
     if not os.path.exists(full_save_path):
         os.makedirs(full_save_path)
     with open(pathlib.Path(full_save_path, "config.yaml"), "+w") as f:
@@ -59,19 +57,15 @@ def train(cfg: DictConfig):
     adata_train = sc.read(cfg.dataset.adata_train_path)
     dss = []
     for cell_line in adata_train.obs["cell_line"].cat.categories:
-        adata_cell_line = adata_train[adata_train.obs["cell_line"]==cell_line]
-        source = adata_cell_line[adata_cell_line.obs["condition"]=="control"].obsm[cfg.dataset.obsm_key_train_data]
+        adata_cell_line = adata_train[adata_train.obs["cell_line"] == cell_line]
+        source = adata_cell_line[adata_cell_line.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_train_data]
         for cond in adata_cell_line.obs["condition"].cat.categories:
             if cond == "control":
                 continue
-            target = adata_cell_line[adata_cell_line.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_train_data]
-            conditions = adata_cell_line[adata_cell_line.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_train_data]
-            dss.append(datasets.OTDataset(
-                lin=source,
-                target_lin=target,
-                conditions=conditions
-            ))
-    
+            target = adata_cell_line[adata_cell_line.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_train_data]
+            conditions = adata_cell_line[adata_cell_line.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_train_data]
+            dss.append(datasets.OTDataset(lin=source, target_lin=target, conditions=conditions))
+
     train_loader = datasets.ConditionalOTDataset(dss, seed=cfg.get("seed"))
 
     valid_data_source = {}
@@ -79,34 +73,33 @@ def train(cfg: DictConfig):
     valid_data_target = {}
     adata_valid = sc.read(cfg.dataset.adata_valid_path)
     for cell_line in adata_valid.obs["cell_line"].cat.categories:
-        adata_cell_line = adata_valid[adata_valid.obs["cell_line"]==cell_line]
-        source = adata_cell_line[adata_cell_line.obs["condition"]=="control"].obsm[cfg.dataset.obsm_key_valid_data]
+        adata_cell_line = adata_valid[adata_valid.obs["cell_line"] == cell_line]
+        source = adata_cell_line[adata_cell_line.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_valid_data]
         for cond in adata_cell_line.obs["condition"].cat.categories:
             if cond == "control":
                 continue
-            target = adata_cell_line[adata_cell_line.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_valid_data]
-            conditions = adata_cell_line[adata_cell_line.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_valid_data]
+            target = adata_cell_line[adata_cell_line.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_valid_data]
+            conditions = adata_cell_line[adata_cell_line.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_valid_data]
             valid_data_source[cell_line][cond] = source
             valid_data_target[cell_line][cond] = target
             valid_data_conditions[cell_line][cond] = conditions
-
 
     test_data_source = {}
     test_data_target = {}
     test_data_conditions = {}
     adata_test = sc.read(cfg.dataset.adata_test_path)
     for cell_line in adata_test.obs["cell_line"].cat.categories:
-        adata_cell_line = adata_test[adata_test.obs["cell_line"]==cell_line]
-        source = adata_cell_line[adata_cell_line.obs["condition"]=="control"].obsm[cfg.dataset.obsm_key_test_data]
+        adata_cell_line = adata_test[adata_test.obs["cell_line"] == cell_line]
+        source = adata_cell_line[adata_cell_line.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_test_data]
         for cond in adata_cell_line.obs["condition"].cat.categories:
             if cond == "control":
                 continue
-            target = adata_cell_line[adata_cell_line.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_test_data]
-            conditions = adata_cell_line[adata_cell_line.obs["condition"]==cond].obsm[cfg.dataset.obsm_key_test_data]
+            target = adata_cell_line[adata_cell_line.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_test_data]
+            conditions = adata_cell_line[adata_cell_line.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_test_data]
             test_data_source[cell_line][cond] = source
             test_data_target[cell_line][cond] = target
             test_data_conditions[cell_line][cond] = conditions
-    
+
     source_dim = source.shape[1]
     target_dim = source_dim
     condition_dim = conditions.shape[1]
@@ -116,7 +109,7 @@ def train(cfg: DictConfig):
         condition_dim=source_dim + condition_dim,
         latent_embed_dim=cfg.models.latent_embed_dim,
     )
-    ot_solver = sinkhorn.Sinkhorn() 
+    ot_solver = sinkhorn.Sinkhorn()
     ot_matcher = base_solver.OTMatcherLinear(
         ot_solver, cost_fn=costs.SqEuclidean(), tau_a=cfg.models.tau_a, tau_b=cfg.models.tau_b
     )
@@ -136,11 +129,9 @@ def train(cfg: DictConfig):
         time_sampler=time_sampler,
         k_samples_per_x=cfg.models.k_samples_per_x,
     )
-    
-    # Train, we don't use the valid_loader, so this can be the train_loader 
-    genot(
-        train_loader, train_loader
-    )
+
+    # Train, we don't use the valid_loader, so this can be the train_loader
+    genot(train_loader, train_loader)
     # Predict
     predicted_target_valid = jax.tree_util.tree_map(genot.transport, valid_data_source, valid_data_conditions)
     predicted_target_test = jax.tree_util.tree_map(genot.transport, test_data_source, test_data_conditions)
@@ -148,7 +139,7 @@ def train(cfg: DictConfig):
     # compute metrics
     valid_metrics = jax.tree_util.tree_map(compute_metrics, valid_data_target, predicted_target_valid)
     test_metrics = jax.tree_util.tree_map(compute_metrics, test_data_target, predicted_target_test)
-	
+
     table = wandb.Table(columns=["metric", "cell_line", "condition", "value"])
     for metric in test_metrics.keys():
         for cell_line in test_metrics.keys():
@@ -159,13 +150,14 @@ def train(cfg: DictConfig):
                     condition,
                     test_metrics[metric][cell_line][condition],
                 )
-	
+
     wandb.log({"table": table})
     wandb.finish()
-    
-    
+
+
 if __name__ == "__main__":
     import traceback
+
     try:
         train()
     except Exception:
