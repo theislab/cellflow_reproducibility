@@ -24,4 +24,4 @@ source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate /home/icb/dominik.klein/mambaforge/envs/ot_pert_genot
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/train_combosciplex.py dataset=combosciplex model=combosciplex training=training_combosciplex logger=combosciplex
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/train_combosciplex.py dataset=combosciplex_300 model=combosciplex training=training_combosciplex logger=combosciplex

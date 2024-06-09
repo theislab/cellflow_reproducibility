@@ -12,9 +12,9 @@ hydra:
 
     direction: minimize
 
-    n_jobs: 1000
+    n_jobs: 100
 
-    n_trials: 1000
+    n_trials: 100
 
     sampler:
       _target_: optuna.samplers.RandomSampler
@@ -22,20 +22,20 @@ hydra:
     # define hyperparameter search space
     params:
       model.num_heads: choice(2, 4, 8)
-      model.qkv_feature_dim: choice(16, 32, 64, 128, 256)
-      model.output_dims: choice([512, 512, 512], [1024, 1024, 1024], [512, 512, 512, 512], [1024, 1024, 1024, 1024])
-      model.hidden_dims: choice([512, 512, 512], [1024, 1024, 1024], [512, 512, 512, 512], [1024, 1024, 1024, 1024])
-      model.time_dims: choice([256, 256, 256], [512, 512, 512])
-      model.condition_dims: choice([256, 256, 256], [512, 512, 512],  [1024, 1024, 1024])
-      model.condition_dims_forward: choice([512, 512, 512], [1024, 1024, 1024], [512, 512, 512, 512], [1024, 1024, 1024, 1024])
-      model.condition_dims_post_attention: choice([32, 32, 32], [128, 128, 128], [256, 256, 256])
+      model.qkv_feature_dim: choice(16, 32, 64)
+      model.output_dims:  choice([1024, 1024, 1024, 1024], [4096, 4096, 4096], [4096, 4096, 4096, 4096], [8192, 8192, 8192])
+      model.hidden_dims: choice([1024, 1024, 1024], [1024, 1024, 1024, 1024], [4096, 4096, 4096], [4096, 4096, 4096, 4096])
+      model.time_dims: choice([512, 512, 512], [1024, 1024, 1024])
+      model.condition_dims: choice([1024, 1024, 1024],  [4096, 4096, 4096])
+      model.condition_dims_forward: choice([1024, 1024, 1024],  [4096, 4096, 4096])
+      model.condition_dims_post_attention: choice([32, 32, 32], [128, 128, 128], [512, 512, 512])
       model.flow_noise: choice(0.5, 1.0)
       model.learning_rate: choice(0.0001, 0.00005)
-      model.multi_steps: choice(20, 50, 100)
-      model.epsilon: choice(1.0, 0.1, 0.01)
-      model.tau_a: choice(1.0, 0.999, 0.99)
-      model.tau_b: choice(1.0, 0.999, 0.99)
-      model.dropout_rate: choice(0.0, 0.1, 0.2)
-      training.num_iterations: choice(30000, 50000, 100000)
+      model.multi_steps: choice(20, 50)
+      model.epsilon: choice(0.1)
+      model.tau_a: choice(0.999)
+      model.tau_b: choice(0.999)
+      model.dropout_rate: choice(0.0, 0.2, 0.4)
+      training.num_iterations: choice(100000)
 
-      training.batch_size: choice(512, 1024, 2048)
+      training.batch_size: choice(1024)

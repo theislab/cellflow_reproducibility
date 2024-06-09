@@ -1,0 +1,12 @@
+hidden_dims: [2048, 2048, 2048, 2048]
+output_dims: [2048, 2048, 2048, 2048]
+condition_dims: [1024, 1024, 1024]
+time_dims: [2048, 2048, 2048]
+time_n_freqs: 2048
+flow_noise: 0.0
+learning_rate: 0.00005
+multi_steps: 50
+epsilon: 0.01
+tau_a: 0.999
+tau_b: 0.999
+dropout_rate: 0.0

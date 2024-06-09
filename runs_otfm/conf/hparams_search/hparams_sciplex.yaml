@@ -12,27 +12,27 @@ hydra:
 
     direction: minimize
 
-    n_jobs: 1000
+    n_jobs: 10
 
-    n_trials: 1000
+    n_trials: 10
 
     sampler:
       _target_: optuna.samplers.RandomSampler
 
     # define hyperparameter search space
     params:
-      model.output_dims: choice([1024, 1024, 1024])
-      model.hidden_dims: choice([1024, 1024, 1024])
-      model.time_dims: choice([512, 512, 512])
-      model.condition_dims: choice([4096, 4096, 4096])
-      model.flow_noise: choice(1.0)
+      model.output_dims: choice([1024, 1024, 1024], [2048, 2048, 2048], [4096, 4096, 4096])
+      model.hidden_dims: choice([1024, 1024, 1024], [2048, 2048, 2048], [4096, 4096, 4096])
+      model.time_dims: choice([1024, 1024 1024])
+      model.condition_dims: choice([4096, 4096, 4096], [2048, 2048, 2048],[1024, 1024, 1024], [512, 512, 512], [256, 256, 256], [128, 128, 128], [64, 64, 64])
+      model.flow_noise: choice(0.0, 0.5, 1.0)
       model.learning_rate: choice(0.0001, 0.00005)
       model.multi_steps: choice(20, 50)
       model.epsilon: choice(0.01)
       model.tau_a: choice(0.999)
       model.tau_b: choice(0.999)
-      model.dropout_rate: choice(0.0, 0.1, 0.2)
-      training.num_iterations: choice(200000, 2000000, 10000000)
+      model.dropout_rate: choice(0.0, 0.1, 0.2, 0.3)
+      training.num_iterations: choice(200000, 500000, 1000000)
 
       training.batch_size: choice(1024)
       dataset.obsm_key_cond: choice(ecfp_cell_line_logdose_more_dose)
