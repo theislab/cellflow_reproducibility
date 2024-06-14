@@ -1,5 +1,5 @@
 valid_freq: 5000
-num_iterations: 20000
+num_iterations: 200000
 batch_size: 1024
 out_dir: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/out
 fast_metrics: True

@@ -33,6 +33,7 @@ hydra:
       model.epsilon: choice(1.0, 0.1, 0.01)
       model.tau_a: choice(0.999)
       model.tau_b: choice(0.999)
+      model.flow_type: choice("constant", "bridge")
       model.dropout_rate: choice(0.0, 0.1, 0.2)
       training.num_iterations: choice(100000)
 

@@ -154,9 +154,14 @@ def run(cfg: DictConfig):
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
 
+    if cfg.model.flow_type == "constant":
+        flow=dynamics.ConstantNoiseFlow(cfg.model.flow_noise)
+    elif cfg.model.flow_type == "bridge":
+        flow = dynamics.BrownianBridge(cfg.model.flow_noise)
+
     model = otfm.OTFlowMatching(
         vf,
-        flow=dynamics.ConstantNoiseFlow(cfg.model.flow_noise),
+        flow=flow,
         match_fn=jax.jit(
             functools.partial(
                 data_match_fn,

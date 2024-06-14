@@ -13,3 +13,4 @@ epsilon: 0.01
 tau_a: 0.999
 tau_b: 0.999
 dropout_rate: 0.2
+flow_type: "constant"
