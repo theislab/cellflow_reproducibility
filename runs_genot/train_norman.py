@@ -2,7 +2,7 @@ import functools
 import os
 import sys
 import traceback
-from typing import Literal, Optional
+from typing import Dict, Literal, Optional, Tuple
 
 import hydra
 import jax
@@ -15,7 +15,7 @@ import scanpy as sc
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from ott.neural import datasets
-from ott.neural.methods.flows import dynamics, otfm
+from ott.neural.methods.flows import dynamics, genot
 from ott.neural.networks.layers import time_encoder
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
@@ -37,7 +37,7 @@ def setup_logger(cfg):
     return wandb.init(
         project=cfg.dataset.wandb_project,
         config=OmegaConf.to_container(cfg, resolve=True),
-        #dir="/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts",
+        dir="/home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts",
         settings=wandb.Settings(start_method="thread"),
     )
 
@@ -50,12 +50,12 @@ def load_data(adata, cfg, *, return_dl: bool):
     data_source_decoded = {}
     data_target_decoded = {}
     data_conditions = {}
-    source = adata[adata.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_data]
+    source = adata[adata.obs["condition"] == "control"].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
     source_decoded = adata[adata.obs["condition"] == "control"].X
 
     for cond in adata.obs["condition"].cat.categories:
         if cond != "control":
-            target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
+            target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
             target_decoded = adata[adata.obs["condition"] == cond].X.A
             condition_1 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_1]
             condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2]
@@ -101,6 +101,31 @@ def load_data(adata, cfg, *, return_dl: bool):
     }
 
 
+def prepare_data(
+    batch: Dict[str, jnp.ndarray],
+) -> Tuple[
+    Tuple[jnp.ndarray, Optional[jnp.ndarray], jnp.ndarray],
+    Tuple[jnp.ndarray, jnp.ndarray, Optional[jnp.ndarray], Optional[jnp.ndarray]],
+]:
+    src_lin, src_quad = batch.get("src_lin"), batch.get("src_quad")
+    tgt_lin, tgt_quad = batch.get("tgt_lin"), batch.get("tgt_quad")
+
+    if src_quad is None and tgt_quad is None:  # lin
+        src, tgt = src_lin, tgt_lin
+        arrs = src_lin, tgt_lin
+    elif src_lin is None and tgt_lin is None:  # quad
+        src, tgt = src_quad, tgt_quad
+        arrs = src_quad, tgt_quad
+    elif all(arr is not None for arr in (src_lin, tgt_lin, src_quad, tgt_quad)):  # fused quad
+        src = jnp.concatenate([src_lin, src_quad], axis=1)
+        tgt = jnp.concatenate([tgt_lin, tgt_quad], axis=1)
+        arrs = src_quad, tgt_quad, src_lin, tgt_lin
+    else:
+        raise RuntimeError("Cannot infer OT problem type from data.")
+
+    return (src, batch.get("src_condition"), tgt), arrs
+
+
 def data_match_fn(
     src_lin: Optional[jnp.ndarray],
     tgt_lin: Optional[jnp.ndarray],
@@ -144,12 +169,13 @@ def run(cfg: DictConfig):
     comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
 
     reconstruct_data_fn = functools.partial(
-        reconstruct_data, projection_matrix=adata_train.varm["PCs"], mean_to_add=adata_train.varm["X_train_mean"].T
+        reconstruct_data, projection_matrix=adata_train.varm["PCs"][:,:cfg.dataset.PCs], mean_to_add=adata_train.varm["X_train_mean"].T
     )
     mask_fn = functools.partial(get_mask, var_names=adata_train.var_names)
 
     batch = next(dl)
-    output_dim = batch["tgt_lin"].shape[1]
+    source_dim = batch["tgt_lin"].shape[1]
+    target_dim = batch["tgt_lin"].shape[1]
     condition_dim = batch["src_condition"].shape[-1]
 
     vf = VelocityFieldWithAttention(
@@ -158,18 +184,18 @@ def run(cfg: DictConfig):
         max_seq_length=cfg.model.max_seq_length,
         hidden_dims=cfg.model.hidden_dims,
         time_dims=cfg.model.time_dims,
-        output_dims=cfg.model.output_dims + [output_dim],
+        output_dims=cfg.model.output_dims + [target_dim],
         condition_dims=cfg.model.condition_dims,
         dropout_rate=cfg.model.dropout_rate,
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
 
     print(vf)
-    
-    model = otfm.OTFlowMatching(
+
+    model = genot.GENOT(
         vf,
         flow=dynamics.ConstantNoiseFlow(cfg.model.flow_noise),
-        match_fn=jax.jit(
+        data_match_fn=jax.jit(
             functools.partial(
                 data_match_fn,
                 typ="lin",
@@ -180,6 +206,8 @@ def run(cfg: DictConfig):
                 tau_b=cfg.model.tau_b,
             )
         ),
+        source_dim=source_dim,
+        target_dim=target_dim,
         condition_dim=condition_dim,
         rng=jax.random.PRNGKey(13),
         optimizer=optax.MultiSteps(optax.adam(cfg.model.learning_rate), cfg.model.multi_steps),
@@ -189,29 +217,45 @@ def run(cfg: DictConfig):
     rng = jax.random.PRNGKey(0)
 
     for it in tqdm(range(cfg.training.num_iterations)):
-        rng, rng_resample, rng_step_fn = jax.random.split(rng, 3)
-        batch = next(dl)
+
+        batch = next(iter(dl))
         batch = jtu.tree_map(jnp.asarray, batch)
+        rng = jax.random.split(rng, 5)
+        rng, rng_resample, rng_noise, rng_time, rng_step_fn = rng
 
-        src, tgt = batch["src_lin"], batch["tgt_lin"]
-        src_cond = batch.get("src_condition")
+        batch = jtu.tree_map(jnp.asarray, batch)
+        (src, src_cond, tgt), matching_data = prepare_data(batch)
+        
+        n = src.shape[0]
+        time = model.time_sampler(rng_time, n * model.n_samples_per_src)
+        latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
 
-        if model.match_fn is not None:
-            tmat = model.match_fn(src, tgt)
-            src_ixs, tgt_ixs = solver_utils.sample_joint(rng_resample, tmat)
-            src, tgt = src[src_ixs], tgt[tgt_ixs]
-            src_cond = None if src_cond is None else src_cond[src_ixs]
-
-        model.vf_state, loss = model.step_fn(
-            rng_step_fn,
-            model.vf_state,
-            src,
-            tgt,
-            src_cond,
+        tmat = model.data_match_fn(*matching_data)  # (n, m)
+        src_ixs, tgt_ixs = solver_utils.sample_conditional(  # (n, k), (m, k)
+            rng_resample,
+            tmat,
+            k=model.n_samples_per_src,
         )
 
+        src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
+        if src_cond is not None:
+            src_cond = src_cond[src_ixs]
+            
+        if model.latent_match_fn is not None:
+            src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
+          
+        src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
+        tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
+        latent = latent.reshape(-1, *latent.shape[2:])
+        if src_cond is not None:
+            src_cond = src_cond.reshape(-1, *src_cond.shape[2:])
+            
+        src = jnp.tile(jnp.expand_dims(src, 1), (1, 2, 1))
+        
+        loss, model.vf_state = model.step_fn(rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond)
+
         training_logs["loss"].append(float(loss))
-        if (it % cfg.training.valid_freq == 0) and (it > 0):
+        if ((it-1) % cfg.training.valid_freq == 0) and (it > 0):
             train_loss = np.mean(training_logs["loss"][-cfg.training.valid_freq :])
             log_metrics = {"train_loss": train_loss}
             eval_step(
@@ -256,6 +300,10 @@ def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_f
                 dat_deg_dict = dat["deg_dict"]
                 dat_target_decoded = dat["target_decoded"]
 
+            dat_source = jax.tree_util.tree_map(
+                lambda x: jnp.tile(jnp.expand_dims(x, 1), (1, cfg.model.max_seq_length, 1)), dat_source
+            )
+            
             prediction = jtu.tree_map(model.transport, dat_source, dat_conditions)
             metrics = jtu.tree_map(comp_metrics_fn, dat_target, prediction)
             mean_metrics = compute_mean_metrics(metrics, prefix=f"{k}_")

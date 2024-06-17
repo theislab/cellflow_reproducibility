@@ -164,8 +164,6 @@ def run(cfg: DictConfig):
         time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
     )
 
-    print(vf)
-    
     model = otfm.OTFlowMatching(
         vf,
         flow=dynamics.ConstantNoiseFlow(cfg.model.flow_noise),

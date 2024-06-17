@@ -1,0 +1,12 @@
+base_path: /home/icb/alejandro.tejada/ot_pert_reproducibility/runs_gears/data
+name: norman_0seen
+gears_train: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/gears/0seen/perturb_processed.h5ad
+custom_split: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/gears/0seen/custom_split_0seen.pkl
+adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/gears/0seen/train_processed.h5ad
+adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/gears/0seen/test_processed.h5ad
+adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/norman/gears/0seen/ood_processed.h5ad
+project: gears_norman_0seen
+remove_perturbations: ['KIAA1804+ctrl', 'IER5L+LYL1', 'IER5L+ctrl']
+obsm_key_data: X_pca
+obsm_key_cond_1: emb_gene_1
+obsm_key_cond_2: emb_gene_2

@@ -33,3 +33,6 @@ wandb/
 outputs/
 runs_otfm/bash_scripts/outputs/
 runs_otfm/bash_scripts/wandb/
+*.csv
+*.err
+*.out
