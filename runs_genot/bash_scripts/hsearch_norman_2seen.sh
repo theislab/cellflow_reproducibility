@@ -14,4 +14,4 @@
 source ${HOME}/.bashrc
 mamba activate jax
 
-python -u /home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_norman.py --multirun dataset=norman_0seen hparams_search=hparams_norman model=norman training=training_norman logger=norman_0seen
+python -u /home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_norman.py --multirun dataset=norman_2seen hparams_search=hparams_norman model=norman training=training_norman logger=norman_2seen
