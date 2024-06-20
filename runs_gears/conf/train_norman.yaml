@@ -1,0 +1,13 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: norman_2seen
+  - hparams_search: hparams_norman_gears
+  - hydra: conf
+  - model: norman
+  - launcher: slurm_icb
+  - logger: default
+  - training: training
+  
