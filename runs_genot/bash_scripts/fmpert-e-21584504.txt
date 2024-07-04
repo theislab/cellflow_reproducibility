@@ -1,0 +1,35 @@
+/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py:158: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train_zebrafish")
+/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+wandb: Currently logged in as: aletl (modality_translation). Use `wandb login --relogin` to force relogin
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory.
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory
+wandb: wandb version 0.17.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.17.0
+wandb: Run data is saved locally in /tmp/wandb/run-20240626_142602-yggpvphm
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run wild-dew-42
+wandb: ⭐️ View project at https://wandb.ai/modality_translation/genot_zebrafish
+wandb: 🚀 View run at https://wandb.ai/modality_translation/genot_zebrafish/runs/yggpvphm
+2024-06-26 14:31:11.763737: W external/xla/xla/service/gpu/nvptx_compiler.cc:760] The NVIDIA driver's CUDA version is 12.3 which is older than the ptxas CUDA version (12.4.131). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
+  0%|          | 0/2000000 [00:00<?, ?it/s]  0%|          | 1/2000000 [01:11<39815:34:10, 71.67s/it]  0%|          | 1/2000000 [31:54<1063705:58:40, 1914.67s/it]
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py", line 271, in run
+    eval_step(
+  File "/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py", line 320, in eval_step
+    print(dat_conditions.shape)
+          ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'shape'
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: - 0.014 MB of 0.014 MB uploadedwandb: \ 0.014 MB of 0.022 MB uploadedwandb: | 0.014 MB of 0.022 MB uploadedwandb: / 0.014 MB of 0.022 MB uploadedwandb: - 0.014 MB of 0.022 MB uploadedwandb: \ 0.022 MB of 0.022 MB uploadedwandb: 🚀 View run wild-dew-42 at: https://wandb.ai/modality_translation/genot_zebrafish/runs/yggpvphm
+wandb: ⭐️ View project at: https://wandb.ai/modality_translation/genot_zebrafish
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /tmp/wandb/run-20240626_142602-yggpvphm/logs

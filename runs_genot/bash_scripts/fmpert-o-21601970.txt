@@ -1,0 +1,43 @@
+target:  (8642, 30)
+source:  (7694, 30)
+target:  (28520, 30)
+source:  (7694, 30)
+target:  (18706, 30)
+source:  (7694, 30)
+target:  (17506, 30)
+source:  (7694, 30)
+target:  (57625, 30)
+source:  (7694, 30)
+target:  (127151, 30)
+source:  (7694, 30)
+target:  (48969, 30)
+source:  (43508, 30)
+target:  (161612, 30)
+source:  (43508, 30)
+target:  (105998, 30)
+source:  (43508, 30)
+target:  (99196, 30)
+source:  (43508, 30)
+[2024-06-27 10:16:06,630][jax._src.xla_bridge][INFO] - Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+[2024-06-27 10:16:06,649][jax._src.xla_bridge][INFO] - Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+VelocityFieldWithAttention(
+    # attributes
+    num_heads = 4
+    qkv_feature_dim = 32
+    max_seq_length = 3
+    hidden_dims = [512, 512, 512]
+    output_dims = [1024, 1024, 1024, 30]
+    condition_dims = [64, 64]
+    time_dims = [512, 512]
+    time_encoder = functools.partial(<function cyclical_time_encoder at 0x7f9da71098a0>, n_freqs=1024)
+    act_fn = silu
+    dropout_rate = 0.3
+)
+hello  train
+hello  test
+(28520, 30) (7694, 30)
+(18706, 30) (7694, 30)
+(17506, 30) (7694, 30)
+dying
+hello  ood
+(57625, 30) (7694, 30)

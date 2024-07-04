@@ -1,0 +1,36 @@
+/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py:173: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train_zebrafish")
+/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+wandb: Currently logged in as: aletl (modality_translation). Use `wandb login --relogin` to force relogin
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory.
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory
+wandb: wandb version 0.17.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.17.0
+wandb: Run data is saved locally in /tmp/wandb/run-20240628_163356-2i49qmeb
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run bright-snow-62
+wandb: ⭐️ View project at https://wandb.ai/modality_translation/genot_zebrafish
+wandb: 🚀 View run at https://wandb.ai/modality_translation/genot_zebrafish/runs/2i49qmeb
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py", line 196, in run
+    test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py", line 68, in load_data
+    target_indices = sample_rows(source, target.shape[0]*subsample_ratio)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/alejandro.tejada/ot_pert_reproducibility/src/ot_pert/metrics.py", line 82, in sample_rows
+    raise ValueError("num_rows cannot be greater than the number of rows in the array.")
+ValueError: num_rows cannot be greater than the number of rows in the array.
+
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
+wandb: - 0.014 MB of 0.014 MB uploadedwandb: \ 0.016 MB of 0.030 MB uploadedwandb: | 0.016 MB of 0.030 MB uploadedwandb: / 0.016 MB of 0.030 MB uploadedwandb: - 0.020 MB of 0.030 MB uploadedwandb: \ 0.020 MB of 0.030 MB uploadedwandb: | 0.020 MB of 0.030 MB uploadedwandb: / 0.030 MB of 0.030 MB uploadedwandb: 🚀 View run bright-snow-62 at: https://wandb.ai/modality_translation/genot_zebrafish/runs/2i49qmeb
+wandb: ⭐️ View project at: https://wandb.ai/modality_translation/genot_zebrafish
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: /tmp/wandb/run-20240628_163356-2i49qmeb/logs

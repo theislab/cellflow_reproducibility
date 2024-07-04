@@ -20,11 +20,20 @@ from ott.neural.networks.layers import time_encoder
 from ott.solvers import utils as solver_utils
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import anndata as ad
 
-from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
+from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast, sample_rows
 from ot_pert.nets.nets import VelocityFieldWithAttention
 from ot_pert.utils import ConditionalLoader
 
+import psutil
+import os
+
+def get_memory_usage_gb():
+    process = psutil.Process(os.getpid())
+    mem_info = process.memory_info()
+    memory_usage_gb = mem_info.rss / (1024 ** 3)  # Convert bytes to GB
+    return memory_usage_gb
 
 def reconstruct_data(embedding, projection_matrix, mean_to_add):
     """Reconstructs data from projections."""
@@ -42,7 +51,7 @@ def setup_logger(cfg):
     )
 
 
-def load_data(adata, cfg, *, return_dl: bool):
+def load_data(adata, cfg, *, return_dl: bool, subsample_ratio:float = 1):
     """Loads data and preprocesses it based on configuration."""
     dls = []
     data_source = {}
@@ -50,31 +59,37 @@ def load_data(adata, cfg, *, return_dl: bool):
     data_source_decoded = {}
     data_target_decoded = {}
     data_conditions = {}
-    source = adata[((adata.obs["gene1+gene2"] == "negative+negative") & (adata.obs["timepoint"] == "18"))].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
-    source_decoded = adata[((adata.obs["gene1+gene2"] == "negative+negative") & (adata.obs["timepoint"] == "18"))].X
+    source = adata[adata.obs["condition"] == "negative+negative_18"].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
+    source_decoded = adata[adata.obs["condition"] == "negative+negative_18"].X
 
-    for cond in adata.obs["gene1+gene2"].cat.categories:
-        if cond != "negative+negative":
-            target = adata[adata.obs["gene1+gene2"] == cond].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
-            target_decoded = adata[adata.obs["gene1+gene2"] == cond].X.A
-            condition_1 = adata[adata.obs["gene1+gene2"] == cond].obsm[cfg.dataset.obsm_key_cond_1]
-            condition_2 = adata[adata.obs["gene1+gene2"] == cond].obsm[cfg.dataset.obsm_key_cond_2]
-            condition_2 = adata[adata.obs["gene1+gene2"] == cond].obsm[cfg.dataset.obsm_key_cond_2]
-            condition_3 = np.log(adata[adata.obs["gene1+gene2"] == cond].obs["timepoints_int"].values).reshape(-1,1)
+    for cond in adata.obs["condition"].unique():
+        if cond != "negative+negative_18":
+            target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
+            target_indices = sample_rows(target, target.shape[0]*subsample_ratio)
+            target = target[target_indices, :]
+            target_decoded = adata[adata.obs["condition"] == cond].X[target_indices, :].A
+            condition_1 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_1][target_indices, :]
+            condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2][target_indices, :]
+            condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2][target_indices, :]
+            condition_3 = np.log(adata[adata.obs["condition"] == cond].obs["timepoints_int"].values).reshape(-1,1)
             assert np.all(np.all(condition_1 == condition_1[0], axis=1))
             assert np.all(np.all(condition_2 == condition_2[0], axis=1))
-            assert np.all(np.all(condition_3 == condition_3[0], axis=1))
             expanded_arr = np.expand_dims(
-                np.concatenate((condition_1[0, :][None, :], condition_2[0, :][None, :], condition_3[0, :][None, :]), axis=0), axis=0
+                np.concatenate((condition_1[0, :][None, :], condition_2[0, :][None, :], np.repeat(condition_3[0, :][None, :], condition_2.shape[1], axis=1)), axis=0), axis=0
             )
             conds = np.tile(expanded_arr, (len(source), 1, 1))
+            
+            source_indices = sample_rows(source, source.shape[0]*subsample_ratio)
+            subsampled_source = source[source_indices, :]
+            print("Source: ", source.shape, " and target: ", target.shape)
+            print("Memory: ", get_memory_usage_gb())
 
             if return_dl:
                 dls.append(
                     DataLoader(
                         datasets.OTDataset(
                             datasets.OTData(
-                                lin=source,
+                                lin=subsampled_source,
                                 condition=conds,
                             ),
                             datasets.OTData(lin=target),
@@ -92,7 +107,7 @@ def load_data(adata, cfg, *, return_dl: bool):
     if return_dl:
         return ConditionalLoader(dls, seed=0)
 
-    deg_dict = {k: v for k, v in adata.uns["rank_genes_groups_cov_all"].items() if k in data_conditions.keys()}
+    #deg_dict = {k: v for k, v in adata.uns["rank_genes_groups_cov_all"].items() if k in data_conditions.keys()}
 
     return {
         "source": data_source,
@@ -100,7 +115,7 @@ def load_data(adata, cfg, *, return_dl: bool):
         "source_decoded": data_source_decoded,
         "target_decoded": data_target_decoded,
         "conditions": data_conditions,
-        "deg_dict": deg_dict,
+    #    "deg_dict": deg_dict,
     }
 
 
@@ -155,26 +170,43 @@ def get_mask(x, y, var_names):
     return x[:, [gene in y for gene in var_names]]
 
 
-@hydra.main(config_path="conf", config_name="train_norman")
+@hydra.main(config_path="conf", config_name="train_zebrafish")
 def run(cfg: DictConfig):
     """Main function to handle model training and evaluation."""
     logger = setup_logger(cfg)
-    adata_train = sc.read_h5ad(cfg.dataset.adata_train_path)
-    adata_train.obs['timepoints_int'] = adata_train.obs['timepoint'].astype(int)
+
     adata_test = sc.read_h5ad(cfg.dataset.adata_test_path)
     adata_test.obs['timepoints_int'] = adata_test.obs['timepoint'].astype(int)
+    adata_test.obs['condition'] = adata_test.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
+    
+    print("Memory test: ", get_memory_usage_gb())
     adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path)
-    adata_ood.obs['timepoints_int'] = adata_ood.obs['timepoint'].astype(int)
-    train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
-    test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
-    ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
-    dl = load_data(adata_train, cfg, return_dl=True)
-    comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
+    adata_ood.obs['timepoints_int'] = adata_ood.obs['timepoint'].astype(int)   
+    # adata_ood has no negatives 
+    adata_ood = ad.concat((adata_ood, adata_test[adata_test.obs["condition"]=="negative+negative_18"])) 
+    adata_ood.obs['condition'] = adata_ood.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
 
+    print("Memory test ood: ", get_memory_usage_gb())
+    adata_train = sc.read_h5ad(cfg.dataset.adata_train_path)
+    adata_train.obs['timepoints_int'] = adata_train.obs['timepoint'].astype(int)
+    adata_train.obs['condition'] = adata_train.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
+    print("Memory test ood train: ", get_memory_usage_gb())
+    train_data = load_data(adata_train, cfg, return_dl=False, subsample_ratio=0.2) if cfg.training.n_train_samples != 0 else {}
+    print("Memory load tra: ", get_memory_usage_gb())
+    test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
+    print("Memory load test: ", get_memory_usage_gb())
+    del adata_test
+    print("Memory load test remove: ", get_memory_usage_gb())
+    ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
+    print("Memory load test remove: ", get_memory_usage_gb())
+    del adata_ood
+    dl = load_data(adata_train, cfg, return_dl=True, subsample_ratio=0.2)
+    comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
     reconstruct_data_fn = functools.partial(
         reconstruct_data, projection_matrix=adata_train.varm["PCs"][:,:cfg.dataset.PCs], mean_to_add=adata_train.varm["X_train_mean"].T
     )
     mask_fn = functools.partial(get_mask, var_names=adata_train.var_names)
+    del adata_train
 
     batch = next(dl)
     source_dim = batch["tgt_lin"].shape[1]
@@ -220,7 +252,7 @@ def run(cfg: DictConfig):
     rng = jax.random.PRNGKey(0)
 
     for it in tqdm(range(cfg.training.num_iterations)):
-
+        
         batch = next(iter(dl))
         batch = jtu.tree_map(jnp.asarray, batch)
         rng = jax.random.split(rng, 5)
@@ -228,7 +260,7 @@ def run(cfg: DictConfig):
 
         batch = jtu.tree_map(jnp.asarray, batch)
         (src, src_cond, tgt), matching_data = prepare_data(batch)
-        
+
         n = src.shape[0]
         time = model.time_sampler(rng_time, n * model.n_samples_per_src)
         latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
@@ -243,18 +275,18 @@ def run(cfg: DictConfig):
         src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
         if src_cond is not None:
             src_cond = src_cond[src_ixs]
-            
+        
         if model.latent_match_fn is not None:
             src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
-          
+
         src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
         tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
         latent = latent.reshape(-1, *latent.shape[2:])
         if src_cond is not None:
             src_cond = src_cond.reshape(-1, *src_cond.shape[2:])
-            
-        src = jnp.tile(jnp.expand_dims(src, 1), (1, 2, 1))
-        
+  
+        src = jnp.tile(jnp.expand_dims(src, 1), (1, src_cond.shape[1], 1))
+
         loss, model.vf_state = model.step_fn(rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond)
 
         training_logs["loss"].append(float(loss))
@@ -294,14 +326,14 @@ def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_f
                 dat_source = {k: v for k, v in dat["source"].items() if k in idcs}
                 dat_target = {k: v for k, v in dat["target"].items() if k in idcs}
                 dat_conditions = {k: v for k, v in dat["conditions"].items() if k in idcs}
-                dat_deg_dict = {k: v for k, v in dat["deg_dict"].items() if k in idcs}
-                dat_target_decoded = {k: v for k, v in dat["target_decoded"].items() if k in idcs}
+                #dat_deg_dict = {k: v for k, v in dat["deg_dict"].items() if k in idcs}
+                #dat_target_decoded = {k: v for k, v in dat["target_decoded"].items() if k in idcs}
             else:
                 dat_source = dat["source"]
                 dat_target = dat["target"]
                 dat_conditions = dat["conditions"]
-                dat_deg_dict = dat["deg_dict"]
-                dat_target_decoded = dat["target_decoded"]
+                #dat_deg_dict = dat["deg_dict"]
+                #dat_target_decoded = dat["target_decoded"]
 
             dat_source = jax.tree_util.tree_map(
                 lambda x: jnp.tile(jnp.expand_dims(x, 1), (1, cfg.model.max_seq_length, 1)), dat_source
@@ -311,18 +343,18 @@ def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_f
             metrics = jtu.tree_map(comp_metrics_fn, dat_target, prediction)
             mean_metrics = compute_mean_metrics(metrics, prefix=f"{k}_")
             log_metrics.update(mean_metrics)
+            
+            # prediction_decoded = jtu.tree_map(reconstruct_data_fn, prediction)
+            # metrics_decoded = jtu.tree_map(comp_metrics_fn, dat_target_decoded, prediction_decoded)
+            # mean_metrics_decoded = compute_mean_metrics(metrics_decoded, prefix=f"decoded_{k}_")
+            # log_metrics.update(mean_metrics_decoded)
 
-            prediction_decoded = jtu.tree_map(reconstruct_data_fn, prediction)
-            metrics_decoded = jtu.tree_map(comp_metrics_fn, dat_target_decoded, prediction_decoded)
-            mean_metrics_decoded = compute_mean_metrics(metrics_decoded, prefix=f"decoded_{k}_")
-            log_metrics.update(mean_metrics_decoded)
-
-            prediction_decoded_deg = jtu.tree_map(mask_fn, prediction_decoded, dat_deg_dict)
-            target_decoded_deg = jax.tree_util.tree_map(mask_fn, dat_target_decoded, dat_deg_dict)
-            metrics_deg = jtu.tree_map(comp_metrics_fn, target_decoded_deg, prediction_decoded_deg)
-            mean_metrics_deg = compute_mean_metrics(metrics_deg, prefix=f"deg_{k}_")
-            log_metrics.update(mean_metrics_deg)
-
+            #prediction_decoded_deg = jtu.tree_map(mask_fn, prediction_decoded, dat_deg_dict)
+            #target_decoded_deg = jax.tree_util.tree_map(mask_fn, dat_target_decoded, dat_deg_dict)
+            #metrics_deg = jtu.tree_map(comp_metrics_fn, target_decoded_deg, prediction_decoded_deg)
+            #mean_metrics_deg = compute_mean_metrics(metrics_deg, prefix=f"deg_{k}_")
+            #log_metrics.update(mean_metrics_deg)
+    
     wandb.log(log_metrics)
 
 

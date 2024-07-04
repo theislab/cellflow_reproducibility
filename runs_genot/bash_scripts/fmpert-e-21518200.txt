@@ -1,0 +1,21 @@
+/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py:158: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train_zebrafish")
+/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+wandb: W&B API key is configured. Use `wandb login --relogin` to force relogin
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory.
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory
+wandb: - Waiting for wandb.init()...wandb: \ Waiting for wandb.init()...wandb: wandb version 0.17.2 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.17.0
+wandb: Run data is saved locally in /tmp/wandb/run-20240621_090021-6qo5o1vs
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run glamorous-sunset-34
+wandb: ⭐️ View project at https://wandb.ai/modality_translation/genot_zebrafish
+wandb: 🚀 View run at https://wandb.ai/modality_translation/genot_zebrafish/runs/6qo5o1vs
+2024-06-21 09:06:43.852387: W external/xla/xla/service/gpu/nvptx_compiler.cc:760] The NVIDIA driver's CUDA version is 12.3 which is older than the ptxas CUDA version (12.4.131). Because the driver is older than the ptxas version, XLA is disabling parallel compilation, which may slow down compilation. You should update your NVIDIA driver or use the NVIDIA-provided CUDA forward compatibility packages.
+  0%|          | 0/2000000 [00:00<?, ?it/s]  0%|          | 1/2000000 [01:08<37901:49:23, 68.22s/it]slurmstepd: error: *** JOB 21518200 ON gpusrv38 CANCELLED AT 2024-06-21T09:22:01 ***

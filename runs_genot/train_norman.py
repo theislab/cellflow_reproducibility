@@ -226,32 +226,38 @@ def run(cfg: DictConfig):
         batch = jtu.tree_map(jnp.asarray, batch)
         (src, src_cond, tgt), matching_data = prepare_data(batch)
         
+        print("cond1: ", src_cond.shape)
+        print("source1: ", src.shape)
         n = src.shape[0]
         time = model.time_sampler(rng_time, n * model.n_samples_per_src)
         latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
-
+        
         tmat = model.data_match_fn(*matching_data)  # (n, m)
         src_ixs, tgt_ixs = solver_utils.sample_conditional(  # (n, k), (m, k)
             rng_resample,
             tmat,
             k=model.n_samples_per_src,
         )
-
+        print("cond2: ", src_cond.shape)
+        print("source2: ", src.shape)
         src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
         if src_cond is not None:
             src_cond = src_cond[src_ixs]
             
         if model.latent_match_fn is not None:
             src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
-          
+        print("cond3: ", src_cond.shape)
+        print("source3: ", src.shape)
         src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
         tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
         latent = latent.reshape(-1, *latent.shape[2:])
         if src_cond is not None:
             src_cond = src_cond.reshape(-1, *src_cond.shape[2:])
-            
+        print("cond4: ", src_cond.shape)
+        print("source4: ", src.shape)
         src = jnp.tile(jnp.expand_dims(src, 1), (1, 2, 1))
-        
+        print("cond5: ", src_cond.shape)
+        print("source5: ", src.shape)
         loss, model.vf_state = model.step_fn(rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond)
 
         training_logs["loss"].append(float(loss))

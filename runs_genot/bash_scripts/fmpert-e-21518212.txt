@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py", line 15, in <module>
+    import wandb
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/wandb/__init__.py", line 27, in <module>
+    from wandb import sdk as wandb_sdk
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/wandb/sdk/__init__.py", line 25, in <module>
+    from .artifacts.artifact import Artifact
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/wandb/sdk/artifacts/artifact.py", line 45, in <module>
+    from wandb import data_types, env, util
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/wandb/data_types.py", line 33, in <module>
+    from .sdk.data_types._private import MEDIA_TMP
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/wandb/sdk/data_types/_private.py", line 6, in <module>
+    MEDIA_TMP = tempfile.TemporaryDirectory("wandb-media")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/tempfile.py", line 882, in __init__
+    self.name = mkdtemp(suffix, prefix, dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/tempfile.py", line 384, in mkdtemp
+    _os.mkdir(file, 0o700)
+OSError: [Errno 28] No space left on device: '/tmp/tmpqm7bxh6jwandb-media'

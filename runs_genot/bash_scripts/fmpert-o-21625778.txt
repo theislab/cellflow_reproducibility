@@ -1,0 +1,225 @@
+Memory test:  13.510723114013672
+Memory test ood:  38.41658020019531
+Memory test ood train:  127.01780319213867
+Memory load tra:  127.0179443359375
+Source:  (7694, 30)  and target:  (23782, 30)
+Memory:  115.78404235839844
+Source:  (7694, 30)  and target:  (17425, 30)
+Memory:  116.10298156738281
+Source:  (7694, 30)  and target:  (30530, 30)
+Memory:  116.97567749023438
+Source:  (7694, 30)  and target:  (12195, 30)
+Memory:  117.13811874389648
+Source:  (7694, 30)  and target:  (3796, 30)
+Memory:  117.41821670532227
+Source:  (7694, 30)  and target:  (4144, 30)
+Memory:  117.8651123046875
+Source:  (7694, 30)  and target:  (10195, 30)
+Memory:  118.50690078735352
+Source:  (7694, 30)  and target:  (11640, 30)
+Memory:  119.04943084716797
+Source:  (7694, 30)  and target:  (3292, 30)
+Memory:  119.33065032958984
+Source:  (7694, 30)  and target:  (2779, 30)
+Memory:  119.82792282104492
+Source:  (7694, 30)  and target:  (3878, 30)
+Memory:  120.36587524414062
+Source:  (7694, 30)  and target:  (12960, 30)
+Memory:  121.01035690307617
+Source:  (7694, 30)  and target:  (6300, 30)
+Memory:  121.36205291748047
+Source:  (7694, 30)  and target:  (5223, 30)
+Memory:  121.81356811523438
+Source:  (7694, 30)  and target:  (7891, 30)
+Memory:  122.35392379760742
+Source:  (7694, 30)  and target:  (9251, 30)
+Memory:  122.87692642211914
+Source:  (7694, 30)  and target:  (706, 30)
+Memory:  123.14078140258789
+Source:  (7694, 30)  and target:  (4363, 30)
+Memory:  123.6907958984375
+Source:  (7694, 30)  and target:  (3614, 30)
+Memory:  124.12137222290039
+Source:  (7694, 30)  and target:  (1418, 30)
+Memory:  124.54808807373047
+Source:  (7694, 30)  and target:  (5950, 30)
+Memory:  125.13814163208008
+Source:  (7694, 30)  and target:  (4905, 30)
+Memory:  125.55843353271484
+Source:  (7694, 30)  and target:  (3805, 30)
+Memory:  125.99958038330078
+Source:  (7694, 30)  and target:  (4546, 30)
+Memory:  126.48801040649414
+Source:  (7694, 30)  and target:  (9516, 30)
+Memory:  127.09952926635742
+Source:  (7694, 30)  and target:  (3897, 30)
+Memory:  127.4460563659668
+Source:  (7694, 30)  and target:  (3508, 30)
+Memory:  127.90011215209961
+Source:  (7694, 30)  and target:  (1251, 30)
+Memory:  128.32166290283203
+Source:  (7694, 30)  and target:  (3592, 30)
+Memory:  128.85239028930664
+Source:  (7694, 30)  and target:  (4856, 30)
+Memory:  129.34611892700195
+Source:  (7694, 30)  and target:  (5082, 30)
+Memory:  129.8216552734375
+Source:  (7694, 30)  and target:  (4366, 30)
+Memory:  130.27448654174805
+Source:  (7694, 30)  and target:  (5462, 30)
+Memory:  130.7689323425293
+Source:  (7694, 30)  and target:  (8167, 30)
+Memory:  131.3109359741211
+Source:  (7694, 30)  and target:  (7756, 30)
+Memory:  131.78985214233398
+Source:  (7694, 30)  and target:  (2726, 30)
+Memory:  132.18622970581055
+Source:  (7694, 30)  and target:  (3727, 30)
+Memory:  132.7203483581543
+Source:  (7694, 30)  and target:  (3444, 30)
+Memory:  133.1224594116211
+Source:  (7694, 30)  and target:  (3028, 30)
+Memory:  133.61645889282227
+Source:  (7694, 30)  and target:  (1863, 30)
+Memory:  134.00163650512695
+Source:  (7694, 30)  and target:  (5142, 30)
+Memory:  134.57098007202148
+Source:  (7694, 30)  and target:  (6659, 30)
+Memory:  135.080078125
+Source:  (7694, 30)  and target:  (5810, 30)
+Memory:  135.53941345214844
+Source:  (7694, 30)  and target:  (7136, 30)
+Memory:  136.04755783081055
+Source:  (7694, 30)  and target:  (4087, 30)
+Memory:  136.43874740600586
+Source:  (7694, 30)  and target:  (4378, 30)
+Memory:  136.91072845458984
+Source:  (7694, 30)  and target:  (1923, 30)
+Memory:  137.3409080505371
+Source:  (7694, 30)  and target:  (2714, 30)
+Memory:  137.84923553466797
+Source:  (7694, 30)  and target:  (2087, 30)
+Memory:  138.28950881958008
+Source:  (7694, 30)  and target:  (3907, 30)
+Memory:  138.80408477783203
+Source:  (7694, 30)  and target:  (2803, 30)
+Memory:  139.24726486206055
+Source:  (7694, 30)  and target:  (2456, 30)
+Memory:  139.68751525878906
+Source:  (7694, 30)  and target:  (3525, 30)
+Memory:  140.1950912475586
+Source:  (7694, 30)  and target:  (4910, 30)
+Memory:  140.66175079345703
+Source:  (7694, 30)  and target:  (4493, 30)
+Memory:  141.12154006958008
+Source:  (7694, 30)  and target:  (2952, 30)
+Memory:  141.57118225097656
+Source:  (7694, 30)  and target:  (2805, 30)
+Memory:  142.03821563720703
+Source:  (7694, 30)  and target:  (3469, 30)
+Memory:  142.5446891784668
+Source:  (7694, 30)  and target:  (3603, 30)
+Memory:  142.98740768432617
+Source:  (7694, 30)  and target:  (1786, 30)
+Memory:  143.39441680908203
+Source:  (7694, 30)  and target:  (2347, 30)
+Memory:  143.8938102722168
+Source:  (7694, 30)  and target:  (3146, 30)
+Memory:  144.41306686401367
+Source:  (7694, 30)  and target:  (1749, 30)
+Memory:  144.85348892211914
+Source:  (7694, 30)  and target:  (1694, 30)
+Memory:  145.2935791015625
+Source:  (7694, 30)  and target:  (1946, 30)
+Memory:  145.73398971557617
+Memory load test:  145.73398971557617
+Memory load test remove:  145.73398971557617
+Source:  (7694, 30)  and target:  (70732, 30)
+Memory:  148.05085372924805
+Source:  (7694, 30)  and target:  (45620, 30)
+Memory:  148.35193252563477
+Source:  (7694, 30)  and target:  (15116, 30)
+Memory:  148.32306289672852
+Source:  (7694, 30)  and target:  (37887, 30)
+Memory:  149.51467514038086
+Source:  (7694, 30)  and target:  (24067, 30)
+Memory:  149.8774528503418
+Source:  (7694, 30)  and target:  (23167, 30)
+Memory:  150.49866104125977
+Source:  (7694, 30)  and target:  (26205, 30)
+Memory:  151.19210815429688
+Source:  (7694, 30)  and target:  (18442, 30)
+Memory:  151.62164306640625
+Source:  (7694, 30)  and target:  (65585, 30)
+Memory:  153.49338150024414
+Source:  (7694, 30)  and target:  (18532, 30)
+Memory:  153.17424774169922
+Memory load test remove:  152.82092666625977
+Source:  (43508, 30)  and target:  (19712, 30)
+Memory:  155.8826904296875
+Source:  (43508, 30)  and target:  (34760, 30)
+Memory:  158.88500595092773
+Source:  (43508, 30)  and target:  (26957, 30)
+Memory:  161.32332611083984
+Source:  (43508, 30)  and target:  (13714, 30)
+Memory:  163.55274200439453
+Source:  (43508, 30)  and target:  (3984, 30)
+Memory:  165.71219635009766
+Source:  (43508, 30)  and target:  (10641, 30)
+Memory:  168.470458984375
+Source:  (43508, 30)  and target:  (5097, 30)
+Memory:  170.74029922485352
+Source:  (43508, 30)  and target:  (4382, 30)
+Memory:  173.2649383544922
+Source:  (43508, 30)  and target:  (11599, 30)
+Memory:  175.96283721923828
+Source:  (43508, 30)  and target:  (3316, 30)
+Memory:  178.16064071655273
+Source:  (43508, 30)  and target:  (5488, 30)
+Memory:  180.78754806518555
+Source:  (43508, 30)  and target:  (4046, 30)
+Memory:  183.1784210205078
+Source:  (43508, 30)  and target:  (4388, 30)
+Memory:  185.71306610107422
+Source:  (43508, 30)  and target:  (8247, 30)
+Memory:  188.3252944946289
+Source:  (43508, 30)  and target:  (8754, 30)
+Memory:  190.82762908935547
+Source:  (43508, 30)  and target:  (2141, 30)
+Memory:  193.09859085083008
+Source:  (43508, 30)  and target:  (5776, 30)
+Memory:  195.7329330444336
+Source:  (43508, 30)  and target:  (9164, 30)
+Memory:  198.30881881713867
+Source:  (43508, 30)  and target:  (4466, 30)
+Memory:  200.6524314880371
+Source:  (43508, 30)  and target:  (5442, 30)
+Memory:  203.19362258911133
+Source:  (43508, 30)  and target:  (4979, 30)
+Memory:  205.64123916625977
+Source:  (43508, 30)  and target:  (6236, 30)
+Memory:  208.1927719116211
+Source:  (43508, 30)  and target:  (3159, 30)
+Memory:  210.58536911010742
+Source:  (43508, 30)  and target:  (4283, 30)
+Memory:  213.14202499389648
+Source:  (43508, 30)  and target:  (3497, 30)
+Memory:  215.59790802001953
+Source:  (43508, 30)  and target:  (3192, 30)
+Memory:  218.12056350708008
+Source:  (43508, 30)  and target:  (4724, 30)
+Memory:  220.6462516784668
+Source:  (43508, 30)  and target:  (5893, 30)
+Memory:  223.16579818725586
+Source:  (43508, 30)  and target:  (10680, 30)
+Memory:  225.8035125732422
+Source:  (43508, 30)  and target:  (3226, 30)
+Memory:  228.11599349975586
+Source:  (43508, 30)  and target:  (14727, 30)
+Memory:  230.88589477539062
+Source:  (43508, 30)  and target:  (6759, 30)
+Memory:  233.2358055114746
+Source:  (43508, 30)  and target:  (4377, 30)
+Memory:  235.67881774902344
+Source:  (43508, 30)  and target:  (3904, 30)
+Memory:  238.1568489074707

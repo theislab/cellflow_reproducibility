@@ -1,0 +1,21 @@
+/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py:158: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train_zebrafish")
+/home/icb/alejandro.tejada/miniforge3/envs/jax/lib/python3.12/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+wandb: Currently logged in as: aletl (modality_translation). Use `wandb login --relogin` to force relogin
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory.
+wandb: WARNING Path /home/icb/alejandro.tejadata/ot_pert_new/runs_genot/bash_scripts/wandb/ wasn't writable, using system temp directory
+wandb: wandb version 0.17.2 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.17.0
+wandb: Run data is saved locally in /tmp/wandb/run-20240621_000217-emgepgjy
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run elated-voice-27
+wandb: ⭐️ View project at https://wandb.ai/modality_translation/genot_zebrafish
+wandb: 🚀 View run at https://wandb.ai/modality_translation/genot_zebrafish/runs/emgepgjy
+/var/spool/slurmd/job21517478/slurm_script: line 16: 1432736 Killed                  python -u /home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=21517478.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.

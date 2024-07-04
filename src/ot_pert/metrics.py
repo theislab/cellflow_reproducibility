@@ -5,6 +5,7 @@ from ott.geometry import costs, pointcloud
 from ott.tools.sinkhorn_divergence import sinkhorn_divergence
 from sklearn.metrics import pairwise_distances, r2_score
 from sklearn.metrics.pairwise import rbf_kernel
+import math
 
 
 def compute_r_squared(x: np.ndarray, y: np.ndarray) -> float:
@@ -75,9 +76,26 @@ def compute_scalar_mmd(target, transport, gammas=None):  # from CellOT repo
     return np.mean(list(map(lambda x: safe_mmd(target, transport, x), gammas)))
 
 
-def compute_metrics_fast(x: np.ndarray, y: np.ndarray) -> Dict[str, float]:
+def sample_rows(array, num_rows):
+    n, m = array.shape
+    if num_rows > n:
+        raise ValueError("num_rows cannot be greater than the number of rows in the array.")
+    
+    # Randomly choose indices of rows to sample
+    row_indices = np.random.choice(n, math.ceil(num_rows), replace=False)
+
+    return row_indices
+
+def compute_metrics_fast(x: np.ndarray, y: np.ndarray, subsample: bool = True) -> Dict[str, float]:
+    if subsample:
+        indices = sample_rows(x, x.shape[0]*0.1)
+        x = x[indices, :]
+        y = y[indices, :]
     metrics = {}
     metrics["r_squared"] = compute_r_squared(x, y)
+    print(x.shape, y.shape)
     metrics["e_distance"] = compute_e_distance(x, y)
+    print(x.shape, y.shape)
     metrics["mmd_distance"] = compute_scalar_mmd(x, y)
+    print(x.shape, y.shape)
     return metrics

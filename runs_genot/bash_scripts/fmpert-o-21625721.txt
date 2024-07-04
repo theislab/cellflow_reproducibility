@@ -1,0 +1,12 @@
+Memory test:  13.48324203491211
+Memory test ood:  38.399169921875
+Memory test ood train:  127.01863479614258
+Memory load tra:  127.018798828125
+Source:  (7694, 30)  and target:  (7694, 30)
+Memory:  115.26312255859375
+Source:  (7694, 30)  and target:  (7694, 30)
+Memory:  115.7765884399414
+Source:  (7694, 30)  and target:  (7694, 30)
+Memory:  116.21701431274414
+Source:  (7694, 30)  and target:  (7694, 30)
+Memory:  116.70298385620117

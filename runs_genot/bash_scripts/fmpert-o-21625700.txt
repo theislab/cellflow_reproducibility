@@ -1,0 +1,4 @@
+Memory test:  13.505939483642578
+Memory test ood:  38.38844680786133
+Memory test ood train:  127.01564407348633
+Memory load tra:  127.01580810546875

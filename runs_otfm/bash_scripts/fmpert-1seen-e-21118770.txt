@@ -1,0 +1,14 @@
+/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_otfm/train_norman.py:130: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train_norman")
+usage: train_norman.py [--help] [--hydra-help] [--version]
+                       [--cfg {job,hydra,all}] [--resolve] [--package PACKAGE]
+                       [--run] [--multirun] [--shell-completion]
+                       [--config-path CONFIG_PATH] [--config-name CONFIG_NAME]
+                       [--config-dir CONFIG_DIR]
+                       [--experimental-rerun EXPERIMENTAL_RERUN]
+                       [--info [{all,config,defaults,defaults-tree,plugins,searchpath}]]
+                       [overrides ...]
+train_norman.py: error: unrecognized arguments: --dataset=norman_1seen

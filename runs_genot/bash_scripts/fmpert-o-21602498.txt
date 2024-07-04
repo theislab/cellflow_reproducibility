@@ -1,0 +1,327 @@
+condition:  negative+negative_36
+target:  (23782, 30)
+source:  (7694, 30)
+condition:  negative+negative_72
+target:  (17425, 30)
+source:  (7694, 30)
+condition:  negative+negative_48
+target:  (30530, 30)
+source:  (7694, 30)
+condition:  negative+negative_24
+target:  (12195, 30)
+source:  (7694, 30)
+condition:  met+negative_36
+target:  (3796, 30)
+source:  (7694, 30)
+condition:  hgfa+negative_48
+target:  (4144, 30)
+source:  (7694, 30)
+condition:  epha4a+negative_48
+target:  (10195, 30)
+source:  (7694, 30)
+condition:  hgfa+negative_72
+target:  (11640, 30)
+source:  (7694, 30)
+condition:  tbx16+negative_18
+target:  (3292, 30)
+source:  (7694, 30)
+condition:  tbx16+tbx16l_24
+target:  (2779, 30)
+source:  (7694, 30)
+condition:  cdx4+cdx1a_36
+target:  (3878, 30)
+source:  (7694, 30)
+condition:  egr2b+negative_48
+target:  (12960, 30)
+source:  (7694, 30)
+condition:  phox2a+negative_48
+target:  (6300, 30)
+source:  (7694, 30)
+condition:  noto+negative_48
+target:  (5223, 30)
+source:  (7694, 30)
+condition:  foxd3+negative_72
+target:  (7891, 30)
+source:  (7694, 30)
+condition:  tfap2a+negative_72
+target:  (9251, 30)
+source:  (7694, 30)
+condition:  wnt3a+wnt8_24
+target:  (706, 30)
+source:  (7694, 30)
+condition:  zc4h2+negative_36
+target:  (4363, 30)
+source:  (7694, 30)
+condition:  hand2+negative_24
+target:  (3614, 30)
+source:  (7694, 30)
+condition:  cdx4+cdx1a_24
+target:  (1418, 30)
+source:  (7694, 30)
+condition:  tbx1+negative_48
+target:  (5950, 30)
+source:  (7694, 30)
+condition:  met+negative_72
+target:  (4905, 30)
+source:  (7694, 30)
+condition:  foxd3+negative_48
+target:  (3805, 30)
+source:  (7694, 30)
+condition:  noto+negative_18
+target:  (4546, 30)
+source:  (7694, 30)
+condition:  tfap2a+negative_48
+target:  (9516, 30)
+source:  (7694, 30)
+condition:  egr2b+negative_18
+target:  (3897, 30)
+source:  (7694, 30)
+condition:  tbx16+negative_24
+target:  (3508, 30)
+source:  (7694, 30)
+condition:  tbxta+negative_24
+target:  (1251, 30)
+source:  (7694, 30)
+condition:  tbx16+negative_36
+target:  (3592, 30)
+source:  (7694, 30)
+condition:  cdx4+negative_36
+target:  (4856, 30)
+source:  (7694, 30)
+condition:  met+negative_48
+target:  (5082, 30)
+source:  (7694, 30)
+condition:  phox2a+negative_36
+target:  (4366, 30)
+source:  (7694, 30)
+condition:  hoxb1a+negative_48
+target:  (5462, 30)
+source:  (7694, 30)
+condition:  foxi1+negative_72
+target:  (8167, 30)
+source:  (7694, 30)
+condition:  egr2b+negative_36
+target:  (7756, 30)
+source:  (7694, 30)
+condition:  hand2+negative_48
+target:  (2726, 30)
+source:  (7694, 30)
+condition:  tbx1+negative_36
+target:  (3727, 30)
+source:  (7694, 30)
+condition:  tbx1+negative_24
+target:  (3444, 30)
+source:  (7694, 30)
+condition:  zc4h2+negative_48
+target:  (3028, 30)
+source:  (7694, 30)
+condition:  cdx4+negative_18
+target:  (1863, 30)
+source:  (7694, 30)
+condition:  tfap2a+negative_36
+target:  (5142, 30)
+source:  (7694, 30)
+condition:  hgfa+negative_36
+target:  (6659, 30)
+source:  (7694, 30)
+condition:  foxd3+negative_36
+target:  (5810, 30)
+source:  (7694, 30)
+condition:  noto+negative_36
+target:  (7136, 30)
+source:  (7694, 30)
+condition:  foxi1+negative_48
+target:  (4087, 30)
+source:  (7694, 30)
+condition:  epha4a+negative_36
+target:  (4378, 30)
+source:  (7694, 30)
+condition:  cdx4+negative_24
+target:  (1923, 30)
+source:  (7694, 30)
+condition:  tbx16+msgn1_18
+target:  (2714, 30)
+source:  (7694, 30)
+condition:  hoxb1a+negative_24
+target:  (2087, 30)
+source:  (7694, 30)
+condition:  egr2b+negative_24
+target:  (3907, 30)
+source:  (7694, 30)
+condition:  wnt3a+wnt8_36
+target:  (2803, 30)
+source:  (7694, 30)
+condition:  tbx16+tbx16l_18
+target:  (2456, 30)
+source:  (7694, 30)
+condition:  tbx16+msgn1_36
+target:  (3525, 30)
+source:  (7694, 30)
+condition:  noto+negative_24
+target:  (4910, 30)
+source:  (7694, 30)
+condition:  hand2+negative_36
+target:  (4493, 30)
+source:  (7694, 30)
+condition:  tbxta+negative_36
+target:  (2952, 30)
+source:  (7694, 30)
+condition:  tbx16+msgn1_24
+target:  (2805, 30)
+source:  (7694, 30)
+condition:  tbx16+tbx16l_36
+target:  (3469, 30)
+source:  (7694, 30)
+condition:  zc4h2+negative_24
+target:  (3603, 30)
+source:  (7694, 30)
+condition:  epha4a+negative_18
+target:  (1786, 30)
+source:  (7694, 30)
+condition:  epha4a+negative_24
+target:  (2347, 30)
+source:  (7694, 30)
+condition:  hoxb1a+negative_36
+target:  (3146, 30)
+source:  (7694, 30)
+condition:  tbxta+negative_18
+target:  (1749, 30)
+source:  (7694, 30)
+condition:  wnt3a+wnt8_18
+target:  (1694, 30)
+source:  (7694, 30)
+condition:  cdx4+cdx1a_18
+target:  (1946, 30)
+source:  (7694, 30)
+condition:  tfap2a+foxd3_72
+target:  (70732, 30)
+source:  (7694, 30)
+condition:  mafba+negative_36
+target:  (45620, 30)
+source:  (7694, 30)
+condition:  smo+negative_18
+target:  (15116, 30)
+source:  (7694, 30)
+condition:  tfap2a+foxd3_36
+target:  (37887, 30)
+source:  (7694, 30)
+condition:  smo+negative_36
+target:  (24067, 30)
+source:  (7694, 30)
+condition:  mafba+negative_18
+target:  (23167, 30)
+source:  (7694, 30)
+condition:  mafba+negative_24
+target:  (26205, 30)
+source:  (7694, 30)
+condition:  smo+negative_24
+target:  (18442, 30)
+source:  (7694, 30)
+condition:  mafba+negative_48
+target:  (65585, 30)
+source:  (7694, 30)
+condition:  tfap2a+foxd3_48
+target:  (18532, 30)
+source:  (7694, 30)
+condition:  negative+negative_72
+target:  (98560, 30)
+source:  (43508, 30)
+condition:  negative+negative_48
+target:  (173797, 30)
+source:  (43508, 30)
+condition:  negative+negative_36
+target:  (134782, 30)
+source:  (43508, 30)
+condition:  negative+negative_24
+target:  (68566, 30)
+source:  (43508, 30)
+condition:  zc4h2+negative_24
+target:  (19918, 30)
+source:  (43508, 30)
+condition:  tfap2a+negative_72
+target:  (53201, 30)
+source:  (43508, 30)
+condition:  noto+negative_18
+target:  (25483, 30)
+source:  (43508, 30)
+condition:  cdx4+cdx1a_36
+target:  (21909, 30)
+source:  (43508, 30)
+condition:  epha4a+negative_48
+target:  (57991, 30)
+source:  (43508, 30)
+condition:  tbx16+msgn1_24
+target:  (16580, 30)
+source:  (43508, 30)
+condition:  noto+negative_24
+target:  (27439, 30)
+source:  (43508, 30)
+condition:  hand2+negative_24
+target:  (20227, 30)
+source:  (43508, 30)
+condition:  met+negative_36
+target:  (21939, 30)
+source:  (43508, 30)
+condition:  noto+negative_36
+target:  (41234, 30)
+source:  (43508, 30)
+condition:  egr2b+negative_36
+target:  (43767, 30)
+source:  (43508, 30)
+condition:  cdx4+negative_18
+target:  (10703, 30)
+source:  (43508, 30)
+condition:  tfap2a+negative_36
+target:  (28880, 30)
+source:  (43508, 30)
+condition:  foxi1+negative_72
+target:  (45816, 30)
+source:  (43508, 30)
+condition:  egr2b+negative_24
+target:  (22328, 30)
+source:  (43508, 30)
+condition:  cdx4+negative_36
+target:  (27206, 30)
+source:  (43508, 30)
+condition:  zc4h2+negative_36
+target:  (24892, 30)
+source:  (43508, 30)
+condition:  hoxb1a+negative_48
+target:  (31176, 30)
+source:  (43508, 30)
+condition:  tbx16+tbx16l_24
+target:  (15795, 30)
+source:  (43508, 30)
+condition:  tbx1+negative_36
+target:  (21413, 30)
+source:  (43508, 30)
+condition:  zc4h2+negative_48
+target:  (17484, 30)
+source:  (43508, 30)
+condition:  wnt3a+wnt8_36
+target:  (15960, 30)
+source:  (43508, 30)
+condition:  foxi1+negative_48
+target:  (23618, 30)
+source:  (43508, 30)
+condition:  noto+negative_48
+target:  (29462, 30)
+source:  (43508, 30)
+condition:  tfap2a+negative_48
+target:  (53398, 30)
+source:  (43508, 30)
+condition:  hand2+negative_48
+target:  (16129, 30)
+source:  (43508, 30)
+condition:  egr2b+negative_48
+target:  (73634, 30)
+source:  (43508, 30)
+condition:  tbx1+negative_48
+target:  (33792, 30)
+source:  (43508, 30)
+condition:  egr2b+negative_18
+target:  (21883, 30)
+source:  (43508, 30)
+condition:  tbx16+msgn1_36
+target:  (19516, 30)
+source:  (43508, 30)

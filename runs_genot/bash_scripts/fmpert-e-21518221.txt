@@ -1,0 +1,2 @@
+/var/spool/slurmd/job21518221/slurm_script: line 19: export: `-u': not a valid identifier
+/var/spool/slurmd/job21518221/slurm_script: line 19: export: `/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_genot/train_zebrafish.py': not a valid identifier

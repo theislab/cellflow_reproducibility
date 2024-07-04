@@ -1,0 +1,6 @@
+/home/icb/alejandro.tejada/ot_pert_reproducibility/runs_otfm/train_norman.py:130: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="conf", config_name="train_norman")
+[32m[I 2024-05-28 11:58:48,708][0m A new study created in memory with name: no-name-703382ea-6483-4fde-b804-f193ced0f2b4[0m
