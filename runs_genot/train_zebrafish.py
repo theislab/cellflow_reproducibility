@@ -13,6 +13,7 @@ import optax
 import orbax
 import scanpy as sc
 import wandb
+import pickle as pkl
 from omegaconf import DictConfig, OmegaConf
 from ott.neural import datasets
 from ott.neural.methods.flows import dynamics, genot
@@ -51,7 +52,7 @@ def setup_logger(cfg):
     )
 
 
-def load_data(adata, cfg, *, return_dl: bool, subsample_ratio:float = 1):
+def load_data(adata, cfg, *, return_dl: bool):
     """Loads data and preprocesses it based on configuration."""
     dls = []
     data_source = {}
@@ -65,31 +66,23 @@ def load_data(adata, cfg, *, return_dl: bool, subsample_ratio:float = 1):
     for cond in adata.obs["condition"].unique():
         if cond != "negative+negative_18":
             target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data][:,:cfg.dataset.PCs]
-            target_indices = sample_rows(target, target.shape[0]*subsample_ratio)
-            target = target[target_indices, :]
-            target_decoded = adata[adata.obs["condition"] == cond].X[target_indices, :].A
-            condition_1 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_1][target_indices, :]
-            condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2][target_indices, :]
-            condition_2 = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond_2][target_indices, :]
-            condition_3 = np.log(adata[adata.obs["condition"] == cond].obs["timepoints_int"].values).reshape(-1,1)
+            target_decoded = adata[adata.obs["condition"] == cond].X.A
+            condition_1 = adata[adata.obs["condition"] == cond].obsm["cond_gene1"]
+            condition_2 = adata[adata.obs["condition"] == cond].obsm["cond_gene2"]
+            condition_3 = adata[adata.obs["condition"] == cond].obsm["cond_time"]
             assert np.all(np.all(condition_1 == condition_1[0], axis=1))
             assert np.all(np.all(condition_2 == condition_2[0], axis=1))
             expanded_arr = np.expand_dims(
-                np.concatenate((condition_1[0, :][None, :], condition_2[0, :][None, :], np.repeat(condition_3[0, :][None, :], condition_2.shape[1], axis=1)), axis=0), axis=0
+                np.concatenate((condition_1[0, :][None, :], condition_2[0, :][None, :], condition_3[0, :][None, :]), axis=0), axis=0
             )
             conds = np.tile(expanded_arr, (len(source), 1, 1))
-            
-            source_indices = sample_rows(source, source.shape[0]*subsample_ratio)
-            subsampled_source = source[source_indices, :]
-            print("Source: ", source.shape, " and target: ", target.shape)
-            print("Memory: ", get_memory_usage_gb())
 
             if return_dl:
                 dls.append(
                     DataLoader(
                         datasets.OTDataset(
                             datasets.OTData(
-                                lin=subsampled_source,
+                                lin=source,
                                 condition=conds,
                             ),
                             datasets.OTData(lin=target),
@@ -174,33 +167,70 @@ def get_mask(x, y, var_names):
 def run(cfg: DictConfig):
     """Main function to handle model training and evaluation."""
     logger = setup_logger(cfg)
-
-    adata_test = sc.read_h5ad(cfg.dataset.adata_test_path)
-    adata_test.obs['timepoints_int'] = adata_test.obs['timepoint'].astype(int)
-    adata_test.obs['condition'] = adata_test.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
     
-    print("Memory test: ", get_memory_usage_gb())
+    ## Read dictionary of perturbations
+    with open(cfg.dataset.embedding_dict, "rb") as f:
+        dict_int_to_embedding = pkl.load(f)
+    ind_to_cond = {i: k for i, k in enumerate(dict_int_to_embedding.keys())}
+    cond_to_ind = {k: i for i, k in ind_to_cond.items()}
+    ind_to_emb = {cond_to_ind.get(k, -1): v for k, v in dict_int_to_embedding.items()}
+    def map_emb(x):
+        return cond_to_ind.get(x, -1)
+    vectorized_map_emb = np.vectorize(map_emb)
+    key_array = ind_to_emb.keys()
+    max_key = max(key_array)
+    emb_shape = ind_to_emb[0].shape[0]
+    lookup_table = jnp.zeros((max_key + 1, emb_shape))
+    for key, value in ind_to_emb.items():
+        lookup_table = lookup_table.at[key].set(value)
+
+    def fetch_value(x):
+        print(lookup_table[x].shape)
+        return lookup_table[x]
+    fetch_values_vmap = jax.vmap(fetch_value)
+    
+    ## Read data
+    adata_test = sc.read_h5ad(cfg.dataset.adata_test_path)
+    del adata_test.obsm['emb_1'], adata_test.obsm['emb_2']
+    adata_test.obs['condition'] = adata_test.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
+    adata_test.obsm['cond_gene1'] = np.expand_dims(adata_test.obs['gene1'], axis=1)
+    adata_test.obsm['cond_gene2'] = np.expand_dims(adata_test.obs['gene2'], axis=1)
+    adata_test.obsm['cond_time'] = np.expand_dims(adata_test.obs['timepoint'], axis=1)
+    adata_test.obsm['cond_gene1'] = vectorized_map_emb(adata_test.obsm['cond_gene1'])
+    adata_test.obsm['cond_gene2'] = vectorized_map_emb(adata_test.obsm['cond_gene2'])
+    adata_test.obsm['cond_time'] = vectorized_map_emb(adata_test.obsm['cond_time'])
+    
     adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path)
-    adata_ood.obs['timepoints_int'] = adata_ood.obs['timepoint'].astype(int)   
+    del adata_ood.obsm['emb_1'], adata_ood.obsm['emb_2']
     # adata_ood has no negatives 
     adata_ood = ad.concat((adata_ood, adata_test[adata_test.obs["condition"]=="negative+negative_18"])) 
     adata_ood.obs['condition'] = adata_ood.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
+    adata_ood.obsm['cond_gene1'] = np.expand_dims(adata_ood.obs['gene1'], axis=1)
+    adata_ood.obsm['cond_gene2'] = np.expand_dims(adata_ood.obs['gene2'], axis=1)
+    adata_ood.obsm['cond_time'] = np.expand_dims(adata_ood.obs['timepoint'], axis=1)
+    adata_ood.obsm['cond_gene1'] = vectorized_map_emb(adata_ood.obsm['cond_gene1'])
+    adata_ood.obsm['cond_gene2'] = vectorized_map_emb(adata_ood.obsm['cond_gene2'])
+    adata_ood.obsm['cond_time'] = vectorized_map_emb(adata_ood.obsm['cond_time'])
 
-    print("Memory test ood: ", get_memory_usage_gb())
     adata_train = sc.read_h5ad(cfg.dataset.adata_train_path)
-    adata_train.obs['timepoints_int'] = adata_train.obs['timepoint'].astype(int)
+    del adata_train.obsm['emb_1'], adata_train.obsm['emb_2']
     adata_train.obs['condition'] = adata_train.obs.apply(lambda row: f"{row['gene1+gene2']}_{row['timepoint']}", axis=1)
-    print("Memory test ood train: ", get_memory_usage_gb())
-    train_data = load_data(adata_train, cfg, return_dl=False, subsample_ratio=0.2) if cfg.training.n_train_samples != 0 else {}
-    print("Memory load tra: ", get_memory_usage_gb())
+    adata_train.obsm['cond_gene1'] = np.expand_dims(adata_train.obs['gene1'], axis=1)
+    adata_train.obsm['cond_gene2'] = np.expand_dims(adata_train.obs['gene2'], axis=1)
+    adata_train.obsm['cond_time'] = np.expand_dims(adata_train.obs['timepoint'], axis=1)
+    adata_train.obsm['cond_gene1'] = vectorized_map_emb(adata_train.obsm['cond_gene1'])
+    adata_train.obsm['cond_gene2'] = vectorized_map_emb(adata_train.obsm['cond_gene2'])
+    adata_train.obsm['cond_time'] = vectorized_map_emb(adata_train.obsm['cond_time'])
+    
+    train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
+    
     test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
-    print("Memory load test: ", get_memory_usage_gb())
     del adata_test
-    print("Memory load test remove: ", get_memory_usage_gb())
+    
     ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
-    print("Memory load test remove: ", get_memory_usage_gb())
     del adata_ood
-    dl = load_data(adata_train, cfg, return_dl=True, subsample_ratio=0.2)
+    
+    dl = load_data(adata_train, cfg, return_dl=True)
     comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
     reconstruct_data_fn = functools.partial(
         reconstruct_data, projection_matrix=adata_train.varm["PCs"][:,:cfg.dataset.PCs], mean_to_add=adata_train.varm["X_train_mean"].T
@@ -275,6 +305,7 @@ def run(cfg: DictConfig):
         src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
         if src_cond is not None:
             src_cond = src_cond[src_ixs]
+            src_cond = fetch_values_vmap(src_cond)
         
         if model.latent_match_fn is not None:
             src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
