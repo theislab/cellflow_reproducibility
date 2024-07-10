@@ -93,9 +93,6 @@ def compute_metrics_fast(x: np.ndarray, y: np.ndarray, subsample: bool = True) -
         y = y[indices, :]
     metrics = {}
     metrics["r_squared"] = compute_r_squared(x, y)
-    print(x.shape, y.shape)
     metrics["e_distance"] = compute_e_distance(x, y)
-    print(x.shape, y.shape)
     metrics["mmd_distance"] = compute_scalar_mmd(x, y)
-    print(x.shape, y.shape)
     return metrics

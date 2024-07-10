@@ -185,7 +185,6 @@ def run(cfg: DictConfig):
         lookup_table = lookup_table.at[key].set(value)
 
     def fetch_value(x):
-        print(lookup_table[x].shape)
         return lookup_table[x]
     fetch_values_vmap = jax.vmap(fetch_value)
     
@@ -241,7 +240,7 @@ def run(cfg: DictConfig):
     batch = next(dl)
     source_dim = batch["tgt_lin"].shape[1]
     target_dim = batch["tgt_lin"].shape[1]
-    condition_dim = batch["src_condition"].shape[-1]
+    condition_dim = 2560 # batch["src_condition"].shape[-1]
 
     vf = VelocityFieldWithAttention(
         num_heads=cfg.model.num_heads,
@@ -290,26 +289,26 @@ def run(cfg: DictConfig):
 
         batch = jtu.tree_map(jnp.asarray, batch)
         (src, src_cond, tgt), matching_data = prepare_data(batch)
-
+        src_cond = fetch_values_vmap(src_cond)
+        src_cond = jnp.squeeze(src_cond)
+        
         n = src.shape[0]
         time = model.time_sampler(rng_time, n * model.n_samples_per_src)
         latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
-
         tmat = model.data_match_fn(*matching_data)  # (n, m)
         src_ixs, tgt_ixs = solver_utils.sample_conditional(  # (n, k), (m, k)
             rng_resample,
             tmat,
             k=model.n_samples_per_src,
         )
-
+        
         src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
         if src_cond is not None:
             src_cond = src_cond[src_ixs]
-            src_cond = fetch_values_vmap(src_cond)
         
         if model.latent_match_fn is not None:
             src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
-
+            
         src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
         tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
         latent = latent.reshape(-1, *latent.shape[2:])
@@ -332,6 +331,7 @@ def run(cfg: DictConfig):
                 reconstruct_data_fn,
                 comp_metrics_fn,
                 mask_fn,
+                fetch_values_vmap
             )
 
     if cfg.training.save_model:
@@ -342,7 +342,7 @@ def run(cfg: DictConfig):
     return 1.0
 
 
-def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_fn, mask_fn):
+def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_fn, mask_fn, fetch_values_vmap):
     for k, dat in data.items():
         if k == "test":
             n_samples = cfg.training.n_test_samples
@@ -356,7 +356,7 @@ def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_f
                 idcs = np.random.choice(list(list(dat.values())[0]), n_samples)
                 dat_source = {k: v for k, v in dat["source"].items() if k in idcs}
                 dat_target = {k: v for k, v in dat["target"].items() if k in idcs}
-                dat_conditions = {k: v for k, v in dat["conditions"].items() if k in idcs}
+                dat_conditions = {k: jnp.squeeze(fetch_values_vmap(v)) for k, v in dat["conditions"].items() if k in idcs}
                 #dat_deg_dict = {k: v for k, v in dat["deg_dict"].items() if k in idcs}
                 #dat_target_decoded = {k: v for k, v in dat["target_decoded"].items() if k in idcs}
             else:

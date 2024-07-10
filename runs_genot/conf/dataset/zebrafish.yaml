@@ -4,5 +4,6 @@ adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/zebrafish/ada
 obsm_key_data: X_pca
 obsm_key_cond_1: emb_1
 obsm_key_cond_2: emb_2
+embedding_dict: /lustre/groups/ml01/workspace/ot_perturbation/data/zebrafish/ESM2_embeddings.pkl
 wandb_project: genot_zebrafish
 PCs: 30
