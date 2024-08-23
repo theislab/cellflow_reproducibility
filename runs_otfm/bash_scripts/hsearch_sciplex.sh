@@ -22,6 +22,6 @@
 
 source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
-conda activate /home/icb/dominik.klein/mambaforge/envs/ot_pert_genot_scvi
+conda activate /home/icb/dominik.klein/mambaforge/envs/cfp
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py --multirun dataset=sciplex +hparams_search=hparams_sciplex model=sciplex training=training_sciplex logger=sciplex
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py --multirun dataset=sciplex +hparams_search=hparams_sciplex model=sciplex training=sciplex logger=sciplex

@@ -8,14 +8,14 @@ decoder_dropout: 0.0
 pooling: "mean"
 layers_before_pool: 
   drugs:
-    - layer_type: mlp
-    - dims: [1024, 1024]
+    layer_type: mlp
+    dims: [1024, 1024]
   dose:
-    - layer_type: mlp
-    - dims: [1024, 1024]
+    layer_type: mlp
+    dims: [1024, 1024]
   cell_line:
-    - layer_type: mlp
-    - dims: [1024, 1024]
+    layer_type: mlp
+    dims: [1024, 1024]
 layers_after_pool:
   layer_type: mlp
   dims: [1024, 1024]

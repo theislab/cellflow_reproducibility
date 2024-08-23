@@ -135,6 +135,8 @@ def run(config):
         valid_freq=config_dict["training"]["valid_freq"],
     )
 
+    return 1.0
+
 if __name__ == "__main__":
     try:
         run()
