@@ -21,9 +21,10 @@ hydra:
 
     # define hyperparameter search space
     params:
-      model.output_dims: choice([1024, 1024, 1024], [2048, 2048, 2048], [4096, 4096, 4096])
-      model.hidden_dims: choice([1024, 1024, 1024], [2048, 2048, 2048], [4096, 4096, 4096])
-      model.time_dims: choice([1024, 1024 1024])
+      dataset.sample_covariates: choice(None, [cell_line])
+      model.output_dims: choice([1024, 1024, 1024], [2048, 2048, 2048])
+      model.hidden_dims: choice([1024, 1024, 1024], [2048, 2048, 2048])
+      model.time_dims: choice([1024, 1024, 1024])
       model.condition_dims: choice([4096, 4096, 4096], [2048, 2048, 2048],[1024, 1024, 1024], [512, 512, 512], [256, 256, 256], [128, 128, 128], [64, 64, 64])
       model.flow_noise: choice(0.0, 0.5, 1.0)
       model.learning_rate: choice(0.0001, 0.00005)

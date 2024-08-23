@@ -1,17 +1,18 @@
 num_heads: 4
 qkv_feature_dim: 16
 max_seq_length: 2
-hidden_dims: [1024, 1024, 1024]
-output_dims: [1024, 1024, 1024]
-condition_dims: [512, 512, 512]
+hidden_dims: [1024, 1024, 1024, 1024]
+output_dims: [1024, 1024, 1024, 1024]
+condition_dims: [256, 256, 256]
 condition_dims_forward: [1024, 1024, 1024]
-condition_dims_post_attention: [128, 128, 128]
+condition_dims_post_attention: [256, 256, 256]
 time_dims: [512, 512, 512]
 time_n_freqs: 1024
 flow_noise: 1.0
 learning_rate: 0.00005
-multi_steps: 50
+multi_steps: 20
 epsilon: 0.01
 tau_a: 0.999
 tau_b: 0.999
 dropout_rate: 0.2
+flow_type: "constant"

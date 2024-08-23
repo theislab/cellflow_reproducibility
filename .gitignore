@@ -29,6 +29,7 @@ __pycache__/
 
 **/*.h5ad
 **/*.pkl
+**/*.pt
 wandb/
 outputs/
 runs_otfm/bash_scripts/outputs/

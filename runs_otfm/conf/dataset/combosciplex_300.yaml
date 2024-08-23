@@ -1,7 +1,0 @@
-adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_train_300.h5ad
-adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_test_300.h5ad
-adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood_300.h5ad
-obsm_key_data: X_pca
-obsm_key_cond_1: ecfp_drug_1
-obsm_key_cond_2: ecfp_drug_2
-wandb_project: otfm_combosciplex

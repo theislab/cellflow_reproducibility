@@ -3,7 +3,7 @@
 # Default configurations
 defaults:
   - _self_
-  - dataset: sciplex_30
+  - dataset: sciplex
   - hydra: conf
   - model: sciplex
   - launcher: slurm_icb

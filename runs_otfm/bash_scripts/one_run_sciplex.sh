@@ -8,20 +8,18 @@
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_long
-
-#SBATCH --constraint=a100_80gb
+#SBATCH --qos=gpu_normal
 
 #SBATCH --gres=gpu:1
 
-#SBATCH --mem=200G
+#SBATCH --mem=80G
 
-#SBATCH -t 4-00:00
+#SBATCH -t 0-01:00
 
 #SBATCH --nice=1
 
 source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
-conda activate /home/icb/dominik.klein/mambaforge/envs/ot_pert_genot
+conda activate /home/icb/dominik.klein/mambaforge/envs/cfp
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py dataset=sciplex_biolord_split logger=sciplex training=training_sciplex training.save_model=True launcher=slurm_icb model=sciplex
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py dataset=sciplex logger=sciplex training=sciplex launcher=slurm_icb model=sciplex
