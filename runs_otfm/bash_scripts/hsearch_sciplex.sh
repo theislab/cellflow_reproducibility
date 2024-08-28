@@ -8,15 +8,15 @@
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_normal
+#SBATCH --qos=gpu_reservation
+
+#SBATCH --reservation=rocky_linux_9_test
 
 #SBATCH --gres=gpu:1
 
-#SBATCH -c 4
+#SBATCH --mem=80G
 
-#SBATCH --mem=90G
-
-#SBATCH -t 1-00:00
+#SBATCH -t 0-12:00:00
 
 #SBATCH --nice=1
 

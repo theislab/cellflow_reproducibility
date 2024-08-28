@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH -o otfm_one_sciplex.out
+#SBATCH -o h-otfm-sciplex.out
 
-#SBATCH -e otfm_one_sciplex.err
+#SBATCH -e h-otfm-sciplex.err
 
-#SBATCH -J otfm_one_sciplex
+#SBATCH -J h-otfm-sciplex
 
 #SBATCH -p gpu_p
 
@@ -24,4 +24,4 @@ source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate /home/icb/dominik.klein/mambaforge/envs/cfp
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_sciplex.py dataset=sciplex logger=sciplex training=sciplex launcher=slurm_icb model=sciplex
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_combosciplex.py --multirun dataset=combosciplex +hparams_search=hparams_combosciplex model=combosciplex training=combosciplex logger=combosciplex

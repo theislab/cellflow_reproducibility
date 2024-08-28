@@ -23,27 +23,23 @@ class PCADecoder(NamedTuple):
 
 def prepare_data(adata_train, adata_test, adata_ood):
     adata_train.varm["X_mean"] = adata_train.varm["X_train_mean"] 
-    
-    adata_train.obs["CTRL"] = adata_train.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
-    adata_test.obs["CTRL"] = adata_test.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
-    adata_ood.obs["CTRL"] = adata_ood.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
 
-    adata_tmp =  adata_train[adata_train.obs["drug"].drop_duplicates().index]
-    ecfp_dict = {drug: adata_tmp[adata_tmp.obs["drug"]==drug].obsm["ecfp"] for drug in adata_tmp.obs["drug"]}
+    adata_tmp =  adata_train[adata_train.obs["Drug1"].drop_duplicates().index]
+    ecfp_dict = {drug: adata_tmp[adata_tmp.obs["Drug1"]==drug].obsm["ecfp_drug_1"] for drug in adata_tmp.obs["Drug1"]}
 
-    adata_tmp =  adata_ood[adata_ood.obs["drug"].drop_duplicates().index]
-    ecfp_dict.update({drug: adata_tmp[adata_tmp.obs["drug"]==drug].obsm["ecfp"] for drug in adata_tmp.obs["drug"]})
+    adata_tmp =  adata_train[adata_train.obs["Drug2"].drop_duplicates().index]
+    ecfp_dict.update({drug: adata_tmp[adata_tmp.obs["Drug2"]==drug].obsm["ecfp_drug_2"] for drug in adata_tmp.obs["Drug2"]})
 
-    adata_tmp =  adata_ood[adata_ood.obs["cell_line"].drop_duplicates().index]
-    cell_line_dict = {cell_line: adata_tmp[adata_tmp.obs["cell_line"]==cell_line].obsm["cell_line_emb"] for cell_line in adata_tmp.obs["cell_line"]}
+    adata_tmp =  adata_ood[adata_ood.obs["Drug1"].drop_duplicates().index]
+    ecfp_dict.update({drug: adata_tmp[adata_tmp.obs["Drug1"]==drug].obsm["ecfp_drug_1"] for drug in adata_tmp.obs["Drug1"]})
 
+    adata_tmp =  adata_ood[adata_ood.obs["Drug2"].drop_duplicates().index]
+    ecfp_dict.update({drug: adata_tmp[adata_tmp.obs["Drug2"]==drug].obsm["ecfp_drug_2"] for drug in adata_tmp.obs["Drug2"]})
+
+        
     adata_train.uns['ecfp_rep'] = ecfp_dict
     adata_test.uns['ecfp_rep'] = ecfp_dict
     adata_ood.uns['ecfp_rep'] = ecfp_dict
-    adata_train.uns['cl_rep'] = cell_line_dict
-    adata_test.uns['cl_rep'] = cell_line_dict
-    adata_ood.uns['cl_rep'] = cell_line_dict
-
     return adata_train, adata_test, adata_ood
 
 
@@ -66,12 +62,9 @@ def run(config):
     perturbation_covariates = {k: tuple(v) for k, v in config_dict["dataset"]["perturbation_covariates"].items()}
     cf.prepare_data(
         sample_rep="X_pca_use",
-        control_key="CTRL",
+        control_key="control",
         perturbation_covariates=perturbation_covariates,
         perturbation_covariate_reps=dict(config_dict["dataset"]["perturbation_covariate_reps"]),
-        sample_covariates=list(config_dict["dataset"]["sample_covariates"]),
-        sample_covariate_reps=dict(config_dict["dataset"]["sample_covariate_reps"]),
-        split_covariates=list(config_dict["dataset"]["split_covariates"]),
     )
 
     match_fn = functools.partial(
