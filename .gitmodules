@@ -1,0 +1,3 @@
+[submodule "competing_methods/sciplex/chemcpa/chemCPA"]
+	path = competing_methods/sciplex/chemcpa/chemCPA
+	url = /Users/arturszalata/PycharmProjects/ot_pert_reproducibility/competing_methods/sciplex/chemcpa/chemCPA

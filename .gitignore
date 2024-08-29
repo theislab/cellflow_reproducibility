@@ -26,3 +26,6 @@ __pycache__/
 # IDEs
 /.idea/
 /.vscode/
+
+# directory where by default intermediate sciplex chemcpa files are stored
+competing_methods/sciplex/chemcpa/dataset_files/
