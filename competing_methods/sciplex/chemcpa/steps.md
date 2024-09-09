@@ -12,4 +12,4 @@ Adjust dataset_path in `competing_methods/sciplex/chemcpa/chemCPA/config/dataset
 `python chemCPA/train_hydra.py`
 
 # 3 results analysis
-`/Users/arturszalata/PycharmProjects/ot_pert_reproducibility/competing_methods/sciplex/chemcpa/chemCPA/load_lightning.ipynb`
+`competing_methods/sciplex/chemcpa/chemCPA/load_lightning.ipynb`
