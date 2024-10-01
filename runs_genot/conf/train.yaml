@@ -3,9 +3,9 @@
 # Default configurations
 defaults:
   - _self_
-  - dataset: combosciplex_30
+  - dataset: sciplex
   - hydra: conf
-  - model: default_combosciplex
+  - model: sciplex
   - launcher: slurm_icb
   - logger: default
-  - training: training
+  - training: training_sciplex

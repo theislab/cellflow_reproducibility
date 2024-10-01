@@ -4,38 +4,40 @@ defaults:
   - override /hydra/sweeper/sampler: random
   - override /hydra/sweeper: optuna
 
-optimized_metric: ood_sinkhorn_div_1
+optimized_metric: r_squared
 
 hydra:
   sweeper:
-    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
 
     direction: minimize
 
-    n_jobs: 100
+    n_jobs: 1000
 
-    n_trials: 100
+    n_trials: 1000
 
     sampler:
       _target_: optuna.samplers.RandomSampler
 
     # define hyperparameter search space
     params:
-      model.num_heads: choice(2, 4, 8)
-      model.qkv_feature_dim: choice(16, 32, 64)
-      model.output_dims:  choice([1024, 1024, 1024, 1024], [4096, 4096, 4096], [4096, 4096, 4096, 4096], [8192, 8192, 8192])
-      model.hidden_dims: choice([1024, 1024, 1024], [1024, 1024, 1024, 1024], [4096, 4096, 4096], [4096, 4096, 4096, 4096])
-      model.time_dims: choice([512, 512, 512], [1024, 1024, 1024])
-      model.condition_dims: choice([1024, 1024, 1024],  [4096, 4096, 4096])
-      model.condition_dims_forward: choice([1024, 1024, 1024],  [4096, 4096, 4096])
-      model.condition_dims_post_attention: choice([32, 32, 32], [128, 128, 128], [512, 512, 512])
-      model.flow_noise: choice(0.5, 1.0)
-      model.learning_rate: choice(0.0001, 0.00005)
-      model.multi_steps: choice(20, 50)
-      model.epsilon: choice(0.1)
-      model.tau_a: choice(0.999)
-      model.tau_b: choice(0.999)
-      model.dropout_rate: choice(0.0, 0.2, 0.4)
-      training.num_iterations: choice(100000)
-
-      training.batch_size: choice(1024)
+      model.pooling: choice(mean, attention_token, attention_seed)
+      model.condition_embedding_dim: choice(64, 256, 1024, 2048)
+      model.time_encoder_dims: choice([1024, 1024, 1024], [2048, 2048, 2048])
+      model.time_encoder_dropout: choice(0.0, 0.1, 0.2, 0.5)
+      model.hidden_dims: choice([2048, 2048, 2048], [4096, 4096, 4096], [4096, 4096, 4096])
+      model.decoder_dims: choice([1024, 1024, 1024], [2048, 2048, 2048], [4096, 4096, 4096])
+      model.decoder_dropout: choice(0.0, 0.1, 0.2, 0.5)
+      model.layers_before_pool.drugs.layer_type: choice(mlp, self_attention)
+      model.layers_before_pool.drugs.dims: choice([1024, 1024], [2048, 2048], [1024, 512])
+      model.layers_before_pool.drugs.dropout_rate: choice(0.0, 0.1, 0.2, 0.5)
+      model.layers_after_pool.layer_type: choice(mlp, self_attention)
+      model.layers_after_pool.dims: choice([512, 512], [1024, 1024], [2048, 2048])
+      model.layers_after_pool.dropout_rate: choice(0.0, 0.1, 0.2, 0.5)
+      model.cond_output_dropout: choice(0.0, 0.2, 0.5, 0.9)
+      model.multi_steps: choice(10, 20, 50)
+      model.tau_a: choice(0.95, 0.99, 0.999, 1.0)
+      model.tau_b: choice(0.95, 0.99, 0.999, 1.0)
+      model.flow_noise: choice(0.0, 0.5, 1.0)
+      model.epsilon: choice(0.1, 1.0)
+      

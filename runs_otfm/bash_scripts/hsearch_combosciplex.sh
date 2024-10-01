@@ -1,22 +1,20 @@
 #!/bin/bash
 
-#SBATCH -o h-otfm-sciplex.out
+#SBATCH -o h-otfm-combosciplex.out
 
-#SBATCH -e h-otfm-sciplex.err
+#SBATCH -e h-otfm-combosciplex.err
 
-#SBATCH -J h-otfm-sciplex
+#SBATCH -J h-otfm-combosciplex
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_reservation
-
-#SBATCH --reservation=rocky_linux_9_test
+#SBATCH --qos=gpu_normal
 
 #SBATCH --gres=gpu:1
 
 #SBATCH --mem=80G
 
-#SBATCH -t 0-12:00:00
+#SBATCH -t 0-01:00:00
 
 #SBATCH --nice=1
 

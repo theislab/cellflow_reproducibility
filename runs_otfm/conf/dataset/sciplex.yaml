@@ -1,17 +1,15 @@
-adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_train_biolord_split_300.h5ad
-adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_test_biolord_split_300.h5ad
-adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_ood_biolord_split_300.h5ad
+split: 5
 sample_rep: X_pca
 pca_dims: 300
 perturbation_covariates:
   drugs: [drug]
   dose: [logdose]
 perturbation_covariate_reps:
-  drugs: ecfp_rep
+  drugs: ecfp_dict
 sample_covariates: 
-  - cell_line
+  -  cell_line
 sample_covariate_reps: 
-  cell_line: cl_rep
+  cell_line: cell_line_dict
 split_covariates: 
   - cell_line
 wandb_project: otfm_sciplex

@@ -13,17 +13,11 @@ import optax
 from omegaconf import OmegaConf
 from typing import NamedTuple, Any
 import hydra
-
-class PCADecoder(NamedTuple):
-    pcs: Any
-    means: Any
-
-
+import wandb
 
 
 def prepare_data(adata_train, adata_test, adata_ood):
-    adata_train.varm["X_mean"] = adata_train.varm["X_train_mean"] 
-
+    
     adata_tmp =  adata_train[adata_train.obs["Drug1"].drop_duplicates().index]
     ecfp_dict = {drug: adata_tmp[adata_tmp.obs["Drug1"]==drug].obsm["ecfp_drug_1"] for drug in adata_tmp.obs["Drug1"]}
 
@@ -46,22 +40,21 @@ def prepare_data(adata_train, adata_test, adata_ood):
 @hydra.main(config_path="conf", config_name="train")
 def run(config):
     config_dict  = OmegaConf.to_container(config, resolve=True)
-    adata_train = sc.read_h5ad(config_dict["dataset"]["adata_train_path"])
-    adata_test = sc.read_h5ad(config_dict["dataset"]["adata_test_path"])
-    adata_ood = sc.read_h5ad(config_dict["dataset"]["adata_ood_path"])
+    split = config_dict["dataset"]["split"]
+    adata_train_path = f"/lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_train_{split}.h5ad"
+    adata_test_path = f"/lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_test_{split}.h5ad"
+    adata_ood_path = f"/lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood_{split}.h5ad"
+    adata_train = sc.read_h5ad(adata_train_path)
+    adata_test = sc.read_h5ad(adata_test_path)
+    adata_ood = sc.read_h5ad(adata_ood_path)
     adata_train, adata_test, adata_ood = prepare_data(adata_train, adata_test, adata_ood)
-
-    adata_train.obsm["X_pca_use"] = adata_train.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
-    adata_test.obsm["X_pca_use"] = adata_test.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
-    adata_ood.obsm["X_pca_use"] = adata_ood.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
-    pca_dec = PCADecoder(adata_train.varm["PCs"][:, :config_dict["dataset"]["pca_dims"]], adata_train.varm["X_train_mean"])
 
     cf = cfp.model.CellFlow(adata_train, solver="otfm")
 
     # Prepare the training data and perturbation conditions
     perturbation_covariates = {k: tuple(v) for k, v in config_dict["dataset"]["perturbation_covariates"].items()}
     cf.prepare_data(
-        sample_rep="X_pca_use",
+        sample_rep="X_pca",
         control_key="control",
         perturbation_covariates=perturbation_covariates,
         perturbation_covariate_reps=dict(config_dict["dataset"]["perturbation_covariate_reps"]),
@@ -99,6 +92,8 @@ def run(config):
         match_fn=match_fn,
         optimizer=optimizer,
         flow=flow,
+        layer_norm_before_concatenation=config_dict["model"]["layer_norm_before_concatenation"],
+        linear_projection_before_concatenation=config_dict["model"]["linear_projection_before_concatenation"],
     )
 
     cf.prepare_validation_data(
@@ -117,7 +112,7 @@ def run(config):
 
     metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
     decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_train, metrics=["r_squared", "mmd", "e_distance"])
-    wandb_callback = cfp.training.WandbLogger(project="cfp", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
+    wandb_callback = cfp.training.WandbLogger(project="cfp_combosciplex_otfm", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
 
     callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
 
@@ -127,6 +122,9 @@ def run(config):
         callbacks=callbacks,
         valid_freq=config_dict["training"]["valid_freq"],
     )
+
+    if config_dict["training"]["save_model"]:
+        cf.save(config_dict["training"]["out_dir"], file_prefix=wandb.run.name)
 
     return 1.0
 

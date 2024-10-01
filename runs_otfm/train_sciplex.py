@@ -13,64 +13,37 @@ import optax
 from omegaconf import OmegaConf
 from typing import NamedTuple, Any
 import hydra
-
-class PCADecoder(NamedTuple):
-    pcs: Any
-    means: Any
+import wandb
 
 
-
-
-def prepare_data(adata_train, adata_test, adata_ood):
-    adata_train.varm["X_mean"] = adata_train.varm["X_train_mean"] 
-    
-    adata_train.obs["CTRL"] = adata_train.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
-    adata_test.obs["CTRL"] = adata_test.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
-    adata_ood.obs["CTRL"] = adata_ood.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
-
-    adata_tmp =  adata_train[adata_train.obs["drug"].drop_duplicates().index]
-    ecfp_dict = {drug: adata_tmp[adata_tmp.obs["drug"]==drug].obsm["ecfp"] for drug in adata_tmp.obs["drug"]}
-
-    adata_tmp =  adata_ood[adata_ood.obs["drug"].drop_duplicates().index]
-    ecfp_dict.update({drug: adata_tmp[adata_tmp.obs["drug"]==drug].obsm["ecfp"] for drug in adata_tmp.obs["drug"]})
-
-    adata_tmp =  adata_ood[adata_ood.obs["cell_line"].drop_duplicates().index]
-    cell_line_dict = {cell_line: adata_tmp[adata_tmp.obs["cell_line"]==cell_line].obsm["cell_line_emb"] for cell_line in adata_tmp.obs["cell_line"]}
-
-    adata_train.uns['ecfp_rep'] = ecfp_dict
-    adata_test.uns['ecfp_rep'] = ecfp_dict
-    adata_ood.uns['ecfp_rep'] = ecfp_dict
-    adata_train.uns['cl_rep'] = cell_line_dict
-    adata_test.uns['cl_rep'] = cell_line_dict
-    adata_ood.uns['cl_rep'] = cell_line_dict
-
-    return adata_train, adata_test, adata_ood
 
 
 @hydra.main(config_path="conf", config_name="train")
 def run(config):
     config_dict  = OmegaConf.to_container(config, resolve=True)
-    adata_train = sc.read_h5ad(config_dict["dataset"]["adata_train_path"])
-    adata_test = sc.read_h5ad(config_dict["dataset"]["adata_test_path"])
-    adata_ood = sc.read_h5ad(config_dict["dataset"]["adata_ood_path"])
-    adata_train, adata_test, adata_ood = prepare_data(adata_train, adata_test, adata_ood)
-
-    adata_train.obsm["X_pca_use"] = adata_train.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
-    adata_test.obsm["X_pca_use"] = adata_test.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
-    adata_ood.obsm["X_pca_use"] = adata_ood.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
-    pca_dec = PCADecoder(adata_train.varm["PCs"][:, :config_dict["dataset"]["pca_dims"]], adata_train.varm["X_train_mean"])
-
+    config_dict  = OmegaConf.to_container(config, resolve=True)
+    split = config_dict["dataset"]["split"]
+    adata_train_path = f"/lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_train_{split}.h5ad"
+    adata_test_path = f"/lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_test_{split}.h5ad"
+    adata_ood_path = f"/lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/adata_ood_{split}.h5ad"
+    adata_train = sc.read_h5ad(adata_train_path)
+    adata_test = sc.read_h5ad(adata_test_path)
+    adata_ood = sc.read_h5ad(adata_ood_path)
+    
     cf = cfp.model.CellFlow(adata_train, solver="otfm")
 
     # Prepare the training data and perturbation conditions
     perturbation_covariates = {k: tuple(v) for k, v in config_dict["dataset"]["perturbation_covariates"].items()}
+    sample_covariates = list(config_dict["dataset"]["sample_covariates"]) if list(config_dict["dataset"]["sample_covariates"])[0] is not None else None
+    sample_covariate_reps = dict(config_dict["dataset"]["sample_covariate_reps"]) if sample_covariates is not None else None
+    
     cf.prepare_data(
-        sample_rep="X_pca_use",
-        control_key="CTRL",
+        sample_rep="X_pca",
+        control_key="control",
         perturbation_covariates=perturbation_covariates,
         perturbation_covariate_reps=dict(config_dict["dataset"]["perturbation_covariate_reps"]),
-        sample_covariates=list(config_dict["dataset"]["sample_covariates"]),
-        sample_covariate_reps=dict(config_dict["dataset"]["sample_covariate_reps"]),
+        sample_covariates=sample_covariates,
+        sample_covariate_reps=sample_covariate_reps,
         split_covariates=list(config_dict["dataset"]["split_covariates"]),
     )
 
@@ -92,13 +65,13 @@ def run(config):
     cf.prepare_model(
         encode_conditions=True,
         condition_embedding_dim=config_dict["model"]["condition_embedding_dim"],
+        pooling=config_dict["model"]["pooling"],
         time_encoder_dims=config_dict["model"]["time_encoder_dims"],
         time_encoder_dropout=config_dict["model"]["time_encoder_dropout"],
         hidden_dims=config_dict["model"]["hidden_dims"],
         hidden_dropout=config_dict["model"]["hidden_dropout"],
         decoder_dims=config_dict["model"]["decoder_dims"],
         decoder_dropout=config_dict["model"]["decoder_dropout"],
-        pooling=config_dict["model"]["pooling"],
         layers_before_pool=layers_before_pool,
         layers_after_pool=layers_after_pool,
         cond_output_dropout=config_dict["model"]["cond_output_dropout"],
@@ -106,6 +79,8 @@ def run(config):
         match_fn=match_fn,
         optimizer=optimizer,
         flow=flow,
+        layer_norm_before_concatenation=config_dict["model"]["layer_norm_before_concatenation"],
+        linear_projection_before_concatenation=config_dict["model"]["linear_projection_before_concatenation"],
     )
 
     cf.prepare_validation_data(
@@ -124,7 +99,7 @@ def run(config):
 
     metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
     decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_train, metrics=["r_squared", "mmd", "e_distance"])
-    wandb_callback = cfp.training.WandbLogger(project="cfp", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
+    wandb_callback = cfp.training.WandbLogger(project="cfp_otfm_sciplex", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
 
     callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
 
@@ -134,7 +109,10 @@ def run(config):
         callbacks=callbacks,
         valid_freq=config_dict["training"]["valid_freq"],
     )
+    if config_dict["training"]["save_model"]:
+        cf.save(config_dict["training"]["out_dir"], file_prefix=wandb.run.name)
 
+    
     return 1.0
 
 if __name__ == "__main__":

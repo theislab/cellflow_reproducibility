@@ -4,304 +4,135 @@ import sys
 import traceback
 from typing import Dict, Literal, Optional, Tuple
 
-import hydra
-import jax
-import jax.numpy as jnp
-import jax.tree_util as jtu
-import numpy as np
-import optax
-import orbax
+import cfp
 import scanpy as sc
-import wandb
-from omegaconf import DictConfig, OmegaConf
-from ott.neural import datasets
-from ott.neural.methods.flows import dynamics, genot
-from ott.neural.networks.layers import time_encoder
+import numpy as np
+import functools
 from ott.solvers import utils as solver_utils
-from torch.utils.data import DataLoader
-from tqdm import tqdm
-
-from ot_pert.metrics import compute_mean_metrics, compute_metrics, compute_metrics_fast
-from ot_pert.nets.nets import CondVelocityField
-from ot_pert.utils import ConditionalLoader
+import optax
+from omegaconf import OmegaConf
+from typing import NamedTuple, Any
+import hydra
 
 
-def reconstruct_data(embedding, projection_matrix, mean_to_add):
-    """Reconstructs data from projections."""
-    return np.matmul(embedding, projection_matrix.T) + mean_to_add
 
 
-def setup_logger(cfg):
-    """Initialize and return a Weights & Biases logger."""
-    wandb.login()
-    return wandb.init(
-        project=cfg.dataset.wandb_project,
-        config=OmegaConf.to_container(cfg, resolve=True),
-        dir="/home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/bash_scripts",
-        settings=wandb.Settings(start_method="thread"),
-    )
+def prepare_data(adata_train, adata_test, adata_ood):
+    adata_train.varm["X_mean"] = adata_train.varm["X_train_mean"] 
+    
+    adata_train.obs["CTRL"] = adata_train.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
+    adata_test.obs["CTRL"] = adata_test.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
+    adata_ood.obs["CTRL"] = adata_ood.obs.apply(lambda x: True if x["drug"] == "Vehicle" else False, axis=1)
 
+    adata_tmp =  adata_train[adata_train.obs["drug"].drop_duplicates().index]
+    ecfp_dict = {drug: adata_tmp[adata_tmp.obs["drug"]==drug].obsm["ecfp"] for drug in adata_tmp.obs["drug"]}
 
-def load_data(adata, cfg, *, return_dl: bool):
-    """Loads data and preprocesses it based on configuration."""
-    dls = []
-    data_source = {}
-    data_target = {}
-    data_source_decoded = {}
-    data_target_decoded = {}
-    data_conditions = {}
-    for cond in adata.obs["condition"].cat.categories:
-        if "Vehicle" not in cond:
-            src_str_unique = list(adata[adata.obs["condition"] == cond].obs["cell_type"].unique())
-            assert len(src_str_unique) == 1
-            src_str = src_str_unique[0] + "_Vehicle_0.0"
-            source = adata[adata.obs["condition"] == src_str].obsm[cfg.dataset.obsm_key_data]
-            source_decoded = adata[adata.obs["condition"] == src_str].X.A
-            target = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_data]
-            target_decoded = adata[adata.obs["condition"] == cond].X.A
-            conds = adata[adata.obs["condition"] == cond].obsm[cfg.dataset.obsm_key_cond]
-            assert np.all(np.all(conds == conds[0], axis=1))
-            conds = np.tile(conds[0], (len(source), 1))
-            if return_dl:
-                dls.append(
-                    DataLoader(
-                        datasets.OTDataset(
-                            datasets.OTData(
-                                lin=source,
-                                condition=conds,
-                            ),
-                            datasets.OTData(lin=target),
-                        ),
-                        batch_size=cfg.training.batch_size,
-                        shuffle=True,
-                    )
-                )
-            else:
-                data_source[cond] = source
-                data_target[cond] = target
-                data_source_decoded[cond] = source_decoded
-                data_target_decoded[cond] = target_decoded
-                data_conditions[cond] = conds
-    if return_dl:
-        return ConditionalLoader(dls, seed=0)
+    adata_tmp =  adata_ood[adata_ood.obs["drug"].drop_duplicates().index]
+    ecfp_dict.update({drug: adata_tmp[adata_tmp.obs["drug"]==drug].obsm["ecfp"] for drug in adata_tmp.obs["drug"]})
 
-    deg_dict = {k: v for k, v in adata.uns["rank_genes_groups_cov_all"].items() if k in data_conditions.keys()}
+    adata_tmp =  adata_ood[adata_ood.obs["cell_line"].drop_duplicates().index]
+    cell_line_dict = {cell_line: adata_tmp[adata_tmp.obs["cell_line"]==cell_line].obsm["cell_line_emb"] for cell_line in adata_tmp.obs["cell_line"]}
 
-    return {
-        "source": data_source,
-        "target": data_target,
-        "source_decoded": data_source_decoded,
-        "target_decoded": data_target_decoded,
-        "conditions": data_conditions,
-        "deg_dict": deg_dict,
-    }
+    adata_train.uns['ecfp_rep'] = ecfp_dict
+    adata_test.uns['ecfp_rep'] = ecfp_dict
+    adata_ood.uns['ecfp_rep'] = ecfp_dict
+    adata_train.uns['cl_rep'] = cell_line_dict
+    adata_test.uns['cl_rep'] = cell_line_dict
+    adata_ood.uns['cl_rep'] = cell_line_dict
 
-
-def prepare_data(
-    batch: Dict[str, jnp.ndarray],
-) -> Tuple[
-    Tuple[jnp.ndarray, Optional[jnp.ndarray], jnp.ndarray],
-    Tuple[jnp.ndarray, jnp.ndarray, Optional[jnp.ndarray], Optional[jnp.ndarray]],
-]:
-    src_lin, src_quad = batch.get("src_lin"), batch.get("src_quad")
-    tgt_lin, tgt_quad = batch.get("tgt_lin"), batch.get("tgt_quad")
-
-    if src_quad is None and tgt_quad is None:  # lin
-        src, tgt = src_lin, tgt_lin
-        arrs = src_lin, tgt_lin
-    elif src_lin is None and tgt_lin is None:  # quad
-        src, tgt = src_quad, tgt_quad
-        arrs = src_quad, tgt_quad
-    elif all(arr is not None for arr in (src_lin, tgt_lin, src_quad, tgt_quad)):  # fused quad
-        src = jnp.concatenate([src_lin, src_quad], axis=1)
-        tgt = jnp.concatenate([tgt_lin, tgt_quad], axis=1)
-        arrs = src_quad, tgt_quad, src_lin, tgt_lin
-    else:
-        raise RuntimeError("Cannot infer OT problem type from data.")
-
-    return (src, batch.get("src_condition"), tgt), arrs
-
-
-def data_match_fn(
-    src_lin: Optional[jnp.ndarray],
-    tgt_lin: Optional[jnp.ndarray],
-    src_quad: Optional[jnp.ndarray],
-    tgt_quad: Optional[jnp.ndarray],
-    *,
-    typ: Literal["lin", "quad", "fused"],
-    epsilon: float = 1e-2,
-    tau_a: float = 1.0,
-    tau_b: float = 1.0,
-) -> jnp.ndarray:
-    if typ == "lin":
-        return solver_utils.match_linear(
-            x=src_lin, y=tgt_lin, scale_cost="mean", epsilon=epsilon, tau_a=tau_a, tau_b=tau_b
-        )
-    if typ == "quad":
-        return solver_utils.match_quadratic(xx=src_quad, yy=tgt_quad)
-    if typ == "fused":
-        return solver_utils.match_quadratic(xx=src_quad, yy=tgt_quad, x=src_lin, y=tgt_lin)
-    raise NotImplementedError(f"Unknown type: {typ}.")
-
-
-def get_mask(x, y, var_names):
-    return x[:, [gene in y for gene in var_names]]
+    return adata_train, adata_test, adata_ood
 
 
 @hydra.main(config_path="conf", config_name="train")
-def run(cfg: DictConfig):
-    """Main function to handle model training and evaluation."""
-    logger = setup_logger(cfg)
-    adata_train = sc.read_h5ad(cfg.dataset.adata_train_path)
-    adata_test = sc.read_h5ad(cfg.dataset.adata_test_path)
-    adata_ood = sc.read_h5ad(cfg.dataset.adata_ood_path)
-    dl = load_data(adata_train, cfg, return_dl=True)
-    train_data = load_data(adata_train, cfg, return_dl=False) if cfg.training.n_train_samples != 0 else {}
-    test_data = load_data(adata_test, cfg, return_dl=False) if cfg.training.n_test_samples != 0 else {}
-    ood_data = load_data(adata_ood, cfg, return_dl=False) if cfg.training.n_ood_samples != 0 else {}
-    comp_metrics_fn = compute_metrics_fast if cfg.training.fast_metrics else compute_metrics
+def run(config):
+    config_dict  = OmegaConf.to_container(config, resolve=True)
+    adata_train = sc.read_h5ad(config_dict["dataset"]["adata_train_path"])
+    adata_test = sc.read_h5ad(config_dict["dataset"]["adata_test_path"])
+    adata_ood = sc.read_h5ad(config_dict["dataset"]["adata_ood_path"])
+    adata_train, adata_test, adata_ood = prepare_data(adata_train, adata_test, adata_ood)
 
-    reconstruct_data_fn = functools.partial(
-        reconstruct_data, projection_matrix=adata_train.varm["PCs"], mean_to_add=adata_train.varm["X_train_mean"].T
-    )
-    mask_fn = functools.partial(get_mask, var_names=adata_train.var_names)
+    adata_train.obsm["X_pca_use"] = adata_train.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
+    adata_test.obsm["X_pca_use"] = adata_test.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
+    adata_ood.obsm["X_pca_use"] = adata_ood.obsm["X_pca"][:, :config_dict["dataset"]["pca_dims"]]
+    
+    cf = cfp.model.CellFlow(adata_train, solver="genot")
 
-    batch = next(dl)
-    source_dim = batch["tgt_lin"].shape[1]
-    target_dim = batch["tgt_lin"].shape[1]
-    condition_dim = batch["src_condition"].shape[1]
-
-    vf = CondVelocityField(
-        hidden_dims=cfg.model.hidden_dims,
-        time_dims=cfg.model.time_dims,
-        output_dims=cfg.model.output_dims + [target_dim],
-        condition_dims=cfg.model.condition_dims,
-        dropout_rate=cfg.model.dropout_rate,
-        time_encoder=functools.partial(time_encoder.cyclical_time_encoder, n_freqs=cfg.model.time_n_freqs),
+    # Prepare the training data and perturbation conditions
+    perturbation_covariates = {k: tuple(v) for k, v in config_dict["dataset"]["perturbation_covariates"].items()}
+    cf.prepare_data(
+        sample_rep="X_pca_use",
+        control_key="CTRL",
+        perturbation_covariates=perturbation_covariates,
+        perturbation_covariate_reps=dict(config_dict["dataset"]["perturbation_covariate_reps"]),
+        sample_covariates=list(config_dict["dataset"]["sample_covariates"]),
+        sample_covariate_reps=dict(config_dict["dataset"]["sample_covariate_reps"]),
+        split_covariates=list(config_dict["dataset"]["split_covariates"]),
+    
     )
 
-    model = genot.GENOT(
-        vf,
-        flow=dynamics.ConstantNoiseFlow(cfg.model.flow_noise),
-        data_match_fn=jax.jit(
-            functools.partial(
-                data_match_fn,
-                typ="lin",
-                src_quad=None,
-                tgt_quad=None,
-                epsilon=cfg.model.epsilon,
-                tau_a=cfg.model.tau_a,
-                tau_b=cfg.model.tau_b,
-            )
-        ),
-        source_dim=source_dim,
-        target_dim=target_dim,
-        condition_dim=condition_dim,
-        rng=jax.random.PRNGKey(13),
-        optimizer=optax.MultiSteps(optax.adam(cfg.model.learning_rate), cfg.model.multi_steps),
+    match_fn = functools.partial(
+        solver_utils.match_linear,
+        epsilon=config_dict["model"]["epsilon"],
+        scale_cost="mean",
+        tau_a=config_dict["model"]["tau_a"],
+        tau_b=config_dict["model"]["tau_b"]
+    )
+    optimizer = optax.MultiSteps(optax.adam(config_dict["model"]["learning_rate"]), config_dict["model"]["multi_steps"])
+    flow = {config_dict["model"]["flow_type"]: config_dict["model"]["flow_noise"]}
+
+    layers_before_pool = config_dict["model"]["layers_before_pool"]
+    layers_after_pool = config_dict["model"]["layers_after_pool"]
+
+
+    # Prepare the model
+    cf.prepare_model(
+        encode_conditions=True,
+        condition_embedding_dim=config_dict["model"]["condition_embedding_dim"],
+        pooling=config_dict["model"]["pooling"],
+        time_encoder_dims=config_dict["model"]["time_encoder_dims"],
+        time_encoder_dropout=config_dict["model"]["time_encoder_dropout"],
+        hidden_dims=config_dict["model"]["hidden_dims"],
+        hidden_dropout=config_dict["model"]["hidden_dropout"],
+        decoder_dims=config_dict["model"]["decoder_dims"],
+        decoder_dropout=config_dict["model"]["decoder_dropout"],
+        layers_before_pool=layers_before_pool,
+        layers_after_pool=layers_after_pool,
+        cond_output_dropout=config_dict["model"]["cond_output_dropout"],
+        time_freqs=config_dict["model"]["time_freqs"],
+        match_fn=match_fn,
+        optimizer=optimizer,
+        flow=flow,
+        genot_source_layers=config_dict["model"]["genot_source_layers"],
     )
 
-    training_logs = {"loss": []}
-    rng = jax.random.PRNGKey(0)
+    cf.prepare_validation_data(
+        adata_test,
+        name="test",
+        n_conditions_on_log_iteration=config_dict["training"]["test_n_conditions_on_log_iteration"],
+        n_conditions_on_train_end=config_dict["training"]["test_n_conditions_on_log_iteration"],
+    )
 
-    for it in tqdm(range(cfg.training.num_iterations)):
-        batch = next(iter(dl))
-        batch = jtu.tree_map(jnp.asarray, batch)
-        rng = jax.random.split(rng, 5)
-        rng, rng_resample, rng_noise, rng_time, rng_step_fn = rng
+    cf.prepare_validation_data(
+        adata_ood,
+        name="ood",
+        n_conditions_on_log_iteration=config_dict["training"]["ood_n_conditions_on_log_iteration"],
+        n_conditions_on_train_end=config_dict["training"]["ood_n_conditions_on_log_iteration"],
+    )
 
-        batch = jtu.tree_map(jnp.asarray, batch)
-        (src, src_cond, tgt), matching_data = prepare_data(batch)
+    metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
+    decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_train, metrics=["r_squared", "mmd", "e_distance"])
+    wandb_callback = cfp.training.WandbLogger(project="cfp", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
 
-        n = src.shape[0]
-        time = model.time_sampler(rng_time, n * model.n_samples_per_src)
-        latent = model.latent_noise_fn(rng_noise, (n, model.n_samples_per_src))
+    callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
 
-        tmat = model.data_match_fn(*matching_data)  # (n, m)
-        src_ixs, tgt_ixs = solver_utils.sample_conditional(  # (n, k), (m, k)
-            rng_resample,
-            tmat,
-            k=model.n_samples_per_src,
-        )
+    cf.train(
+        num_iterations=config_dict["training"]["num_iterations"],
+        batch_size=config_dict["training"]["batch_size"],
+        callbacks=callbacks,
+        valid_freq=config_dict["training"]["valid_freq"],
+    )
 
-        src, tgt = src[src_ixs], tgt[tgt_ixs]  # (n, k, ...),  # (m, k, ...)
-        if src_cond is not None:
-            src_cond = src_cond[src_ixs]
-
-        if model.latent_match_fn is not None:
-            src, src_cond, tgt = model._match_latent(rng, src, src_cond, latent, tgt)
-
-        src = src.reshape(-1, *src.shape[2:])  # (n * k, ...)
-        tgt = tgt.reshape(-1, *tgt.shape[2:])  # (m * k, ...)
-        latent = latent.reshape(-1, *latent.shape[2:])
-        if src_cond is not None:
-            src_cond = src_cond.reshape(-1, *src_cond.shape[2:])
-
-        loss, model.vf_state = model.step_fn(rng_step_fn, model.vf_state, time, src, tgt, latent, src_cond)
-
-        training_logs["loss"].append(float(loss))
-        if ((it-1) % cfg.training.valid_freq == 0) and (it > 0):
-            train_loss = np.mean(training_logs["loss"][-cfg.training.valid_freq :])
-            log_metrics = {"train_loss": train_loss}
-            eval_step(
-                cfg,
-                model,
-                {"train": train_data, "test": test_data, "ood": ood_data},
-                log_metrics,
-                reconstruct_data_fn,
-                comp_metrics_fn,
-                mask_fn,
-            )
-
-    if cfg.training.save_model:
-        import pickle
-        with open(f"{cfg.training.save_path}/{wandb.run.name}_model.pkl", 'wb') as f:
-            pickle.dump(model.vf_state.params, f)
     return 1.0
-
-
-def eval_step(cfg, model, data, log_metrics, reconstruct_data_fn, comp_metrics_fn, mask_fn):
-    for k, dat in data.items():
-        if k == "test":
-            n_samples = cfg.training.n_test_samples
-        if k == "train":
-            n_samples = cfg.training.n_train_samples
-        if k == "ood":
-            n_samples = cfg.training.n_ood_samples
-
-        if n_samples != 0:
-            if n_samples > 0:
-                idcs = np.random.choice(list(list(dat.values())[0]), n_samples)
-                dat_source = {k: v for k, v in dat["source"].items() if k in idcs}
-                dat_target = {k: v for k, v in dat["target"].items() if k in idcs}
-                dat_conditions = {k: v for k, v in dat["conditions"].items() if k in idcs}
-                dat_deg_dict = {k: v for k, v in dat["deg_dict"].items() if k in idcs}
-                dat_target_decoded = {k: v for k, v in dat["target_decoded"].items() if k in idcs}
-            else:
-                dat_source = dat["source"]
-                dat_target = dat["target"]
-                dat_conditions = dat["conditions"]
-                dat_deg_dict = dat["deg_dict"]
-                dat_target_decoded = dat["target_decoded"]
-
-            prediction = jtu.tree_map(model.transport, dat_source, dat_conditions)
-            metrics = jtu.tree_map(comp_metrics_fn, dat_target, prediction)
-            mean_metrics = compute_mean_metrics(metrics, prefix=f"{k}_")
-            log_metrics.update(mean_metrics)
-
-            prediction_decoded = jtu.tree_map(reconstruct_data_fn, prediction)
-            metrics_decoded = jtu.tree_map(comp_metrics_fn, dat_target_decoded, prediction_decoded)
-            mean_metrics_decoded = compute_mean_metrics(metrics_decoded, prefix=f"decoded_{k}_")
-            log_metrics.update(mean_metrics_decoded)
-
-            prediction_decoded_deg = jtu.tree_map(mask_fn, prediction_decoded, dat_deg_dict)
-            target_decoded_deg = jax.tree_util.tree_map(mask_fn, dat_target_decoded, dat_deg_dict)
-            metrics_deg = jtu.tree_map(comp_metrics_fn, target_decoded_deg, prediction_decoded_deg)
-            mean_metrics_deg = compute_mean_metrics(metrics_deg, prefix=f"deg_{k}_")
-            log_metrics.update(mean_metrics_deg)
-
-    wandb.log(log_metrics)
-
 
 if __name__ == "__main__":
     try:

@@ -1,6 +1,4 @@
-adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_train_300.h5ad
-adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_test_300.h5ad
-adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood_300.h5ad
+split: 1
 sample_rep: X_pca
 pca_dims: 300
 perturbation_covariates:

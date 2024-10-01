@@ -1,0 +1,10 @@
+adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_train_1.h5ad
+adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_test_1.h5ad
+adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood_1.h5ad
+sample_rep: X_pca
+pca_dims: 300
+perturbation_covariates:
+  drugs: [Drug1, Drug2]
+perturbation_covariate_reps:
+  drugs: ecfp_rep
+wandb_project: otfm_combosciplex

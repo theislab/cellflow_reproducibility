@@ -8,9 +8,7 @@
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_reservation
-
-#SBATCH --reservation=rocky_linux_9_test
+#SBATCH --qos=gpu_long
 
 #SBATCH --gres=gpu:1
 

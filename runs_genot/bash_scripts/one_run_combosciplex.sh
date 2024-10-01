@@ -1,27 +1,27 @@
 #!/bin/bash
 
-#SBATCH -o one_combosciplex.out
+#SBATCH -o otfm_one_combosciplex.out
 
-#SBATCH -e one_combosciplex.err
+#SBATCH -e otfm_one_combosciplex.err
 
-#SBATCH -J one_combosciplex
+#SBATCH -J otfm_one_combosciplex
 
 #SBATCH -p gpu_p
 
-#SBATCH --qos=gpu_normal
+#SBATCH --qos=gpu_reservation
 
-#SBATCH --constraint=a100_40gb|a100_80gb
+#SBATCH --reservation=rocky_linux_9_test
 
 #SBATCH --gres=gpu:1
 
-#SBATCH --mem=160G
+#SBATCH --mem=80G
 
-#SBATCH -t 1-00:00
+#SBATCH -t 0-12:00:00
 
 #SBATCH --nice=1
 
 source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
-conda activate /home/icb/dominik.klein/mambaforge/envs/ot_pert_genot
+conda activate /home/icb/dominik.klein/mambaforge/envs/cfp
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_genot/train_combosciplex.py dataset=combosciplex_300 model=combosciplex training=training_combosciplex logger=combosciplex
+python /home/icb/dominik.klein/git_repos/ot_pert_new/runs_otfm/train_combosciplex.py dataset=combosciplex logger=combosciplex training=combosciplex launcher=slurm_icb model=combosciplex
