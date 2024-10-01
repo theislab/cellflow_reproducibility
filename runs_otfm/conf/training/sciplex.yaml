@@ -7,4 +7,4 @@ ood_n_conditions_on_log_iteration: null
 ood_n_conditions_on_train_end: null
 out_dir: /lustre/groups/ml01/workspace/ot_perturbation/data/sciplex/out
 save_path: /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/sciplex
-save_model: False
+save_model: True

@@ -22,7 +22,7 @@ hydra:
 
     # define hyperparameter search space
     params:
-      dataset.split: choice(1,2,3,4)
+      dataset.split: choice(5)
       dataset.sample_covariates: choice([cell_line])
       model.condition_embedding_dim: choice(256, 1024)
       model.time_encoder_dims: choice([2048, 2048, 2048])
