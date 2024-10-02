@@ -47,10 +47,8 @@ for n_latent in n_latents:
         #    r2_train = 0.0
         adata_ood.obsm["X_scVI"] = vae.get_latent_representation(adata_ood)
         adata_ood.obsm["reconstruction"] = vae.get_reconstructed_expression(adata_ood, give_mean="True")
-        try:
-            r2_ood = r2_score(np.mean(adata_ood.obsm["reconstruction"], axis=0), np.array(np.mean(adata_ood.X, axis=0))[0,:])
-        except:
-            r2_ood = 0.0
+        r2_ood = np.mean([r2_score(np.array(np.mean(adata_ood[adata_ood.obs["condition"]==cond].X, axis=0))[0,:], np.mean(adata_ood[adata_ood.obs["condition"]==cond].obsm["reconstruction"], axis=0)) for cond in adata_ood.obs["condition"].cat.categories])
+    
         df_result.loc[config] = r2_ood
         df_result.to_csv('new_result_hyper_sciplex_split_5.csv')
         print(res)

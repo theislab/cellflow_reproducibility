@@ -1,5 +1,5 @@
-valid_freq: 200_000
-num_iterations: 1_000_000
+valid_freq: 10_000
+num_iterations: 200_000
 batch_size: 1024
 test_n_conditions_on_log_iteration: 2
 test_n_conditions_on_train_end: 2

@@ -18,6 +18,11 @@ import wandb
 from cfp.external import CFJaxSCVI
 
 
+def get_vae_from_split(split: int):
+    if split == 5:
+        return "/lustre/groups/ml01/workspace/ot_perturbation/models/vaes/sciplex/32_1024"
+    else:
+        return f"/lustre/groups/ml01/workspace/ot_perturbation/models/vaes/sciplex/32_1024_{split}"
 
 
 @hydra.main(config_path="conf", config_name="train")
@@ -33,7 +38,8 @@ def run(config):
     adata_test = sc.read_h5ad(adata_test_path)
     adata_ood = sc.read_h5ad(adata_ood_path)
 
-    vae = CFJaxSCVI.load("/lustre/groups/ml01/workspace/ot_perturbation/models/vaes/sciplex/32_1024", adata=adata_train)
+    vae_path = get_vae_from_split(split)
+    vae = CFJaxSCVI.load(vae_path, adata=adata_train)
     adata_train.obsm["X_scVI"] = vae.get_latent_representation(adata_train)
     adata_test.obsm["X_scVI"] = vae.get_latent_representation(adata_test)
     adata_ood.obsm["X_scVI"] = vae.get_latent_representation(adata_ood)
