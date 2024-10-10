@@ -1,7 +1,12 @@
-adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_train_30.h5ad
-adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_test_30.h5ad
-adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/combosciplex/adata_ood_30.h5ad
-obsm_key_data: X_pca
-obsm_key_cond_1: ecfp_drug_1
-obsm_key_cond_2: ecfp_drug_2
-wandb_project: otfm_combosciplex
+adata_train_path: /lustre/groups/ml01/workspace/ot_perturbation/data/zebrafish/adata_train.h5ad
+adata_test_path: /lustre/groups/ml01/workspace/ot_perturbation/data/zebrafish/adata_test.h5ad
+adata_ood_path: /lustre/groups/ml01/workspace/ot_perturbation/data/zebrafish/adata_ood.h5ad
+embedding_dict: /lustre/groups/ml01/workspace/ot_perturbation/data/zebrafish/ESM2_embeddings.pkl
+sample_rep: X_pca
+pca_dims: 300
+perturbation_covariates:
+  gene_knockouts: [gene1, gene2]
+  time: [logtimepoint, logtimepoint2]
+perturbation_covariate_reps:
+  gene_knockouts: crispr_rep
+wandb_project: otfm_zebrafish

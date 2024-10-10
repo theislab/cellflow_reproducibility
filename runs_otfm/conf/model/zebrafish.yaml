@@ -1,4 +1,4 @@
-condition_embedding_dim: 2560
+condition_embedding_dim: 1024
 time_encoder_dims: [1024, 1024, 1024]
 time_encoder_dropout: 0.0
 hidden_dims: [1024, 1024, 1024]
@@ -7,25 +7,22 @@ decoder_dims: [1024, 1024, 1024]
 decoder_dropout: 0.0
 pooling: "mean"
 layers_before_pool: 
-  drugs:
+  gene_knockouts:
     layer_type: mlp
-    dims: [1024, 1024]
-  dose:
+    dims: [2560, 1024]
+  time:
     layer_type: mlp
-    dims: [1024, 1024]
-  cell_line:
-    layer_type: mlp
-    dims: [1024, 1024]
+    dims: [256, 1024]
 layers_after_pool:
   layer_type: mlp
   dims: [1024, 1024]
-cond_output_dropout: 0.5
+cond_output_dropout: 0.2
 time_freqs: 1024
 flow_noise: 1.0
 learning_rate: 0.00005
 multi_steps: 20
 epsilon: 0.1
-tau_a: 0.999
-tau_b: 0.999
+tau_a: 0.90
+tau_b: 0.95
 dropout_rate: 0.0
 flow_type: "constant_noise"

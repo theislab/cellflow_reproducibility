@@ -1,0 +1,13 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: zebrafish
+  - hparams_search: hparams_zebrafish
+  - hydra: conf_norman
+  - model: zebrafish
+  - launcher: slurm_icb
+  - logger: zebrafish
+  - training: training_zebrafish
+  
