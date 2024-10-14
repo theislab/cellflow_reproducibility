@@ -1,0 +1,8 @@
+,rank_true,rank_pred,condition
+Panobinostat+Crizotinib,3.0,1.0,Panobinostat+Crizotinib
+Panobinostat+Curcumin,1.0,2.0,Panobinostat+Curcumin
+Panobinostat+SRT1720,4.0,3.0,Panobinostat+SRT1720
+Panobinostat+Sorafenib,2.0,4.0,Panobinostat+Sorafenib
+SRT2104+Alvespimycin,6.0,6.0,SRT2104+Alvespimycin
+control+Alvespimycin,7.0,7.0,control+Alvespimycin
+control+Dacinostat,5.0,5.0,control+Dacinostat

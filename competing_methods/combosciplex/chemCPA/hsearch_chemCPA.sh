@@ -22,4 +22,4 @@ source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate /lustre/groups/ml01/workspace/ot_pert_new/conda_envs/ot_pert_cpa
 
-python /home/icb/dominik.klein/git_repos/ot_pert_new/competing_methods/combosciplex/CPA/hsearch_chemCPA.py
+python /home/icb/dominik.klein/git_repos/ot_pert_new/competing_methods/combosciplex/chemCPA/hsearch_chemCPA.py

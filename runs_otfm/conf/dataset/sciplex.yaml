@@ -1,6 +1,6 @@
 split: 5
-sample_rep: X_scVI
-pca_dims: 3000
+sample_rep: X_pca
+pca_dims: 300
 perturbation_covariates:
   drugs: [drug]
   dose: [logdose]
