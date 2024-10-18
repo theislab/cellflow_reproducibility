@@ -6,6 +6,6 @@ defaults:
   - dataset: sciplex
   - hydra: conf
   - model: sciplex
-  - launcher: slurm_icb
+  # - launcher: slurm_icb
   - logger: default
   - training: training_sciplex
