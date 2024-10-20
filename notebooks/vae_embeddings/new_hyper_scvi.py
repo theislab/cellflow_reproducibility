@@ -17,7 +17,6 @@ def run_vae(
     filename_adata_train: str,
     filename_adata_val: str,
     filename_adata_test: str,
-    split: int,
     n_latents: list[int],
     n_hiddens: list[int],
     gene_likelihood: str,
@@ -30,18 +29,33 @@ def run_vae(
 ) -> None | pd.DataFrame:
     
     all_args = locals()
-    
-    adata_train = sc.read(os.path.join(output_dir, filename_adata_train))
-    adata_test = sc.read(os.path.join(output_dir, filename_adata_val))
-    adata_ood = sc.read(os.path.join(output_dir, filename_adata_test))
+
+    def evaluate(adata, vae) -> list:
+        adata.obsm["X_scVI"] = vae.get_latent_representation(adata)
+        adata.obsm["reconstruction"] = vae.get_reconstructed_expression(adata, give_mean="True")
+        
+        r2_scores = []
+        for cond in adata.obs["condition"].cat.categories:
+            truth = np.mean(adata[adata.obs["condition"]==cond].X, axis=0)
+            reconstruction = np.mean(adata[adata.obs["condition"]==cond].obsm["reconstruction"], axis=0)
+            r2_scores.append(r2_score(truth, reconstruction))
+        
+        return r2_scores
+        
 
     df_result = pd.DataFrame(columns=["n_latent", "n_hidden", "r2_ood"])
     df_result.attrs["all_args"] = all_args
 
-    CFJaxSCVI.setup_anndata(adata_train)
-
     for n_latent in n_latents:
         for n_hidden in n_hiddens:
+    
+            # start with clean data to avoid potential leakage across iterations        
+            adata_train = sc.read(os.path.join(output_dir, filename_adata_train))
+            adata_test = sc.read(os.path.join(output_dir, filename_adata_val))
+            adata_ood = sc.read(os.path.join(output_dir, filename_adata_test))
+            
+            CFJaxSCVI.setup_anndata(adata_train)
+            
             vae = CFJaxSCVI(
                 adata_train, 
                 gene_likelihood=gene_likelihood, 
@@ -60,20 +74,17 @@ def run_vae(
             )
             
             res = [vae.history[k].iloc[-1].values[0] for k in vae.history.keys()]
-            adata_ood.obsm["X_scVI"] = vae.get_latent_representation(adata_ood)
-            adata_ood.obsm["reconstruction"] = vae.get_reconstructed_expression(adata_ood, give_mean="True")
+            print(res)
             
-            for cond in adata_ood.obs["condition"].cat.categories:
-                truth = np.mean(adata_ood[adata_ood.obs["condition"]==cond].X, axis=0)
-                reconstruction = np.mean(adata_ood[adata_ood.obs["condition"]==cond].obsm["reconstruction"], axis=0)
-                r2_ood_scores = r2_score(truth, reconstruction) 
-            
+            r2_scores_test = evaluate(adata_test, vae)
+            r2_scores_ood = evaluate(adata_ood, vae)
             row_idx = df_result.shape[0]
             df_result.loc[row_idx, "n_latent"] = n_latent
             df_result.loc[row_idx, "n_hidden"] = n_hidden
-            df_result.loc[row_idx, "r2_ood"] = np.mean(r2_ood_scores)
-            df_result.to_csv(os.path.join(output_dir, f"{filename_adata_test}_result_hyper_split_{split}.csv"))
-            print(res)
+            df_result.loc[row_idx, "r2_test"] = np.mean(r2_scores_test)
+            df_result.loc[row_idx, "r2_ood"] = np.mean(r2_scores_ood)
+            df_result.to_csv(os.path.join(output_dir, f"{filename_adata_train}.result_hyper.csv"))
+            
     
     if return_results:
         return df_result
@@ -97,7 +108,6 @@ if __name__ == "__main__":
     parser.add_argument("--filename_adata_train", type=str)
     parser.add_argument("--filename_adata_val", type=str)
     parser.add_argument("--filename_adata_test", type=str)
-    parser.add_argument("--split", type=int)
     parser.add_argument("--n_latents", nargs="+", default=[10, 32, 64, 128, 256])
     parser.add_argument("--n_hiddens", nargs="+", default=[512, 1024, 2048])
     parser.add_argument("--gene_likelihood", type=str, default="normal")
@@ -113,7 +123,7 @@ if __name__ == "__main__":
     if not isinstance(args.n_hiddens, list):
         args.n_hiddens = [args.n_hiddens]
     args.n_latents = [int(dim) for dim in args.n_latents]
-    args.n_latents = [int(dim) for dim in args.n_hiddens]
+    args.n_hiddens = [int(dim) for dim in args.n_hiddens]
     
     print(args)
     
@@ -122,7 +132,6 @@ if __name__ == "__main__":
         filename_adata_train=args.filename_adata_train,
         filename_adata_val=args.filename_adata_val,
         filename_adata_test=args.filename_adata_test,
-        split=args.split,
         n_latents=args.n_latents,
         n_hiddens=args.n_hiddens,
         gene_likelihood=args.gene_likelihood,
