@@ -1,14 +1,7 @@
 split: 0 # idx
 sample_rep: X_pca
-# pca_dims: 300
 perturbation_covariates:
   target_gene: [gene_1, gene_2]
 perturbation_covariate_reps:
   target_gene: esm2
-# sample_covariates: 
-#   -  cell_line
-# sample_covariate_reps: 
-#   cell_line: cell_line_dict
-# split_covariates: 
-  # - cell_line
 wandb_project: otfm_norman
