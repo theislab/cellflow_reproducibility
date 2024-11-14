@@ -35,5 +35,8 @@ outputs/
 runs_otfm/bash_scripts/outputs/
 runs_otfm/bash_scripts/wandb/
 
+**/.ipynb_checkpoints
+**/*.zip
+
 **/*.err
 **/*.out
