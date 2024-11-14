@@ -19,7 +19,7 @@
 #SBATCH --nice=1
 
 source /home/haicu/soeren.becker/.bashrc
-conda activate /home/haicu/soeren.becker/miniconda3/envs/env_cfp
+conda activate /home/haicu/soeren.becker/miniconda3/envs/env_cfp2
 
 
 

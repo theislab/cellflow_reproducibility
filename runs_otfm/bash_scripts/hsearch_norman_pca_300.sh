@@ -19,7 +19,7 @@
 #SBATCH --nice=1
 
 source /home/haicu/soeren.becker/.bashrc
-conda activate /home/haicu/soeren.becker/miniconda3/envs/env_cfp
+conda activate /home/haicu/soeren.becker/miniconda3/envs/env_cfp2
 
 python /home/haicu/soeren.becker/repos/ot_pert_reproducibility/runs_otfm/train_norman_pca_300.py \
     --multirun \
