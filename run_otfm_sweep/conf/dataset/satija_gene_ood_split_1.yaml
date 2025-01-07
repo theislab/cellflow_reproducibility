@@ -1,0 +1,3 @@
+# dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/IFNG_IFNB_ct-BXPC3_hvg-1000_pca-30_counts_ms_0.5/
+dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_genes/adata_ood_final_genesIFNG_IFNB_TNFA_TGFB_INS_hvg-500_pca-20_counts_ms_0.5/
+file_suffix: '_split_1'

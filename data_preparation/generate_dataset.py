@@ -7,17 +7,14 @@ import numpy as np
 from utils import get_DE_genes
 import anndata
 from scipy.sparse import csr_matrix
-import h5py
-import anndata as ad
-from scipy import sparse
 from cfp import preprocessing as cfpp
 
 hvg = 500
 pca_dim = 100
+ms = 0.5
 pathway = 'IFNG_IFNB_TNFA_TGFB_INS'
 ood_pathway = 'IFNB'
 ood_cell_type = 'MCF7'
-ms = 0.5
 output_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/" + pathway + '_ct-' + ood_cell_type + '_hvg-' + str(hvg) + '_pca-' + str(pca_dim) + '_counts' + '_ms_' + str(ms)
 
 genes_from_paper = [
@@ -59,9 +56,6 @@ del adata.layers['counts']
 sc.pp.normalize_total(adata)
 sc.pp.log1p(adata)
 
-adata.obs['condition'] = adata.obs.apply(lambda x: "_".join([x.cell_type, x.pathway, x.gene]), axis=1)
-adata.obs['background'] = adata.obs.apply(lambda x: "_".join([x.cell_type, x.pathway]), axis=1)
-
 columns_to_drop = ['orig.ident', 'nCount_RNA', 'nFeature_RNA', 'sample', 'percent.mito', 'sample_ID', 'Batch_info', 'bc1_well', 'bc2_well', 'bc3_well', 'guide', 'mixscale_score', 'RNA_snn_res.0.9', 'seurat_clusters']
 adata.obs.drop(columns=columns_to_drop, inplace=True)
 print('Datasets prepared, running hvg analysis')
@@ -84,21 +78,24 @@ print('HVG analysis done')
 adata = get_DE_genes(adata, by='condition', covariate='background')
 print('DE genes calculated')
 
-controls = {}
-for bg in adata.obs["background"].unique():
-    controls[bg] = adata[adata.obs["condition"]==bg+'_NT'].X.toarray()
+# controls = {}
+# for bg in adata.obs["background"].unique():
+#     controls[bg] = adata[adata.obs["condition"]==bg+'_NT'].X.toarray()
 
 for col in adata.obs.select_dtypes(include=["category"]):
     adata.obs[col].cat.remove_unused_categories()
 
-adata = get_DE_genes(adata, by='condition', covariate='background')
+# adata = get_DE_genes(adata, by='condition', covariate='background')
 
 ood_condition = ood_cell_type + '_' + ood_pathway
 filtered_conditions = adata.obs['condition'].unique() # unnecessary
+
 perturbations = list(adata.obs[adata.obs['gene'] != 'NT']["condition"].unique())
 ood_conditions = [c for c in perturbations if c.startswith(ood_condition) and c in filtered_conditions]
+
 remaining_conditions = list(set(filtered_conditions) - set(ood_conditions))
 remaining_unique = list(set([value for entry in remaining_conditions for value in entry.split('_')]))
+
 adata.obs["ood"] = adata.obs.apply(lambda x: x["condition"] if x["condition"] in ood_conditions else False, axis=1)
 adata.obs["is_ood"] = adata.obs.apply(lambda x: x["condition"] in ood_conditions, axis=1)
 adata.obs.drop(columns='ood', inplace=True)

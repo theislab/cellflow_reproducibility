@@ -1,13 +1,13 @@
 learning_rate: 0.00005
-multi_steps: 20
+multi_steps: 50
 batch_size: 1024
-num_iterations: 250000 # 1000000
-valid_freq: 50000
+num_iterations: 500_000 # 1000000
+valid_freq: 200_000
 ood_name: "ood"
-ood_n_conditions:
-  iteration: 10 # 5
-  end: 10 # 58 
+ood_n_conditions: 
+  iteration: null 
+  end: null  
 test_name: "test"
 test_n_conditions:
-  iteration: 10
-  end: 10 # 219 
+  iteration: 0
+  end: 0

@@ -4,7 +4,7 @@
 defaults:
   - _self_
   - dataset: satija_ifng
-  - hydra: satija_ifng
+  - hydra: satija_gene_ood
   - model: satija_ifng
   - launcher: slurm_icb
   - logger: satija_ifng

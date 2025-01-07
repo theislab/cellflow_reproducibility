@@ -1,0 +1,9 @@
+project: 'satija_gene_ood_2'
+out_dir: '/lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out'
+
+metrics: ['r_squared', "mmd", "sinkhorn_div", "e_distance"]
+calc_decoded_metrics: True
+decoded_metrics: ['r_squared', "mmd", "sinkhorn_div", "e_distance"]
+
+save_model: True
+save_model_path: /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out

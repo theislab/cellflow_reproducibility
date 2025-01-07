@@ -50,7 +50,6 @@ def rank_genes_groups_by_cov(
     if return_dict:
         return gene_dict
 
-
 def get_DE_genes(adata, by='condition', covariate='cell_type'):
     adata.obs.loc[:, "control"] = adata.obs.gene.apply(lambda x: 1 if x == "NT" else 0)
     adata.obs = adata.obs.astype("category")
