@@ -4,8 +4,6 @@ import anndata as ad
 import pandas as pd
 from scipy.sparse import csr_matrix
 from tqdm import tqdm 
-from collections import defaultdict
-import itertools
 import argparse
 
 import sys 
@@ -19,19 +17,18 @@ from cfp import preprocessing as cfpp
 def split_and_save_adata(args):
     """The function to split and 
     """
-    # Input parameters 
-    rng = np.random.default_rng(0)
+    # Initialize parameters and random generator 
+    rng = np.random.default_rng(seed=42)  
     hvg = args.hvg
     pca_dim = args.pca_dim
     ms = args.ms
-
-    # The pathways and the ood_condition 
-    ood_condition = args.ood_split
+    split_path = args.split_path 
+    
     # Pathway string use to parse .h5ad
     pathway = 'IFNG_IFNB_TNFA_TGFB_INS'
     
     # The final output dir
-    output_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_genes" + pathway + '_hvg-' + str(hvg) + '_pca-' + str(pca_dim) + '_counts' + '_ms_' + str(ms)
+    output_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_genes" + pathway + '_hvg-' + str(hvg) + '_pca-' + str(pca_dim) + '_counts' + '_ms_' + str(ms) + "_3"
     os.makedirs(output_dir, exist_ok=True)
 
     genes_from_paper = [
@@ -57,6 +54,9 @@ def split_and_save_adata(args):
 
     # Create common anndata 
     adata = ad.concat(datasets, join='outer')
+    # Remove a combination because it has too few examples
+    adata = adata[~np.logical_and(adata.obs.cell_type=="K562",
+                                 (adata.obs.pathway=="TGFB"))]
     print('Datasets concatenated')
     
     # Make the variable names unique
@@ -66,39 +66,49 @@ def split_and_save_adata(args):
     columns_to_drop = ['orig.ident', 'nCount_RNA', 'nFeature_RNA', 'sample', 'percent.mito', 'sample_ID', 'Batch_info', 'bc1_well', 'bc2_well', 'bc3_well', 'guide', 'mixscale_score', 'RNA_snn_res.0.9', 'seurat_clusters']
     adata.obs.drop(columns=columns_to_drop, inplace=True)
     print('Unnecessary columns dropped')
-
-    # Use a defaultdict for convenience
-    pathway_to_gene = defaultdict(set)
-
-    # Populate the dictionary
-    for pathway, gene in zip(adata.obs.pathway, adata.obs.gene):
-        pathway_to_gene[pathway].add(gene)
-
-    # Convert sets to lists (optional, depending on downstream use)
-    pathway_to_gene = {key: list(value) for key, value in pathway_to_gene.items()}
     
-    # Collect the different splits per pathway 
-    splits = {}
-    for pathway in pathway_to_gene:
-        # Non-control genes to use as part of the splits 
-        pathway_to_gene_no_controls = [gene for gene in pathway_to_gene[pathway] if gene != 'NT']
-        # Split in 4 equal values 
-        oods = np.array_split(np.array(pathway_to_gene_no_controls), 4)
-        splits[pathway] = oods
-        
-    # We will have controls assigned to all observations and then convert to split name per gene
-    adata.obs["split_encodings"] = ["controls"] * len(adata)
+    if split_path==None:
+        # Pathway to gene 
+        pathway_to_gene = {}
 
-    for split_no in range(4):    
-        for pathway in splits:
-            for gene in splits[pathway][split_no]:
-                idx = np.logical_and(adata.obs.pathway==pathway, 
-                                        adata.obs.gene==gene)
-                
-                adata.obs.loc[idx, "split_encodings"] = f"split_{split_no}"
-                
+        # Populate the dictionary
+        for pathway, gene in zip(adata.obs.pathway, adata.obs.gene):
+            if gene != "NT":
+                if pathway not in pathway_to_gene:
+                    pathway_to_gene[pathway]=[]
+                if gene not in pathway_to_gene[pathway]:
+                    pathway_to_gene[pathway].append(gene)
+
+        # Convert sets to lists (optional, depending on downstream use)
+        for key in pathway_to_gene:
+            rng.shuffle(pathway_to_gene[key])  # Shuffle genes per pathway 
+        
+        # Collect the different splits per pathway 
+        splits = {}
+        for pathway in pathway_to_gene:
+            # Split in 4 equal values 
+            oods = np.array_split(np.array(pathway_to_gene[pathway]), 4)
+            splits[pathway] = oods
+            
+        # We will have controls assigned to all observations and then convert to split name per gene
+        adata.obs["split_encodings"] = ["controls"] * len(adata)
+
+        for split_no in range(4):    
+            for pathway in splits:
+                for gene in splits[pathway][split_no]:
+                    idx = np.logical_and(adata.obs.pathway==pathway, 
+                                            adata.obs.gene==gene)
+                    
+                    adata.obs.loc[idx, "split_encodings"] = f"split_{split_no}"
+    else:
+        adata.obs["split_encodings"] = ["controls"] * len(adata)
+        precomp_split = pd.read_csv(split_path)
+        for r in precomp_split.iterrows():
+            gene, pathway, split = r[1].gene, r[1].pathway, r[1].split
+            adata.obs.loc[np.logical_and(adata.obs.pathway==pathway,
+                                     adata.obs.gene==gene), "split_encodings"] = split
+        
     # Add specific columns to adata.obs 
-    adata.obs['split_condition'] = adata.obs.apply(lambda x: "_".join([x.pathway, x.split_encodings]), axis=1)
     adata.obs['perturbation_condition'] = adata.obs.apply(lambda x: "_".join([x.cell_type, x.pathway, x.gene]), axis=1)
     adata.obs['background'] = adata.obs.apply(lambda x: "_".join([x.cell_type, x.pathway]), axis=1)
     print("Added pathway keys to the .obs data frame")
@@ -137,118 +147,114 @@ def split_and_save_adata(args):
     print('DE genes calculated')
 
     for col in adata.obs.select_dtypes(include=["category"]):
-        adata.obs[col].cat.remove_unused_categories()
+       adata.obs[col].cat.remove_unused_categories() 
 
     # Filter the condition
-    filtered_conditions = adata.obs['split_condition'].unique() 
-    perturbations = list(adata.obs[adata.obs['gene'] != 'NT']["split_condition"].unique())
-    # Here I have to pass the split 
-    ood_conditions = [c for c in perturbations if c.endswith(ood_condition) and c in filtered_conditions]
+    for ood_condition in ["split_0", "split_1", "split_2", "split_3"]:
+        adata.obs["is_ood"] = adata.obs.apply(lambda x: x["split_encodings"] == ood_condition, axis=1)
+        adata_train = adata[~adata.obs["is_ood"]]
+        adata_ood = adata[adata.obs["is_ood"]]
+        # adata.write_h5ad("/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/full_adata_with_splits_gene_split.h5ad")
+        print(f"Dataset split: {adata_train.shape} train, {adata_ood.shape} ood")
+        
+        # Add split key    
+        adata_train.obs["split"] = "not_included"
 
-    adata.obs["is_ood"] = adata.obs.apply(lambda x: x["split_condition"] in ood_conditions, axis=1)
-    adata_train = adata[~adata.obs["is_ood"]]
-    adata_ood = adata[adata.obs["is_ood"]]
-    # adata.write_h5ad("/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/full_adata_with_splits_gene_split.h5ad")
-    print(f"Dataset split: {adata_train.shape} train, {adata_ood.shape} ood")
-    
-    # Add split key    
-    adata_train.obs["split"] = "not_included"
+        for c in adata_train.obs["perturbation_condition"].unique():
+            n_cells = adata_train[(adata_train.obs["perturbation_condition"]==c)].n_obs
+            # Subsample the controls, not treated 
+            if c.endswith('_NT'):
+                idx_test = rng.choice(np.arange(n_cells), 500, replace=False) 
+                adata_train.obs.loc[adata_train.obs['perturbation_condition'] == c, 'split'] = ["test" if idx in idx_test else "train" for idx in range(n_cells)]
+            elif n_cells>300:
+                idx_test = rng.choice(np.arange(n_cells), 100, replace=False)
+                adata_train.obs.loc[adata_train.obs['perturbation_condition'] == c, 'split'] = ["test" if idx in idx_test else "train" for idx in range(n_cells)]
 
-    for c in adata_train.obs["perturbation_condition"].unique():
-        n_cells = adata_train[(adata_train.obs["perturbation_condition"]==c)].n_obs
-        # Subsample the controls, not treated 
-        if c.endswith('_NT'):
-            idx_test = rng.choice(np.arange(n_cells), 500, replace=False) 
-            adata_train.obs.loc[adata_train.obs['perturbation_condition'] == c, 'split'] = ["test" if idx in idx_test else "train" for idx in range(n_cells)]
-        elif n_cells>300:
-            idx_test = rng.choice(np.arange(n_cells), 100, replace=False)
-            adata_train.obs.loc[adata_train.obs['perturbation_condition'] == c, 'split'] = ["test" if idx in idx_test else "train" for idx in range(n_cells)]
+        # Final training set 
+        adata_train_final = adata_train[adata_train.obs["split"]=="train"]
+        adata_test_final = adata_train[adata_train.obs["split"]=="test"]
+        # Add test controls to the ood data loader 
+        adata_ood_final = ad.concat((adata_ood, adata_test_final[adata_test_final.obs["perturbation_condition"].str.endswith('_NT')]))
+        adata_ood_final.uns = adata_ood.uns
+        print("Add controls to the ood set")
+        
+        # Compute centered pca on the training data
+        cfpp.centered_pca(adata_train_final, n_comps=pca_dim)  # this is gonna be 100 for training 
+        print("Run centred PCA")
 
-    # Final training set 
-    adata_train_final = adata_train[adata_train.obs["split"]=="train"]
-    adata_test_final = adata_train[adata_train.obs["split"]=="test"]
-    # Add test controls to the ood data loader 
-    adata_ood_final = ad.concat((adata_ood, adata_test_final[adata_test_final.obs["perturbation_condition"].str.endswith('_NT')]))
-    adata_ood_final.uns = adata_ood.uns
-    print("Add controls to the ood set")
-    
-    # Compute centered pca on the training data
-    cfpp.centered_pca(adata_train_final, n_comps=pca_dim)  # this is gonna be 100 for training 
-    print("Run centred PCA")
+        # Initialize a log-count layer
+        adata_train_final.layers["X_log1p"] = adata_train_final.X.copy()
+        # Training data mean 
+        adata_train_final_mean = adata_train_final.varm["X_mean"].flatten()
 
-    # Initialize a log-count layer
-    adata_train_final.layers["X_log1p"] = adata_train_final.X.copy()
-    # Training data mean 
-    adata_train_final_mean = adata_train_final.varm["X_mean"].flatten()
+        # Define the gene means for the anndata train and ood as the training one 
+        adata_ood_final.varm["X_mean"] = adata_train_final.varm["X_mean"]
+        adata_test_final.varm["X_mean"] = adata_train_final.varm["X_mean"]
 
-    # Define the gene means for the anndata train and ood as the training one 
-    adata_ood_final.varm["X_mean"] = adata_train_final.varm["X_mean"]
-    adata_test_final.varm["X_mean"] = adata_train_final.varm["X_mean"]
+        # Center both test and ood data by the mean of the training set and compute PCA based on this
+        adata_test_final.layers["centered_X"] = csr_matrix(adata_test_final.X.toarray() - adata_train_final_mean)
+        adata_ood_final.layers["centered_X"] = csr_matrix(adata_ood_final.X.toarray() - adata_train_final_mean)
+        adata_test_final.obsm["X_pca"] = np.matmul(adata_test_final.layers["centered_X"].toarray(), adata_train_final.varm["PCs"])
+        adata_ood_final.obsm["X_pca"] = np.matmul(adata_ood_final.layers["centered_X"].toarray(), adata_train_final.varm["PCs"])
 
-    # Center both test and ood data by the mean of the training set and compute PCA based on this
-    adata_test_final.layers["centered_X"] = csr_matrix(adata_test_final.X.toarray() - adata_train_final_mean)
-    adata_ood_final.layers["centered_X"] = csr_matrix(adata_ood_final.X.toarray() - adata_train_final_mean)
-    adata_test_final.obsm["X_pca"] = np.matmul(adata_test_final.layers["centered_X"].toarray(), adata_train_final.varm["PCs"])
-    adata_ood_final.obsm["X_pca"] = np.matmul(adata_ood_final.layers["centered_X"].toarray(), adata_train_final.varm["PCs"])
+        # Add the control key to the obs data frame
+        adata_train_final.obs['control'] = adata_train_final.obs.apply(lambda x: x['gene'] == 'NT', axis=1)
+        adata_test_final.obs['control'] = adata_test_final.obs.apply(lambda x: x['gene'] == 'NT', axis=1)
+        adata_ood_final.obs['control'] = adata_ood_final.obs.apply(lambda x: x['gene'] == 'NT', axis=1)
+        
+        # Add embeddings 
+        path_to_embeddings = os.path.join('/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/embeddings/perturb_emb/satijas_v2', 'gene_embeddings.pkl')
+        # Gene KO embeddings 
+        ko_embeddings = pkl.load(open(path_to_embeddings, 'rb'))
+        ko_embeddings = pd.DataFrame(ko_embeddings).T
+        ko_embeddings = ko_embeddings.astype(np.float32)
+        gene_embeddings_dict = dict(zip(ko_embeddings.index, ko_embeddings.values))
 
-    # Add the control key to the obs data frame
-    adata_train_final.obs['control'] = adata_train_final.obs.apply(lambda x: x['gene'] == 'NT', axis=1)
-    adata_test_final.obs['control'] = adata_test_final.obs.apply(lambda x: x['gene'] == 'NT', axis=1)
-    adata_ood_final.obs['control'] = adata_ood_final.obs.apply(lambda x: x['gene'] == 'NT', axis=1)
-    
-    # Add embeddings 
-    path_to_embeddings = os.path.join('/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/embeddings/perturb_emb/satijas_v2', 'gene_embeddings.pkl')
-    # Gene KO embeddings 
-    ko_embeddings = pkl.load(open(path_to_embeddings, 'rb'))
-    ko_embeddings = pd.DataFrame(ko_embeddings).T
-    ko_embeddings = ko_embeddings.astype(np.float32)
-    gene_embeddings_dict = dict(zip(ko_embeddings.index, ko_embeddings.values))
+        # Cell line embedding 
+        cell_embeddings = pd.read_csv('/lustre/groups/ml01/workspace/ot_perturbation/data/satija/embeddings/cell_line_embedding_full_ccle_300_normalized.csv', index_col=0)
+        cell_embeddings = cell_embeddings.astype(np.float32)
+        cell_embeddings_dict = dict(zip(cell_embeddings.index, cell_embeddings.values))
+        cell_embeddings_dict = {k: v for k, v in cell_embeddings_dict.items() if k in adata_train_final.obs['cell_type'].unique()}
 
-    # Cell line embedding 
-    cell_embeddings = pd.read_csv('/lustre/groups/ml01/workspace/ot_perturbation/data/satija/embeddings/cell_line_embedding_full_ccle_300_normalized.csv', index_col=0)
-    cell_embeddings = cell_embeddings.astype(np.float32)
-    cell_embeddings_dict = dict(zip(cell_embeddings.index, cell_embeddings.values))
-    cell_embeddings_dict = {k: v for k, v in cell_embeddings_dict.items() if k in adata_train_final.obs['cell_type'].unique()}
+        # Control embedding as zero 
+        gene_embeddings_dict['NT'] = np.zeros(gene_embeddings_dict['IFNG'].shape)
+        pathway_embeddings = {k: v for k, v in gene_embeddings_dict.items() if k in adata_train_final.obs['pathway'].unique()}
 
-    # Control embedding as zero 
-    gene_embeddings_dict['NT'] = np.zeros(gene_embeddings_dict['IFNG'].shape)
-    pathway_embeddings = {k: v for k, v in gene_embeddings_dict.items() if k in adata_train_final.obs['pathway'].unique()}
+        # Add all the embeddings to the uns of the adata 
+        adata_train_final.uns['gene_emb'] = gene_embeddings_dict
+        adata_train_final.uns['cell_type_emb'] = cell_embeddings_dict
+        adata_train_final.uns['pathway_emb'] = pathway_embeddings
 
-    # Add all the embeddings to the uns of the adata 
-    adata_train_final.uns['gene_emb'] = gene_embeddings_dict
-    adata_train_final.uns['cell_type_emb'] = cell_embeddings_dict
-    adata_train_final.uns['pathway_emb'] = pathway_embeddings
+        adata_test_final.uns['gene_emb'] = gene_embeddings_dict
+        adata_test_final.uns['cell_type_emb'] = cell_embeddings_dict
+        adata_test_final.uns['pathway_emb'] = pathway_embeddings
 
-    adata_test_final.uns['gene_emb'] = gene_embeddings_dict
-    adata_test_final.uns['cell_type_emb'] = cell_embeddings_dict
-    adata_test_final.uns['pathway_emb'] = pathway_embeddings
+        adata_ood_final.uns['gene_emb'] = gene_embeddings_dict
+        adata_ood_final.uns['cell_type_emb'] = cell_embeddings_dict
+        adata_ood_final.uns['pathway_emb'] = pathway_embeddings
 
-    adata_ood_final.uns['gene_emb'] = gene_embeddings_dict
-    adata_ood_final.uns['cell_type_emb'] = cell_embeddings_dict
-    adata_ood_final.uns['pathway_emb'] = pathway_embeddings
+        # Subset for cells for which we have the embeddings 
+        adata_train_final = adata_train_final[adata_train_final.obs['cell_type'].isin(cell_embeddings_dict.keys()), :]
+        adata_train_final = adata_train_final[adata_train_final.obs['pathway'].isin(pathway_embeddings.keys()), :]
+        adata_train_final = adata_train_final[(adata_train_final.obs['gene'].isin(gene_embeddings_dict.keys()) | (adata_train_final.obs['gene'] == 'NT')), :]
 
-    # Subset for cells for which we have the embeddings 
-    adata_train_final = adata_train_final[adata_train_final.obs['cell_type'].isin(cell_embeddings_dict.keys()), :]
-    adata_train_final = adata_train_final[adata_train_final.obs['pathway'].isin(pathway_embeddings.keys()), :]
-    adata_train_final = adata_train_final[(adata_train_final.obs['gene'].isin(gene_embeddings_dict.keys()) | (adata_train_final.obs['gene'] == 'NT')), :]
+        adata_test_final = adata_test_final[adata_test_final.obs['cell_type'].isin(cell_embeddings_dict.keys()), :]
+        adata_test_final = adata_test_final[adata_test_final.obs['pathway'].isin(pathway_embeddings.keys()), :]
+        adata_test_final = adata_test_final[(adata_test_final.obs['gene'].isin(gene_embeddings_dict.keys()) | (adata_test_final.obs['gene'] == 'NT')), :]
 
-    adata_test_final = adata_test_final[adata_test_final.obs['cell_type'].isin(cell_embeddings_dict.keys()), :]
-    adata_test_final = adata_test_final[adata_test_final.obs['pathway'].isin(pathway_embeddings.keys()), :]
-    adata_test_final = adata_test_final[(adata_test_final.obs['gene'].isin(gene_embeddings_dict.keys()) | (adata_test_final.obs['gene'] == 'NT')), :]
+        adata_ood_final = adata_ood_final[adata_ood_final.obs['cell_type'].isin(cell_embeddings_dict.keys()), :]
+        adata_ood_final = adata_ood_final[adata_ood_final.obs['pathway'].isin(pathway_embeddings.keys()), :]
+        adata_ood_final = adata_ood_final[(adata_ood_final.obs['gene'].isin(gene_embeddings_dict.keys()) | (adata_ood_final.obs['gene'] == 'NT')), :]
 
-    adata_ood_final = adata_ood_final[adata_ood_final.obs['cell_type'].isin(cell_embeddings_dict.keys()), :]
-    adata_ood_final = adata_ood_final[adata_ood_final.obs['pathway'].isin(pathway_embeddings.keys()), :]
-    adata_ood_final = adata_ood_final[(adata_ood_final.obs['gene'].isin(gene_embeddings_dict.keys()) | (adata_ood_final.obs['gene'] == 'NT')), :]
-
-    print("Shape train", adata_train_final.shape)
-    print("Shape test", adata_test_final.shape)
-    print("Shape ood", adata_ood_final.shape) 
-    
-    # Save the anndata 
-    adata_train_final.write(os.path.join(output_dir, "adata_train_" + ood_condition + ".h5ad"))
-    adata_ood_final.write(os.path.join(output_dir, "adata_ood_" + ood_condition + ".h5ad"))
-    adata_test_final.write(os.path.join(output_dir, "adata_test_" + ood_condition + ".h5ad"))
-    print("Saved data")
+        print("Shape train", adata_train_final.shape)
+        print("Shape test", adata_test_final.shape)
+        print("Shape ood", adata_ood_final.shape) 
+        
+        # Save the anndata 
+        adata_train_final.write(os.path.join(output_dir, "adata_train_" + ood_condition + ".h5ad"))
+        adata_ood_final.write(os.path.join(output_dir, "adata_ood_" + ood_condition + ".h5ad"))
+        adata_test_final.write(os.path.join(output_dir, "adata_test_" + ood_condition + ".h5ad"))
+        print("Saved data")
     
 def main():
     # Create the argument parser
@@ -281,6 +287,14 @@ def main():
         type=float, 
         required=True, 
         help="MixScape score."
+    )
+    
+    # Add optional argument for "split_path"
+    parser.add_argument(
+        '--split_path', 
+        type=str, 
+        default=None, 
+        help="The path to the split file. Optional, defaults to None if not provided."
     )
     
     # Parse the arguments

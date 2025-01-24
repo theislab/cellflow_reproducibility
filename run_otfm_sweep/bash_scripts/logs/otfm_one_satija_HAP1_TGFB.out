@@ -1,0 +1,9 @@
+------------------ Data loaded ------------------
+[2025-01-20 16:43:39,279][jax._src.xla_bridge][INFO] - Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+[2025-01-20 16:43:39,281][jax._src.xla_bridge][INFO] - Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+------------------ Model prepared ------------------
+------------------ Callbacks prepared ------------------
+------------------ Training done ------------------
+------------------ Model saved ------------------
+[1;34mwandb[0m: 🚀 View run [33mvibrant-oath-1[0m at: [34mhttps://wandb.ai/allepalma/satija_cell_type_HAP1_TGFB/runs/u3aq9fns[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../../../../../../../lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/wandb/run-20250120_164457-u3aq9fns/logs[0m

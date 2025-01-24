@@ -24,27 +24,27 @@ conda activate ot_pert
 # python /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/run_otfm_sweep/train_satija_gene_ood.py \
 # dataset=satija_gene_ood_split_0 \
 # logger=satija_gene_ood_split_0 \
-# training=satija_ifng \
+# training=satija_leaveout_best_0 \
 # launcher=slurm_icb \
-# model=satija_leaveout_best
+# model=satija_leaveout_best_0
 
 # python /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/run_otfm_sweep/train_satija_gene_ood.py \
 # dataset=satija_gene_ood_split_1 \
 # logger=satija_gene_ood_split_1 \
-# training=satija_ifng \
+# training=satija_leaveout_best_0 \
 # launcher=slurm_icb \
-# model=satija_leaveout_best
+# model=satija_leaveout_best_0
 
 # python /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/run_otfm_sweep/train_satija_gene_ood.py \
 # dataset=satija_gene_ood_split_2 \
 # logger=satija_gene_ood_split_2 \
-# training=satija_ifng \
+# training=satija_leaveout_best_0 \
 # launcher=slurm_icb \
-# model=satija_leaveout_best
+# model=satija_leaveout_best_0
 
 python /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/run_otfm_sweep/train_satija_gene_ood.py \
 dataset=satija_gene_ood_split_3 \
 logger=satija_gene_ood_split_3 \
-training=satija_ifng \
+training=satija_leaveout_best_0 \
 launcher=slurm_icb \
-model=satija_leaveout_best
+model=satija_leaveout_best_0

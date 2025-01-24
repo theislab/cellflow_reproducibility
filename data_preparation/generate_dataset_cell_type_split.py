@@ -20,7 +20,7 @@ def split_and_save_adata(args):
     """The function to split and 
     """
     # Input parameters 
-    rng = np.random.default_rng(0)
+    rng = np.random.default_rng(seed=42)  
     hvg = args.hvg
     pca_dim = args.pca_dim
     ms = args.ms
@@ -112,7 +112,7 @@ def split_and_save_adata(args):
     perturbations = list(adata.obs[adata.obs['gene'] != 'NT']["condition"].unique())
     ood_conditions = [c for c in perturbations if c.startswith(ood_condition) and c in filtered_conditions]
 
-    adata.obs["is_ood"] = adata.obs.apply(lambda x: x["cell_type"] in ood_conditions, axis=1)
+    adata.obs["is_ood"] = adata.obs.apply(lambda x: x["condition"] in ood_conditions, axis=1)
     adata_train = adata[~adata.obs["is_ood"]]
     adata_ood = adata[adata.obs["is_ood"]]
     # adata.write_h5ad("/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/full_adata_with_splits_cell_type_split.h5ad")
@@ -179,11 +179,11 @@ def split_and_save_adata(args):
     cell_embeddings = pd.read_csv('/lustre/groups/ml01/workspace/ot_perturbation/data/satija/embeddings/cell_line_embedding_full_ccle_300_normalized.csv', index_col=0)
     cell_embeddings = cell_embeddings.astype(np.float32)
     cell_embeddings_dict = dict(zip(cell_embeddings.index, cell_embeddings.values))
-    cell_embeddings_dict = {k: v for k, v in cell_embeddings_dict.items() if k in adata_train_final.obs['cell_type'].unique()}
+    cell_embeddings_dict = {k: v for k, v in cell_embeddings_dict.items() if k in adata.obs['cell_type'].unique()}
 
     # Control embedding as zero 
     gene_embeddings_dict['NT'] = np.zeros(gene_embeddings_dict['IFNG'].shape)
-    pathway_embeddings = {k: v for k, v in gene_embeddings_dict.items() if k in adata_train_final.obs['pathway'].unique()}
+    pathway_embeddings = {k: v for k, v in gene_embeddings_dict.items() if k in adata.obs['pathway'].unique()}
 
     # Add all the embeddings to the uns of the adata 
     adata_train_final.uns['gene_emb'] = gene_embeddings_dict

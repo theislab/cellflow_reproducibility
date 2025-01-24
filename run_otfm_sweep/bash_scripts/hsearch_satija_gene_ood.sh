@@ -29,5 +29,5 @@ conda activate ot_pert
 #  logger=satija_ifng #launcher=slurm_icb
 
 
-python /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/run_otfm_sweep/train_satija_gene_ood.py --m dataset=satija_gene_ood_split_2 logger=satija_gene_ood_split_2 training=satija_ifng launcher=slurm_icb model=satija_leaveout hparams_search=satija_ifng 
+python /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/run_otfm_sweep/train_satija_gene_ood.py --m dataset=satija_gene_ood_split_0 logger=satija_gene_ood_split_0 training=satija_ifng launcher=slurm_icb model=satija_leaveout hparams_search=satija_ifng 
 
