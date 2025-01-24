@@ -10,54 +10,5 @@
   warnings.warn(msg, FutureWarning)
 /home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_elem from `anndata.experimental` is deprecated. Import anndata.io.read_elem instead.
   warnings.warn(msg, FutureWarning)
-2025-01-01 21:41:26.306345: W external/xla/xla/tsl/framework/bfc_allocator.cc:497] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.85GiB (rounded to 3056984320)requested by op 
-2025-01-01 21:41:26.307479: W external/xla/xla/tsl/framework/bfc_allocator.cc:508] ********************____________********************_______********************____________________*
-E0101 21:41:26.307553 2023687 pjrt_stream_executor_client.cc:3086] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 3056984100 bytes.
-jax.errors.SimplifiedTraceback: For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/ictstr01/home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/evaluation/evaluate_baselines/compute_metrics_mean.py", line 74, in <module>
-    ood_metrics_encoded = jax.tree_util.tree_map(
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/jax/_src/tree_util.py", line 365, in tree_map
-    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/jax/_src/tree_util.py", line 365, in <genexpr>
-    return treedef.unflatten(f(*xs) for xs in zip(*all_leaves))
-  File "/ictstr01/home/icb/alessandro.palma/environment/ot_pert/cell_flow_perturbation/src/cfp/metrics/_metrics.py", line 52, in compute_metrics
-    metrics["sinkhorn_div_1"] = compute_sinkhorn_div(x, y, epsilon=1.0)
-  File "/ictstr01/home/icb/alessandro.palma/environment/ot_pert/cell_flow_perturbation/src/cfp/metrics/_metrics.py", line 29, in compute_sinkhorn_div
-    sinkhorn_divergence(
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/tools/sinkhorn_divergence.py", line 126, in sinkhorn_divergence
-    return _sinkhorn_divergence(
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/tools/sinkhorn_divergence.py", line 203, in _sinkhorn_divergence
-    out_yy = linear.solve(geometry_yy, b, b, **kwargs_symmetric)
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/solvers/linear/_solve.py", line 60, in solve
-    return solver(prob)
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/solvers/linear/sinkhorn.py", line 878, in __call__
-    return run(ot_prob, self, (init_dual_a, init_dual_b))
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/solvers/linear/sinkhorn.py", line 1153, in run
-    out = out.set_cost(ot_prob, solver.lse_mode, solver.use_danskin)
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/solvers/linear/sinkhorn.py", line 345, in set_cost
-    return self.set(reg_ot_cost=compute_kl_reg_cost(f, g, ot_prob, lse_mode))
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/solvers/linear/sinkhorn.py", line 280, in compute_kl_reg_cost
-    total_sum = jnp.sum(ot_prob.geom.marginal_from_potentials(f, g))
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/geometry.py", line 333, in marginal_from_potentials
-    z = self.apply_lse_kernel(f, g, self.epsilon, axis=axis)[0]
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/pointcloud.py", line 237, in apply_lse_kernel
-    return super().apply_lse_kernel(f, g, eps, vec, axis)
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/geometry.py", line 282, in apply_lse_kernel
-    w_res, w_sgn = self._softmax(f, g, eps, vec, axis)
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/geometry.py", line 425, in _softmax
-    self._center(f, g) / eps, axis=axis, return_sign=False
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/geometry.py", line 409, in _center
-    return f[:, jnp.newaxis] + g[jnp.newaxis, :] - self.cost_matrix
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/pointcloud.py", line 103, in cost_matrix
-    cost_matrix = self._compute_cost_matrix()
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/ott/geometry/pointcloud.py", line 187, in _compute_cost_matrix
-    cost_matrix += self._norm_x[:, jnp.newaxis] + self._norm_y[jnp.newaxis, :]
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/jax/_src/numpy/array_methods.py", line 573, in deferring_binary_op
-    return binary_op(*args)
-  File "/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/jax/_src/numpy/ufunc_api.py", line 179, in __call__
-    return call(*args)
-jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 3056984100 bytes.
+E0120 11:24:10.323635  697689 hlo_lexer.cc:443] Failed to parse int literal: 564687803066249355166
+E0120 12:01:22.172621  697689 hlo_lexer.cc:443] Failed to parse int literal: 564687803066249355166

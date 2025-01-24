@@ -1,0 +1,20 @@
+Start
+Centered pca
+Read ref
+Projected pca
+Condition HAP1_TGFB_ATF2
+Condition HAP1_TGFB_HDAC4
+Condition HAP1_TGFB_KRAS
+Condition HAP1_TGFB_MAPK14
+Condition HAP1_TGFB_MED15
+Condition HAP1_TGFB_NRAS
+Condition HAP1_TGFB_NT
+Condition HAP1_TGFB_PPP2CA
+Condition HAP1_TGFB_SMAD3
+Condition HAP1_TGFB_SMAD4
+Condition HAP1_TGFB_SMURF1
+Condition HAP1_TGFB_TGFBR1
+Condition HAP1_TGFB_TGFBR2
+Condition HAP1_TGFB_TGIF1
+End
+Start evaluating the metrics

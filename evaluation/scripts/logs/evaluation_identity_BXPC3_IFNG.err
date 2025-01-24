@@ -1,0 +1,13 @@
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_csv from `anndata` is deprecated. Import anndata.io.read_csv instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_loom from `anndata` is deprecated. Import anndata.io.read_loom instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_text from `anndata` is deprecated. Import anndata.io.read_text instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing CSCDataset from `anndata.experimental` is deprecated. Import anndata.abc.CSCDataset instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing CSRDataset from `anndata.experimental` is deprecated. Import anndata.abc.CSRDataset instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_elem from `anndata.experimental` is deprecated. Import anndata.io.read_elem instead.
+  warnings.warn(msg, FutureWarning)
+E0121 11:49:27.347969 2842406 hlo_lexer.cc:443] Failed to parse int literal: 85472404987179258063

@@ -10,5 +10,3 @@
   warnings.warn(msg, FutureWarning)
 /home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_elem from `anndata.experimental` is deprecated. Import anndata.io.read_elem instead.
   warnings.warn(msg, FutureWarning)
-/var/spool/slurmd/job30701401/slurm_script: line 29: 2347534 Killed                  python compute_metrics_mean.py 1
-slurmstepd: error: Detected 1 oom_kill event in StepId=30701401.batch. Some of the step tasks have been OOM Killed.

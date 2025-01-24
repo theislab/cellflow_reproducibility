@@ -20,7 +20,7 @@ def split_and_save_adata(args):
     """The function to split and 
     """
     # Input parameters 
-    rng = np.random.default_rng(0)
+    rng = np.random.default_rng(seed=42)  
     hvg = args.hvg
     pca_dim = args.pca_dim
     ms = args.ms
@@ -32,7 +32,7 @@ def split_and_save_adata(args):
     pathway = 'IFNG_IFNB_TNFA_TGFB_INS'
     
     # The final output dir
-    output_dir = output_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_cell_type/" + ood_cell_type + "_" + ood_pathway 
+    output_dir = output_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_pathway_cell_type/" + ood_cell_type + "_" + ood_pathway 
     os.makedirs(output_dir, exist_ok=True)
 
     genes_from_paper = [
@@ -112,11 +112,7 @@ def split_and_save_adata(args):
     filtered_conditions = adata.obs['condition'].unique() # unnecessary
     perturbations = list(adata.obs[adata.obs['gene'] != 'NT']["condition"].unique())
     ood_conditions = [c for c in perturbations if c.startswith(ood_condition) and c in filtered_conditions]
-    remaining_conditions = list(set(filtered_conditions) - set(ood_conditions))
-    remaining_unique = list(set([value for entry in remaining_conditions for value in entry.split('_')]))
-
-    # adata.obs["ood"] = adata.obs.apply(lambda x: x["condition"] if x["condition"] in ood_conditions else False, axis=1)
-    # del adata.obs["ood"]
+    
     adata.obs["is_ood"] = adata.obs.apply(lambda x: x["condition"] in ood_conditions, axis=1)
     adata_train = adata[~adata.obs["is_ood"]]
     adata_ood = adata[adata.obs["is_ood"]]

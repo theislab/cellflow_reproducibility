@@ -10,3 +10,4 @@
   warnings.warn(msg, FutureWarning)
 /home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_elem from `anndata.experimental` is deprecated. Import anndata.io.read_elem instead.
   warnings.warn(msg, FutureWarning)
+E0121 13:45:24.953639 3565875 hlo_lexer.cc:443] Failed to parse int literal: 85472404987179258063
