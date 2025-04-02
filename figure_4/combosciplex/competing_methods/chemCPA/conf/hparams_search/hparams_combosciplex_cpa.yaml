@@ -1,0 +1,62 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    #direction: minimize
+
+    n_jobs: 300
+
+    n_trials: 300
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+
+
+    params:
+      generic_params.use_counts: choice(False, True)
+      generic_params.use_deg_stopping_criterion: choice(False, True)
+      generic_params.split: choice(3)
+
+      trainer_hparams.n_epochs_kl_warmup: choice("to_none", 3)
+      trainer_hparams.n_epochs_pretrain_ae: choice("to_none", 30)
+      trainer_hparams.n_epochs_adv_warmup: choice("to_none", 50)
+      trainer_hparams.n_epochs_mixup_warmup: choice("to_none", 3)
+      trainer_hparams.mixup_alpha: choice(0.1)
+      trainer_hparams.adv_steps: choice(2, 5)
+      trainer_hparams.n_hidden_adv: choice(32, 64)
+      trainer_hparams.n_layers_adv: choice(2, 3)
+      trainer_hparams.use_batch_norm_adv: choice(False, True)
+      trainer_hparams.use_layer_norm_adv: choice(False, True)
+      trainer_hparams.dropout_rate_adv: choice(0.2, 0.3)
+      trainer_hparams.reg_adv: choice(10.0, 20.0)
+      trainer_hparams.pen_adv: choice(10.0, 20.0)
+      trainer_hparams.lr: choice(0.0003)
+      trainer_hparams.wd: choice(0.0000007) # choice(4e-07)
+      trainer_hparams.adv_lr: choice(0.0003)
+      trainer_hparams.adv_wd: choice(0.0000007) # 4e-07
+      trainer_hparams.adv_loss: choice(cce)
+      trainer_hparams.doser_lr: choice(0.0003)
+      trainer_hparams.doser_wd: choice(0.0000007) # choice(4e-07)
+      trainer_hparams.do_clip_grad: choice(False)
+      trainer_hparams.gradient_clip_value: choice(1.0)
+      trainer_hparams.step_size_lr: choice(45)
+        
+      ae_hparams.n_latent: choice(64, 128, 256)
+      ae_hparams.n_hidden_encoder: choice(256, 512)
+      ae_hparams.n_layers_encoder: choice(2, 3, 4)
+      ae_hparams.n_hidden_decoder: choice(256, 512, 1024)
+      ae_hparams.n_layers_decoder: choice(2, 3, 4)
+      ae_hparams.use_batch_norm_encoder: choice(False, True)
+      ae_hparams.use_layer_norm_encoder: choice(False, True)
+      ae_hparams.use_batch_norm_decoder: choice(False, True)
+      ae_hparams.use_layer_norm_decoder: choice(False, True)
+        
+

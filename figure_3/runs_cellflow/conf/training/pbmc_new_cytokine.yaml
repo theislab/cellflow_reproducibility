@@ -1,0 +1,9 @@
+valid_freq: 5_000_000
+num_iterations: 500_000
+batch_size: 1024
+train_fraction_for_validation: 0
+test_n_conditions_on_log_iteration: 0
+test_n_conditions_on_train_end: 0
+out_dir: /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_cytokine
+save_model: True
+save_preds: True

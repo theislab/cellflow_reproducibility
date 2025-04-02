@@ -1,0 +1,9 @@
+valid_freq: 50_000
+num_iterations: 500_000
+batch_size: 1024
+test_n_conditions_on_log_iteration: 0
+test_n_conditions_on_train_end: 0
+ood_n_conditions_on_log_iteration: null
+ood_n_conditions_on_train_end: null
+out_dir: /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/sciplex_final
+save_model: False

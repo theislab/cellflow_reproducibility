@@ -1,0 +1,11 @@
+# @package _global_
+
+
+hydra:
+  sweeper:
+      
+    params:
+      dataset.donor_held_out: choice('Donor1', 'Donor2', 'Donor3', 'Donor4', 'Donor5', 'Donor6', 'Donor7', 'Donor8', 'Donor9', 'Donor10', 'Donor11', 'Donor12')
+      dataset.idx_given_donor: choice(25) #choice(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24)
+
+      

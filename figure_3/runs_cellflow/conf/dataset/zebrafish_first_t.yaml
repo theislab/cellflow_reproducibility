@@ -1,0 +1,9 @@
+ood_condition: [cdx4_cdx1a_24, cdx4_control_24]
+perturbation_covariates:
+  gene_knockout: [gene_target_1, gene_target_2]
+perturbation_covariate_reps:
+  gene_knockout: gene_embeddings
+wandb_project: zebrafish_otfm
+sample_rep: X_aligned
+control_key: first_t_control # or is_control
+split_covariates: [] #[tissue_adapted] or [timepoint, tissue_adapted] or null

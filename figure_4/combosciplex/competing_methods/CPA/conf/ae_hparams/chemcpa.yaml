@@ -1,0 +1,14 @@
+n_latent: 256
+doser_type: logsigm
+n_hidden_encoder: 256
+n_layers_encoder: 4
+n_hidden_decoder: 512
+n_layers_decoder: 3
+use_batch_norm_encoder: false
+use_layer_norm_encoder: true
+use_batch_norm_decoder: true
+use_layer_norm_decoder: true
+dropout_rate_encoder: 0.1
+dropout_rate_decoder: 0.1
+variational: false
+seed: 434

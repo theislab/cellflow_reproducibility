@@ -1,0 +1,8 @@
+split: 3
+sample_rep: X_pca
+pca_dims: 300
+perturbation_covariates:
+  drugs: [Drug1, Drug2]
+perturbation_covariate_reps:
+  drugs: ecfp_rep
+wandb_project: otfm_combosciplex
