@@ -5,8 +5,6 @@ warnings.filterwarnings("ignore")
 import os
 import sys
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "5"
-
 import jax.tree as jt
 import jax.numpy as jnp
 import cloudpickle

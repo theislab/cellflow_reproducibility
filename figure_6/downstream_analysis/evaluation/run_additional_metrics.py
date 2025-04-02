@@ -4,8 +4,6 @@ warnings.filterwarnings("ignore")
 
 import os
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "5"
-
 import jax.tree as jt
 import jax.numpy as jnp
 from functools import partial
@@ -26,10 +24,6 @@ parser.add_argument("--full_adata", type=str, help="Path to full data")
 parser.add_argument("--name", type=str, help="Name of the run")
 parser.add_argument("--trial_name", type=str, help="Name of the ray trial")
 args = parser.parse_args()
-
-# args.name = "combination_fatima_RA+CycA"
-# args.trial_name = "cellflow_0a37dcb9"
-# args.full_adata = "/home/fleckj/projects/cellflow/data/datasets/organoids_combined/v8/combination/fatima/RA+CycA/adata_full.h5ad"
 
 
 #### Project name & dir ####

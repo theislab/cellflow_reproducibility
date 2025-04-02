@@ -1,8 +1,6 @@
 source('~/scripts/R/master.R')
 source('~/scripts/R/colors.R')
 
-library(Pando)
-
 select <- dplyr::select
 
 setwd('~/projects/cellflow/')

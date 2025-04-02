@@ -5,13 +5,6 @@ warnings.filterwarnings("ignore")
 import os
 
 import matplotlib.pyplot as plt
-
-
-plt.ion()
-
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = "5"
-
 import numpy as np
 import jax.tree as jt
 import jax.numpy as jnp

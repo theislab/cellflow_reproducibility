@@ -3,9 +3,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = "5"
-
 import numpy as np
 import jax
 import jax.tree as jt

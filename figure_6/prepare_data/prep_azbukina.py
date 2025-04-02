@@ -5,8 +5,6 @@ warnings.filterwarnings("ignore")
 import os
 import sys
 
-sys.path.append("/home/fleckj/projects/atlas/repo/atlas_utils")
-
 import numpy as np
 import pandas as pd
 

@@ -20,8 +20,6 @@ import scanpy as sc
 import anndata as ad
 import umap
 
-# import cuml
-
 import jax.tree as jt
 import jax.numpy as jnp
 import cfp
