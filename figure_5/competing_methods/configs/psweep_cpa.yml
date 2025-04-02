@@ -1,0 +1,89 @@
+# run
+project: cpa2
+wandb_key: "60ca1ce4e7f2712a5efc7b6c2110f4dbc6370057"
+script: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/scripts/otfm/run/bnchmrk/cpa_run.py
+metric: mmd_pca_reproj
+max_concurrent_trials: 15
+bsub_W: 24:00
+bsub_n: 2
+bsub_M: 50G
+bsub_q: long
+bsub_R: span[hosts=1]
+bsub_gpu: num=1:j_exclusive=yes
+
+# inputs and outputs
+h5ad: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/data/ineurons_glutpost.h5ad
+out_dir: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/results/sweeps/cpa
+out_prefix: null
+save_adata: False
+save_model: True
+
+# train-test splits
+train_datasets:
+- glut_post
+test_dataset: glut_post
+train_combs: null
+exclude_combs:
+- XAV+BMP4
+- CHIR+BMP4
+- RA+SHH
+- FGF8+SHH
+- RA+CHIR
+- RA+CHIR+BMP4
+- FGF8+CHIR+SHH
+eval_combs:
+- CHIR+BMP4
+- FGF8+SHH
+sweep_combs:
+- CHIR+BMP4
+- FGF8+SHH
+sweep_combs: []
+train_conds: []
+eval_conds: []
+sweep_conds: []
+plot_umap_combs: 
+- CHIR+BMP4
+- FGF8+SHH
+plot_umap_conds:
+- CHIR_4+BMP4_3
+- FGF8_4+SHH_1
+- FGF8_4+SHH_4
+plot_heatmap_combs:
+- CHIR+BMP4
+- FGF8+SHH
+plot_heatmap_conds: null
+
+# evaluation
+n_dims_eval: 20
+
+# training
+use_counts: [False, True]
+max_epochs: 500
+batch_size: [512, 1024]
+early_stopping_patience: 10
+n_epochs_kl_warmup: [null, 10]
+n_epochs_pretrain_ae: [null, 10, 30]
+n_epochs_adv_warmup: [null, 10, 50]
+n_epochs_mixup_warmup: [null, 3]
+mixup_alpha: 0.1
+adv_steps: 2
+n_hidden_adv: [32, 64, 128, 256, 512]
+n_layers_adv: [1, 2, 3, 4, 5]
+use_batch_norm_adv: [False, True]
+use_layer_norm_adv: [False, True]
+dropout_rate_adv: [0.1, 0.2, 0.3, 0.4, 0.5]
+reg_adv: [0., 10., 20., 40.]
+pen_adv: [0., 10., 20., 40.]
+
+# embedding
+n_latent: [16, 32, 64, 128, 256]
+doser_type: ["logsigm", "linear"]
+n_hidden_encoder: [128, 256, 512, 1024, 2048, 4096]
+n_layers_encoder: [1, 2, 3, 4, 5]
+n_hidden_decoder: [128, 256, 512, 1024, 2048, 4096]
+n_layers_decoder: [1, 2, 3, 4, 5]
+use_batch_norm: [False, True]
+use_layer_norm: [False, True]
+dropout_rate_encoder: [0.1, 0.2, 0.3, 0.4, 0.5]
+dropout_rate_decoder: [0.1, 0.2, 0.3, 0.4, 0.5]
+variational: [False, True]

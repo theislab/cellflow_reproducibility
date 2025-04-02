@@ -1,0 +1,120 @@
+# sweep
+project: "pca30_halfcb_1k"
+wandb_key: "4f842cf37c94355866c1ae1e93550aa83bea0b41"
+script: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/scripts/cellflow/cf_ineurons.py
+bsub_W: 24:00
+bsub_n: 1
+bsub_M: 100G
+bsub_q: long
+bsub_R: span[hosts=1]
+bsub_gpu: num=1:j_exclusive=yes
+
+# inputs and outputs
+h5ad: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/data/ineurons_glutpost.h5ad
+out_dir: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/results/sweeps/pca30_halfcb_1k
+out_prefix: null
+save_adata: False
+save_model: False
+
+# train-test splits
+n_splits: 1
+train_datasets:
+- glut_post
+test_dataset: glut_post
+train_combs: null
+exclude_combs:
+- XAV+BMP4
+- CHIR+BMP4
+- RA+SHH
+- FGF8+SHH
+- RA+CHIR
+- RA+CHIR+BMP4
+- FGF8+CHIR+SHH
+eval_combs:
+- CHIR+BMP4
+- FGF8+SHH
+sweep_combs:
+- CHIR+BMP4
+- FGF8+SHH
+train_conds: null
+eval_conds: null
+sweep_conds: null
+plot_umap_combs: 
+- CHIR+BMP4
+- FGF8+SHH
+plot_umap_conds:
+- RA_3+CHIR_4+BMP4_3
+- RA_4+CHIR_4+BMP4_3
+- FGF8_4+SHH_1
+- FGF8_4+SHH_4
+plot_heatmap_combs:
+- CHIR+BMP4
+- FGF8+SHH
+- RA+CHIR+BMP4
+plot_heatmap_conds: null
+
+# latent space
+latent_space: pca
+n_dims_train: 30
+n_dims_eval: 20
+vae_eval_rep: null
+h5ad_vae_train: null
+vae_train_path: null
+h5ad_vae_eval: null
+vae_eval_path: null
+
+# training
+iterations: [200000, 300000, 500000]
+batch_size: 1024
+lr_init: 0.00005
+lr_schedule: constant
+lr_b1: 0.9
+lr_b2: 0.999
+opt_n_steps: 20
+n_src_cells: [1000, 10000]
+n_src_cells_eval: 1000
+
+# condition embedding
+cond_embed_dim: [32, 64, 128, 256]
+pooling: "mean"
+pool_sample_covariates: False
+pool_num_heads: 0
+pool_qkv_dim: 0
+pool_dropout: 0.
+pool_act_fn: "relu"
+pool_seed_dim: 0
+pool_transformer_block: False
+pool_layer_norm: False
+cond_layers_before_pool: "mlp"
+cond_n_layers_before_pool: [2, 3, 4]
+cond_hidden_dim_before_pool: [256, 512, 1024, 2048, 4096, 8192]
+cond_dropout_before_pool: 0.
+cond_layers_after_pool: "mlp"
+cond_n_layers_after_pool: [0, 1, 2]
+cond_hidden_dim_after_pool: [256, 512, 1024]
+cond_dropout_after_pool: [0., 0.1, 0.2, 0.3, 0.4, 0.5]
+cond_output_dropout: [0., 0.1, 0.2, 0.3, 0.4, 0.5]
+cond_num_heads: 0
+cond_transformer: False
+cond_layer_norm: False
+cond_act_fn: "relu"
+
+# velocity field
+ot_num_layers_t: [1, 2, 3, 4, 5]
+ot_num_layers_x: [1, 2, 3, 4]
+ot_num_layers_decoder: 2
+ot_t_hidden_dim: [128, 256, 512, 1024, 2048]
+ot_x_hidden_dim: [128, 256, 512, 1024, 2048]
+ot_t_embed_dim: [32, 64, 128, 256, 512, 1024]
+ot_x_embed_dim: [32, 64, 128, 256]
+ot_joint_hidden_dim: [128, 256, 512, 1024, 2048, 4096, 8192]
+ot_act_fn: "silu"
+ot_dropout_t: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+ot_dropout_x: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+ot_dropout_decoder: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+ot_flow_type: "constant_noise"
+ot_flow_noise: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+ot_eps: [0.1, 0.5, 1.0]
+ot_tau_a: [0.99, 1.0]
+ot_tau_b: [0.99, 1.0]
+ot_n_frequencies: 1024

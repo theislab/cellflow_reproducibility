@@ -1,0 +1,74 @@
+# run
+project: "biolord2"
+wandb_key: "4f842cf37c94355866c1ae1e93550aa83bea0b41"
+script: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/scripts/bnchmrk/biolord_run.py
+bsub_W: 24:00
+bsub_n: 2
+bsub_M: 100G
+bsub_q: long
+bsub_R: span[hosts=1]
+bsub_gpu: num=1:j_exclusive=yes
+
+# inputs and outputs
+h5ad: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/data/ineurons_glutpost.h5ad
+out_dir: /pmount/projects/site/pred/organoid-atlas/USERS/bobrovsd/results/sweeps/biolord2
+out_prefix: null
+save_adata: False
+save_model: True
+
+# train-test splits
+train_datasets:
+- glut_post
+test_dataset: glut_post
+train_combs: null
+exclude_combs:
+- XAV+BMP4
+- CHIR+BMP4
+- RA+SHH
+- FGF8+SHH
+- RA+CHIR
+- RA+CHIR+BMP4
+- FGF8+CHIR+SHH
+eval_combs:
+- CHIR+BMP4
+- FGF8+SHH
+sweep_combs:
+- CHIR+BMP4
+- FGF8+SHH
+sweep_combs: []
+train_conds: []
+eval_conds: []
+sweep_conds: []
+plot_umap_combs: 
+- CHIR+BMP4
+- FGF8+SHH
+plot_umap_conds:
+- CHIR_4+BMP4_3
+- FGF8_4+SHH_1
+- FGF8_4+SHH_4
+plot_heatmap_combs:
+- CHIR+BMP4
+- FGF8+SHH
+plot_heatmap_conds: null
+
+# evaluation
+n_dims_eval: 20
+
+# training
+max_epochs: 500
+batch_size: [512, 1024]
+early_stopping_patience: 20
+reconstruction_penalty: [1.0, 10.0, 100.0, 1000.0, 10000.0]
+unknown_attribute_penalty: [1.0, 10.0, 100.0]
+unknown_attribute_noise_param: [0.001, 0.1, 0.2, 0.3]
+attribute_dropout_rate: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+use_batch_norm: [True, False]
+use_layer_norm: [True, False]
+
+# embedding
+n_latent: [16, 32, 64]
+decoder_width: [128, 256, 512, 1024, 2048, 4096]
+decoder_depth: [1, 2, 3, 4, 5, 6]
+attribute_nn_width: [128, 256, 512, 1024, 2048, 4096]
+attribute_nn_depth: [1, 2, 3, 4, 5, 6]
+n_latent_attribute_ordered: [16, 32, 64]
