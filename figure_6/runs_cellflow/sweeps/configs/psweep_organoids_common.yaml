@@ -1,0 +1,39 @@
+# # Training
+# lr_init: 0.00002
+# b1: 0.9
+# b2: 0.999
+# batch_size: 512
+# grad_accumulation_steps: 50
+# # Condition encoder
+# cond_net: "mlp"
+# cond_pooling: "mean"
+# cond_dropout_before_pool: 0.0
+cond_dropout_after_pool: [0.3, 0.4, 0.5, 0.6]
+cond_output_dropout: [0.1, 0.2, 0.3, 0.4]
+cond_hidden_dim_before_pool: [1024, 2048]
+cond_hidden_dim_after_pool: [512, 1024, 2048]
+# cond_n_layers_before_pool: 2
+# cond_n_layers_after_pool: 2
+# cond_pool_sample_covariates: True 
+cond_embed_dim: [32, 64, 128]
+# # Velocity field
+# vf_dropout_t: 0.0
+vf_dropout_x: [0.0, 0.1, 0.2, 0.3] 
+vf_dropout_decoder: [0.0, 0.1, 0.2, 0.3]
+# vf_n_frequencies: 1024
+# vf_n_layers_t: 2
+vf_n_layers_x: [1, 2, 3]
+# vf_n_layers_decoder: 3
+# # introduce hidden dims for x and t
+# vf_t_hidden_dim: 1024
+vf_x_hidden_dim: [512, 1024, 2048]
+# vf_t_embed_dim: 1024
+vf_x_embed_dim: [64, 128]
+vf_decoder_hidden_dim: [1024, 2048, 4096] 
+# # OT/Flow
+# flow_noise_type: "constant_noise"
+# flow_noise: 0.0
+# ot_match_epsilon: 1.0
+# ot_match_tau_a: 1.0 
+# ot_match_tau_b: 1.0 
+

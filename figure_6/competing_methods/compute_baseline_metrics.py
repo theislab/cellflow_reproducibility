@@ -3,11 +3,30 @@ from functools import partial
 import numpy as np
 import scanpy as sc
 import pandas as pd
+import anndata as ad
 
 from ott.problems.linear import barycenter_problem
 from ott.solvers.linear import continuous_barycenter, sinkhorn
 
+from scipy.spatial.distance import cosine
+from scipy.stats import pearsonr, wasserstein_distance, entropy
+
+import cfp
 from cfp.metrics import compute_metrics
+
+
+def compute_cluster_metrics(
+    true_props: np.ndarray, pred_props: np.ndarray
+) -> dict[str, float]:
+    metrics = {
+        "cosine": cosine(true_props, pred_props),
+        "pcorr": pearsonr(true_props, pred_props)[0],
+        "wasserstein": wasserstein_distance(true_props, pred_props),
+        "kd_truefirst": entropy(true_props, pred_props),
+        "kd_predfirst": entropy(pred_props, true_props),
+        "mae": np.mean(np.abs(true_props - pred_props)),
+    }
+    return metrics
 
 
 def barycenter_interpolation(*args, epsilon=0.1, **kwargs):
@@ -34,7 +53,7 @@ split_meta = pd.read_csv(
     sep="\t",
 )
 
-RESULTS_DIR = "/pmount/projects/site/pred/organoid-atlas/USERS/fleckj/projects/cellflow/data/datasets/organoids_combined/v8/"
+RESULTS_DIR = "/pmount/projects/site/pred/organoid-atlas/USERS/fleckj/projects/cellflow/data/datasets/organoids_combined/"
 
 split_tasks = split_meta["split_task"].unique().tolist()
 
@@ -42,7 +61,8 @@ split_tasks = split_meta["split_task"].unique().tolist()
 #### Combination splits ####
 combination_split_meta = split_meta[split_meta["split_task"] == "combination"]
 
-all_bg_metrics = []
+all_dist_metrics = []
+all_cluster_metrics = []
 datasets = combination_split_meta["dataset"].unique().tolist()
 for ds in datasets:
     print(ds)
@@ -61,18 +81,15 @@ for ds in datasets:
 
         adata_train = sc.read_h5ad(f"{split_dir}/adata_train.h5ad")
         adata_test = sc.read_h5ad(f"{split_dir}/adata_test.h5ad")
+        adata_full = sc.read_h5ad(f"{split_dir}/adata_full.h5ad")
 
         this_split_meta = this_split_meta[~this_split_meta["components"].isna()]
         if this_split_meta.shape[0] == 0:
             continue
 
-        split_metrics = []
+        union_baselines = []
+        mean_baselines = []
         for _, cond in this_split_meta.iterrows():
-            gt_data = (
-                adata_test[adata_test.obs["condition"] == cond["holdout_condition"]]
-                .obsm["X_latent"]
-                .copy()
-            )
             components = cond["components"].split(";")
             comp_latent = {
                 comp: adata_train.obsm["X_latent"][
@@ -92,31 +109,153 @@ for ds in datasets:
                 *list(comp_latent.values()), epsilon=0.1
             )
 
-            bg_data = {"union": union_latent, "mean": mean_latent, **comp_latent}
-
-            metrics_fun = partial(compute_metrics, gt_data)
-            bg_metrics = jt.map(metrics_fun, bg_data)
-            bg_metrics_df = pd.DataFrame(bg_metrics).T
-            bg_metrics_df["background_condition"] = bg_metrics_df.index
-            bg_metrics_df["background_model"] = np.where(
-                bg_metrics_df["background_condition"].isin(["mean", "union"]),
-                bg_metrics_df["background_condition"],
-                "individual",
+            union_adata = sc.AnnData(
+                X=np.zeros((union_latent.shape[0], 1)),
+                obs={"condition": cond["holdout_condition"]},
+                obsm={"X_latent": union_latent},
             )
-            bg_metrics_df["holdout_condition"] = cond["holdout_condition"]
-            bg_metrics_df["split_name"] = split
-            bg_metrics_df["dataset"] = ds
-            bg_metrics_df["split_task"] = task
-            split_metrics.append(bg_metrics_df)
 
-        split_metrics_df = pd.concat(split_metrics)
-        split_metrics_df.to_csv(f"{split_dir}/background_metrics.tsv", sep="\t")
+            mean_adata = sc.AnnData(
+                X=np.zeros((mean_latent.shape[0], 1)),
+                obs={"condition": cond["holdout_condition"]},
+                obsm={"X_latent": mean_latent},
+            )
 
-        all_bg_metrics.append(split_metrics_df)
+            union_baselines.append(union_adata)
+            mean_baselines.append(mean_adata)
 
-all_bg_metrics_df = pd.concat(all_bg_metrics)
-all_bg_metrics_df.to_csv(
-    f"{RESULTS_DIR}/combination_background_metrics.tsv",
+        union_adata = ad.concat(union_baselines, join="outer")
+        mean_adata = ad.concat(mean_baselines, join="outer")
+
+        adata_baselines = ad.concat(
+            {"union": union_adata, "mean": mean_adata}, join="outer", label="model"
+        )
+
+        cfp.pp.compute_wknn(
+            adata_full,
+            adata_baselines,
+            ref_rep_key="X_latent",
+            query_rep_key="X_latent",
+        )
+
+        for label_key in ["leiden_2", "leiden_3", "leiden_4"]:
+            cfp.pp.transfer_labels(
+                adata_baselines,
+                adata_full,
+                label_key=label_key,
+            )
+
+        adata_baselines.write_h5ad(f"{split_dir}/adata_baselines.h5ad")
+
+        union_adata = adata_baselines[adata_baselines.obs["model"] == "union"]
+        mean_adata = adata_baselines[adata_baselines.obs["model"] == "mean"]
+        holdout_conds = this_split_meta["holdout_condition"].tolist()
+
+        gt_data = {
+            cond: adata_test[adata_test.obs["condition"] == cond]
+            .obsm["X_latent"]
+            .copy()
+            for cond in holdout_conds
+        }
+
+        union_data = {
+            cond: union_adata[union_adata.obs["condition"] == cond]
+            .obsm["X_latent"]
+            .copy()
+            for cond in holdout_conds
+        }
+
+        mean_data = {
+            cond: mean_adata[mean_adata.obs["condition"] == cond]
+            .obsm["X_latent"]
+            .copy()
+            for cond in holdout_conds
+        }
+
+        union_metrics = jt.map(compute_metrics, gt_data, union_data)
+        union_metrics_df = pd.DataFrame(union_metrics).T
+        union_metrics_df["holdout_condition"] = union_metrics_df.index
+        union_metrics_df["model"] = "union"
+
+        mean_metrics = jt.map(compute_metrics, gt_data, mean_data)
+        mean_metrics_df = pd.DataFrame(mean_metrics).T
+        mean_metrics_df["holdout_condition"] = mean_metrics_df.index
+        mean_metrics_df["model"] = "barycenter"
+
+        dist_metrics_df = pd.concat([union_metrics_df, mean_metrics_df])
+        dist_metrics_df["split_name"] = split
+        dist_metrics_df["dataset"] = ds
+        dist_metrics_df["split_task"] = task
+
+        dist_metrics_df.to_csv(f"{split_dir}/baseline_dist_metrics.tsv", sep="\t")
+
+        cluster_metrics_results = {}
+        for label_key in ["leiden_2", "leiden_3", "leiden_4"]:
+            gt_props = {
+                cond: adata_full[adata_full.obs["condition"] == cond]
+                .obs[label_key]
+                .value_counts(normalize=True)
+                for cond in holdout_conds
+            }
+
+            union_props = {
+                cond: union_adata[union_adata.obs["condition"] == cond]
+                .obs[f"{label_key}_transfer"]
+                .value_counts(normalize=True)
+                .reindex(gt_props[cond].index)
+                .fillna(0)
+                for cond in holdout_conds
+            }
+
+            mean_props = {
+                cond: mean_adata[mean_adata.obs["condition"] == cond]
+                .obs[f"{label_key}_transfer"]
+                .value_counts(normalize=True)
+                .reindex(gt_props[cond].index)
+                .fillna(0)
+                for cond in holdout_conds
+            }
+
+            union_cluster_metrics = jt.map(
+                compute_cluster_metrics, gt_props, union_props
+            )
+            union_cluster_metrics_df = pd.DataFrame(union_cluster_metrics).T
+            union_cluster_metrics_df["holdout_condition"] = (
+                union_cluster_metrics_df.index
+            )
+            union_cluster_metrics_df["model"] = "union"
+
+            mean_cluster_metrics = jt.map(compute_cluster_metrics, gt_props, mean_props)
+            mean_cluster_metrics_df = pd.DataFrame(mean_cluster_metrics).T
+            mean_cluster_metrics_df["holdout_condition"] = mean_cluster_metrics_df.index
+            mean_cluster_metrics_df["model"] = "barycenter"
+
+            cluster_metrics_df = pd.concat(
+                [union_cluster_metrics_df, mean_cluster_metrics_df]
+            )
+            cluster_metrics_df["split_name"] = split
+            cluster_metrics_df["dataset"] = ds
+            cluster_metrics_df["split_task"] = task
+            cluster_metrics_df["cluster_key"] = label_key
+            cluster_metrics_results[label_key] = cluster_metrics_df
+
+        cluster_metrics_df = pd.concat(cluster_metrics_results.values())
+        cluster_metrics_df.to_csv(f"{split_dir}/baseline_cluster_metrics.tsv", sep="\t")
+
+        all_cluster_metrics.append(cluster_metrics_df)
+        all_dist_metrics.append(dist_metrics_df)
+
+
+all_cluster_metrics_df = pd.concat(all_cluster_metrics)
+all_cluster_metrics_df.to_csv(
+    f"{RESULTS_DIR}/combination_baseline_cluster_metrics.tsv",
+    sep="\t",
+    index=False,
+)
+
+all_dist_metrics_df = pd.concat(all_dist_metrics)
+all_dist_metrics_df.to_csv(
+    f"{RESULTS_DIR}/combination_baseline_dist_metrics.tsv",
     sep="\t",
     index=False,
 )
@@ -125,7 +264,8 @@ all_bg_metrics_df.to_csv(
 #### Transfer splits ####
 transfer_split_meta = split_meta[split_meta["split_task"] == "transfer"]
 
-all_bg_metrics = []
+all_cluster_metrics = []
+all_dist_metrics = []
 datasets = transfer_split_meta["dataset"].unique().tolist()
 for ds in datasets:
     print(ds)
@@ -144,34 +284,77 @@ for ds in datasets:
 
         adata_train = sc.read_h5ad(f"{split_dir}/adata_train.h5ad")
         adata_test = sc.read_h5ad(f"{split_dir}/adata_test.h5ad")
+        adata_full = sc.read_h5ad(f"{split_dir}/adata_full.h5ad")
 
-        adata_train_subs = sc.pp.subsample(adata_train, n_obs=3000, copy=True)
+        adata_ds_train = adata_full[
+            (adata_full.obs["dataset"] == ds) & (adata_full.obs["split"] == "train")
+        ]
+
+        adata_train_subs = sc.pp.subsample(adata_ds_train, n_obs=3000, copy=True)
         bg_data = adata_train_subs.obsm["X_latent"]
 
-        split_gt_data = {}
-        for _, cond in this_split_meta.iterrows():
-            gt_data = (
-                adata_test[adata_test.obs["condition"] == cond["holdout_condition"]]
-                .obsm["X_latent"]
-                .copy()
-            )
-            split_gt_data[cond["holdout_condition"]] = gt_data
+        holdout_conds = this_split_meta["holdout_condition"].tolist()
+        gt_data = {
+            cond: adata_test[adata_test.obs["condition"] == cond]
+            .obsm["X_latent"]
+            .copy()
+            for cond in holdout_conds
+        }
 
         metrics_fun = lambda x: compute_metrics(x, bg_data)
-        split_metrics = jt.map(metrics_fun, split_gt_data)
-        split_metrics_df = pd.DataFrame(split_metrics).T
-        split_metrics_df["holdout_condition"] = split_metrics_df.index
-        split_metrics_df["split_name"] = split
-        split_metrics_df["dataset"] = ds
-        split_metrics_df["split_task"] = task
-        split_metrics_df["background_model"] = "train_dataset"
-        split_metrics_df.to_csv(f"{split_dir}/background_metrics.tsv", sep="\t")
+        dist_metrics = jt.map(metrics_fun, gt_data)
+        dist_metrics_df = pd.DataFrame(dist_metrics).T
+        dist_metrics_df["holdout_condition"] = dist_metrics_df.index
+        dist_metrics_df["split_name"] = split
+        dist_metrics_df["dataset"] = ds
+        dist_metrics_df["split_task"] = task
+        dist_metrics_df["model"] = "train_dataset"
+        dist_metrics_df.to_csv(f"{split_dir}/baseline_dist_metrics.tsv", sep="\t")
 
-        all_bg_metrics.append(split_metrics_df)
+        cluster_metrics_results = {}
+        for label_key in ["leiden_2", "leiden_3", "leiden_4"]:
+            gt_props = {
+                cond: adata_full[adata_full.obs["condition"] == cond]
+                .obs[label_key]
+                .value_counts(normalize=True)
+                for cond in holdout_conds
+            }
 
-all_bg_metrics_df = pd.concat(all_bg_metrics)
-all_bg_metrics_df.to_csv(
-    f"{RESULTS_DIR}/transfer_background_metrics.tsv",
+            bg_props = {
+                cond: adata_train_subs.obs[label_key]
+                .value_counts(normalize=True)
+                .reindex(gt_props[cond].index)
+                .fillna(0)
+                for cond in holdout_conds
+            }
+
+            bg_metrics = jt.map(compute_cluster_metrics, gt_props, bg_props)
+            bg_metrics_df = pd.DataFrame(bg_metrics).T
+            bg_metrics_df["holdout_condition"] = bg_metrics_df.index
+            bg_metrics_df["model"] = "train_dataset"
+            bg_metrics_df["cluster_key"] = label_key
+            bg_metrics_df["split_name"] = split
+            bg_metrics_df["dataset"] = ds
+            bg_metrics_df["split_task"] = task
+            cluster_metrics_results[label_key] = bg_metrics_df
+
+        cluster_metrics_df = pd.concat(cluster_metrics_results.values())
+        cluster_metrics_df.to_csv(f"{split_dir}/baseline_cluster_metrics.tsv", sep="\t")
+
+        all_cluster_metrics.append(cluster_metrics_df)
+        all_dist_metrics.append(dist_metrics_df)
+
+
+all_cluster_metrics_df = pd.concat(all_cluster_metrics)
+all_cluster_metrics_df.to_csv(
+    f"{RESULTS_DIR}/transfer_baseline_cluster_metrics.tsv",
+    sep="\t",
+    index=False,
+)
+
+all_dist_metrics_df = pd.concat(all_dist_metrics)
+all_dist_metrics_df.to_csv(
+    f"{RESULTS_DIR}/transfer_baseline_dist_metrics.tsv",
     sep="\t",
     index=False,
 )
