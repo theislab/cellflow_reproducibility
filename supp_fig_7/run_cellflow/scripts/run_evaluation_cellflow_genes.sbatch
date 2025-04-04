@@ -23,7 +23,7 @@
 source ${HOME}/.bashrc
 conda activate ot_pert
 
-cd /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/evaluation/evaluate_cellflow
+cd ../evaluate_cellflow
  
 # python compute_metrics.py split_0 /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_genes/adata_ood_final_genesIFNG_IFNB_TNFA_TGFB_INS_hvg-500_pca-100_counts_ms_0.5_3 /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/results_metrics/generated_data/sweep_genes/ ood_genes /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/results_metrics/metrics/sweep_gene/split0 /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/reference/full_adata_with_splits_gene_ood.h5ad
 

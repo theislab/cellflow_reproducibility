@@ -23,7 +23,7 @@
 source ${HOME}/.bashrc
 conda activate ot_pert
 
-cd /home/icb/alessandro.palma/environment/ot_pert/ot_pert_reproducibility/evaluation/evaluate_cellflow
+cd ../evaluate_cellflow
  
 # python compute_metrics.py A549_IFNB /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_pathway_cell_type/A549_IFNB /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/results_metrics/generated_data/sweep_cell_line_pathway ood_cell_line /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/results_metrics/metrics/sweep_cell_line_pathway /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/reference/full_adata_with_splits.h5ad
 
