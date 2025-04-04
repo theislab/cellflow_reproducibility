@@ -1,0 +1,19 @@
+Loading dataset from /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/satija_merged/IFNG_Perturb_seq_ms_0.5.h5ad
+Loading dataset from /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/satija_merged/IFNB_Perturb_seq_ms_0.5.h5ad
+Loading dataset from /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/satija_merged/TNFA_Perturb_seq_ms_0.5.h5ad
+Loading dataset from /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/satija_merged/TGFB_Perturb_seq_ms_0.5.h5ad
+Loading dataset from /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/satija_merged/INS_Perturb_seq_ms_0.5.h5ad
+Datasets concatenated
+Unnecessary columns dropped
+Added pathway keys to the .obs data frame
+Filtered adata for perturbation count: 618023 observations remaining
+Adata pre-processed
+Highly variable genes selected
+DE genes calculated
+Dataset split: (461067, 8265) train, (156956, 8265) ood
+Add controls to the ood set
+Run centred PCA
+Shape train (359460, 8265)
+Shape test (55000, 8265)
+Shape ood (171956, 8265)
+Saved data

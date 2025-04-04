@@ -1,0 +1,819 @@
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_csv from `anndata` is deprecated. Import anndata.io.read_csv instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_loom from `anndata` is deprecated. Import anndata.io.read_loom instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_text from `anndata` is deprecated. Import anndata.io.read_text instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing CSCDataset from `anndata.experimental` is deprecated. Import anndata.abc.CSCDataset instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing CSRDataset from `anndata.experimental` is deprecated. Import anndata.abc.CSRDataset instead.
+  warnings.warn(msg, FutureWarning)
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/utils.py:429: FutureWarning: Importing read_elem from `anndata.experimental` is deprecated. Import anndata.io.read_elem instead.
+  warnings.warn(msg, FutureWarning)
+/ictstr01/home/icb/alessandro.palma/environment/ot_pert/cell_flow_perturbation/src/cfp/data/_datamanager.py:551: ImplicitModificationWarning: Trying to modify attribute `.obs` of view, initializing view as actual.
+  adata.obs[self._control_key] = adata.obs[self._control_key].astype(
+/ictstr01/home/icb/alessandro.palma/environment/ot_pert/cell_flow_perturbation/src/cfp/data/_datamanager.py:358: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  _covariate_data["cell_index"] = _covariate_data.index
+  0%|          | 0/3 [00:00<?, ?it/s] 33%|███▎      | 1/3 [00:00<00:00,  8.80it/s]100%|██████████| 3/3 [00:00<00:00, 24.79it/s]
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 378.01it/s]
+  0%|          | 0/3 [00:00<?, ?it/s]100%|██████████| 3/3 [00:00<00:00, 364.41it/s]
+  0%|          | 0/5 [00:00<?, ?it/s]100%|██████████| 5/5 [00:00<00:00, 368.31it/s]
+  0%|          | 0/5 [00:00<?, ?it/s]100%|██████████| 5/5 [00:00<00:00, 372.17it/s]
+  0%|          | 0/7 [00:00<?, ?it/s]100%|██████████| 7/7 [00:00<00:00, 376.66it/s]
+  0%|          | 0/6 [00:00<?, ?it/s]100%|██████████| 6/6 [00:00<00:00, 371.05it/s]
+  0%|          | 0/13 [00:00<?, ?it/s]100%|██████████| 13/13 [00:00<00:00, 377.46it/s]
+  0%|          | 0/7 [00:00<?, ?it/s]100%|██████████| 7/7 [00:00<00:00, 374.23it/s]
+  0%|          | 0/8 [00:00<?, ?it/s]100%|██████████| 8/8 [00:00<00:00, 378.03it/s]
+  0%|          | 0/5 [00:00<?, ?it/s]100%|██████████| 5/5 [00:00<00:00, 374.95it/s]
+  0%|          | 0/15 [00:00<?, ?it/s]100%|██████████| 15/15 [00:00<00:00, 379.13it/s]
+  0%|          | 0/6 [00:00<?, ?it/s]100%|██████████| 6/6 [00:00<00:00, 376.80it/s]
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 377.65it/s]
+  0%|          | 0/7 [00:00<?, ?it/s]100%|██████████| 7/7 [00:00<00:00, 361.81it/s]
+  0%|          | 0/7 [00:00<?, ?it/s]100%|██████████| 7/7 [00:00<00:00, 366.28it/s]
+  0%|          | 0/3 [00:00<?, ?it/s]100%|██████████| 3/3 [00:00<00:00, 367.24it/s]
+  0%|          | 0/7 [00:00<?, ?it/s]100%|██████████| 7/7 [00:00<00:00, 375.95it/s]
+  0%|          | 0/4 [00:00<?, ?it/s]100%|██████████| 4/4 [00:00<00:00, 369.49it/s]
+  0%|          | 0/3 [00:00<?, ?it/s]100%|██████████| 3/3 [00:00<00:00, 366.30it/s]
+  0%|          | 0/5 [00:00<?, ?it/s]100%|██████████| 5/5 [00:00<00:00, 373.11it/s]
+  0%|          | 0/2 [00:00<?, ?it/s]100%|██████████| 2/2 [00:00<00:00, 361.98it/s]
+  0%|          | 0/6 [00:00<?, ?it/s]100%|██████████| 6/6 [00:00<00:00, 367.20it/s]
+  0%|          | 0/4 [00:00<?, ?it/s]100%|██████████| 4/4 [00:00<00:00, 369.24it/s]
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 381.72it/s]
+  0%|          | 0/7 [00:00<?, ?it/s]100%|██████████| 7/7 [00:00<00:00, 379.38it/s]
+  0%|          | 0/6 [00:00<?, ?it/s]100%|██████████| 6/6 [00:00<00:00, 373.21it/s]
+  0%|          | 0/8 [00:00<?, ?it/s]100%|██████████| 8/8 [00:00<00:00, 138.06it/s]
+  0%|          | 0/10 [00:00<?, ?it/s]100%|██████████| 10/10 [00:00<00:00, 373.05it/s]
+2025-01-21 11:14:32.571820: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:32.572055: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:41.082689: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:41.082855: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:49.001295: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:49.001450: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:57.479122: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:14:57.479632: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:06.026321: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:06.026475: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:14.875231: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:14.875652: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:23.572985: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:23.573136: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:31.628610: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:31.628784: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:39.130293: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:39.130501: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:47.663064: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:47.663726: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:55.173811: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:15:55.173948: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:04.000353: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:04.000538: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:13.421004: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:13.421161: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:21.356077: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:21.356280: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:27.550440: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:27.550559: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:36.606549: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:36.606729: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:44.988672: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:44.988918: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:53.548777: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:16:53.549152: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:00.335102: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:00.335360: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:08.792578: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:08.793044: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:17.790618: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:17.790762: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:26.414063: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:26.414455: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:33.682934: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:33.683056: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:40.528572: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:40.528709: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:49.042224: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:49.042374: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:56.746677: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:17:56.746855: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:05.404051: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:05.404209: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:13.489017: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:13.489411: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:20.776183: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:20.776491: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:29.142287: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:29.142482: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:38.466158: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:38.466330: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:46.234040: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:46.234238: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:54.445117: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:18:54.445272: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:02.724893: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:02.725085: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:12.681545: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:12.681717: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:20.982008: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:20.982187: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:28.484800: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:28.485148: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:36.894769: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:36.894935: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:44.519207: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:44.519440: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:51.962232: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:19:51.962437: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:00.281911: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:00.282093: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:08.622929: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:08.623060: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:16.350733: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:16.351907: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:26.172403: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:26.172555: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:34.031853: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:34.032016: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:42.177375: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:42.177557: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:52.183611: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:52.183794: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:59.642116: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:20:59.642244: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:07.705408: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:07.705554: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:16.905516: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:16.905974: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:24.228603: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:24.228890: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:33.133490: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:33.133682: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:41.256581: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:41.256851: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:51.480211: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:51.480433: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:59.973708: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:21:59.973867: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:08.243508: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:08.243641: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:15.724374: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:15.724524: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:24.318402: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:24.318805: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:31.408838: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:31.409135: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:39.499310: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:39.499498: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:48.184072: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:48.184668: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:56.550994: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:22:56.551436: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:03.824203: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:03.824337: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:11.698138: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:11.698332: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:20.849945: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:20.850115: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:28.585235: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:28.585555: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:37.273730: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:37.273876: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:45.654364: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:45.655139: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:54.483795: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:23:54.484042: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:03.138002: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:03.138423: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:10.139574: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:10.139857: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:18.108242: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:18.108626: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:26.742292: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:26.742691: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:35.254119: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:35.254516: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:44.090774: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:44.090926: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:50.832424: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:50.832598: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:58.633852: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:24:58.634615: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:07.256702: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:07.256877: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:15.845296: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:15.845439: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:22.002372: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:22.002583: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:29.595186: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:29.595343: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:38.324417: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:38.324587: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:46.106416: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:46.106683: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:54.679633: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:25:54.679797: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:02.781862: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:02.782040: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:11.290060: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:11.290552: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:19.450939: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:19.451417: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:27.089557: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:27.090063: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:36.653977: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:36.654132: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:45.046711: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:45.047249: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:51.692947: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:26:51.693410: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:00.096696: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:00.096860: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:08.594513: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:08.595128: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:16.277444: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:16.277674: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:25.748327: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:25.748635: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:32.995687: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:32.995819: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:39.924047: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:39.924566: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:48.309503: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:48.309735: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:56.083417: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:27:56.083793: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:03.401207: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:03.401388: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:11.151192: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:11.151340: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:19.215751: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:19.215924: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:27.471908: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:27.472399: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:35.338669: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:35.339046: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:42.793392: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:42.793702: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:51.489930: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:51.490084: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:59.413130: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:28:59.413325: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:05.760824: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:05.760964: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:13.049115: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:13.049295: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:20.805045: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:20.805289: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:28.542160: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:28.542352: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:36.377663: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:36.377876: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:46.984078: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:46.984274: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:54.405742: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:29:54.405948: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:03.475106: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:03.475566: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:10.382363: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:10.382548: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:18.570283: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:18.570656: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:26.913228: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:26.913642: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:35.573826: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:35.574031: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:44.053962: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:44.054763: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:51.838371: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:51.838523: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:59.667093: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:30:59.667412: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:08.268618: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:08.269846: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:17.914832: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:17.914989: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:26.337994: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:26.338421: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:34.132701: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:34.133117: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:42.157197: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:42.157590: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:49.563374: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:49.563779: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:58.124784: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:31:58.125349: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:05.920362: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:05.920523: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:13.026967: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:13.027100: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:21.729767: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:21.730569: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:30.308017: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:30.308366: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:42.116569: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:42.116782: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:49.135612: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:49.135786: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:57.844274: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:32:57.844805: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:04.886124: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:04.886269: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:11.169645: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:11.169789: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:18.367712: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:18.367914: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:26.233164: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:26.233315: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:32.669650: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:32.669778: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:40.330270: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:40.330783: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:47.039180: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:47.039453: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:55.110700: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:33:55.110846: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:03.311126: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:03.311602: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:11.464095: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:11.464420: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:19.516518: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:19.516676: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:27.488638: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:27.488978: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:35.586529: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:35.586922: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:43.417260: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:43.417495: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:50.749458: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:50.749620: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:57.014590: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:34:57.014788: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:05.623916: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:05.624563: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:13.584173: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:13.584352: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:21.796869: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:21.797046: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:30.349080: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:30.349613: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:41.907928: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:41.908974: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:49.740206: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:49.740398: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:58.207723: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:35:58.208100: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:05.355034: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:05.355881: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:14.447158: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:14.447340: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:22.607681: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:22.607863: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:30.263492: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:30.263889: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:38.621560: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:38.621910: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:46.636616: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:46.636791: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:55.030248: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:36:55.030416: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:04.576969: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:04.577193: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:14.263459: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:14.263643: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:22.200996: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:22.201123: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:30.653072: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:30.653233: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:38.128613: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:38.129675: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:45.766997: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:45.767172: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:53.364750: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:37:53.364887: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:00.963249: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:00.964544: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:09.223136: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:09.223300: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:17.307609: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:17.307782: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:26.351051: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:26.351203: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:35.275152: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:35.275563: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:43.215569: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:43.215749: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:51.963676: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:38:51.964042: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:00.304519: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:00.304879: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:11.236141: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:11.236311: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:20.090540: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:20.090917: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:27.858159: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:27.858641: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:35.728236: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:35.728477: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:43.831842: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:43.832224: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:52.459426: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:39:52.459610: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:01.058972: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:01.059119: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:09.957719: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:09.957894: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:18.009348: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:18.009564: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:26.415672: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:26.416128: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:34.533542: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+2025-01-21 11:40:34.533723: W external/xla/xla/service/gpu/ir_emitter_unnested.cc:1171] Unable to parse backend config for custom call: Could not convert JSON string to proto: : Root element must be a message.
+Fall back to parse the raw backend config str.
+/home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/_core/aligned_df.py:68: ImplicitModificationWarning: Transforming to str index.
+  warnings.warn("Transforming to str index.", ImplicitModificationWarning)
