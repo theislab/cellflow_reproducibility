@@ -28,7 +28,7 @@ save_path = sys.argv[4]
 ref_path = sys.argv[5]
 
 # Read the reference dataset plus centered PCA 
-adata_ref = sc.read_h5ad(ref_path)
+adata_ref = sc.read_h5ad(ref_path)  
 print("Centered pca")
 cfpp.centered_pca(adata_ref, n_comps=20, keep_centered_data=False)
 
@@ -53,18 +53,22 @@ ood_data_target_encoded_predicted = {}
 ood_data_target_decoded_predicted = {}
 
 cond_name = "perturbation_condition" if task=="ood_genes" else "condition"
-for cond in adata_ood.obs[cond_name].cat.categories:
+for cond in adata_ood.obs[cond_name].cat.categories:  # All the perturbation for a certain cell line 
     print(f"Condition {cond}")
     if "NT" in cond:
         continue
-    cell_line, pathway = cond.split("_")[:2]
-    # Take non-control cells from pathway and cell line 
-    adata_pred_train = adata_train[adata_train.obs["background"] == f"{cell_line}_{pathway}"]  # the perturbations of a given cell line and pathway 
+    # Extract pathway from conditions
+    pathway, gene = cond.split("_")[1:]  # Actually always the same 
+    # Take perturbed dataset for the given pathway 
+    adata_pred_train = adata_train[np.logical_and(adata_train.obs["pathway"] == pathway, 
+                                                  adata_train.obs["gene"] == gene)]
+    if adata_pred_train.shape[0]==0:
+        adata_pred_train = adata_train[adata_train.obs["pathway"] == pathway]
+        
     adata_pred_train = adata_pred_train[~adata_pred_train.obs["control"]]
-    # Compute mean shift
-    adata_control_copy = adata_ood[adata_ood.obs["background"]==f"{cell_line}_{pathway}"].copy()
-    adata_control_copy = adata_control_copy[adata_control_copy.obs["control"]]
-    # Evaluate the mean model 
+    
+    adata_control_copy = adata_ood[adata_ood.obs["pathway"]==pathway]
+    adata_control_copy = adata_control_copy[adata_control_copy.obs["control"]].copy()
     pred_train = mean_model(adata_pred_train, adata_control_copy)
     conditions = [cond] * pred_train.shape[0]
 
@@ -81,6 +85,7 @@ for cond in adata_ood.obs[cond_name].cat.categories:
     ood_data_target_decoded[cond] = adata_ood[adata_ood.obs[cond_name] == cond].X.toarray()
     
 del adata_ood
+del adata_ref
 
 # Intersection 
 train_deg_dict = {
@@ -90,7 +95,6 @@ train_deg_dict = {
     }
 
 del adata_train
-del adata_ref
 
 def get_mask(x, y):
     return x[:, [gene in y for gene in adata_train_vars]]

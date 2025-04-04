@@ -104,3 +104,4 @@
   warnings.warn("Transforming to str index.", ImplicitModificationWarning)
 /home/icb/alessandro.palma/miniconda3/envs/ot_pert/lib/python3.10/site-packages/anndata/_core/aligned_df.py:68: ImplicitModificationWarning: Transforming to str index.
   warnings.warn("Transforming to str index.", ImplicitModificationWarning)
+E0214 10:06:13.090611 4096019 hlo_lexer.cc:443] Failed to parse int literal: 85472404987179258063

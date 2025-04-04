@@ -10,8 +10,13 @@ import sys
 from pathlib import Path
 
 def mean_model(adata_pert, adata_ctrl):
-    # Mean displacement of same donor across cytokines
-    displacement = adata_pert.X.toarray().mean(axis=0) - adata_ctrl.X.toarray().mean(axis=0)
+    list_of_displacement_vectors = []
+    for cond in adata_pert.obs[cond_name].unique():
+        # Mean displacement of same donor across cytokines
+        displacement = adata_pert[adata_pert.obs[cond_name]==cond].X.toarray().mean(axis=0) - adata_ctrl.X.toarray().mean(axis=0)
+        list_of_displacement_vectors.append(displacement)
+    
+    displacement = np.array(list_of_displacement_vectors).mean(0)
     pred = np.asarray(adata_ctrl.X.toarray() + displacement)
     return pred
 
@@ -53,10 +58,16 @@ for cond in adata_ood.obs[cond_name].cat.categories:
     if "NT" in cond:
         continue
     # Extract pathway from conditions
-    pathway = cond.split("_")[1]  # Actually always the same 
+    pathway, gene = cond.split("_")[1:]  # Actually always the same 
     # Take perturbed dataset for the given pathway 
-    adata_pred_train = adata_train[adata_train.obs["pathway"] == pathway]
+    adata_pred_train = adata_train[np.logical_and(adata_train.obs["pathway"] == pathway, 
+                                                  adata_train.obs["gene"] == gene)]
+    if adata_pred_train.shape[0]==0:
+        adata_pred_train = adata_train[adata_train.obs["pathway"] == pathway]
+        
+    # if adata_pred_train.shape[0]
     adata_pred_train = adata_pred_train[~adata_pred_train.obs["control"]]
+    
     adata_control_copy = adata_ood[adata_ood.obs["control"]].copy()
     pred_train = mean_model(adata_pred_train, adata_control_copy)
     conditions = [cond] * pred_train.shape[0]
@@ -72,7 +83,7 @@ for cond in adata_ood.obs[cond_name].cat.categories:
     del adata_pred_train
     ood_data_target_encoded[cond] = adata_ood[adata_ood.obs[cond_name] == cond].obsm["X_pca"]
     ood_data_target_decoded[cond] = adata_ood[adata_ood.obs[cond_name] == cond].X.toarray()
-    
+        
 del adata_ood
 del adata_ref
 
