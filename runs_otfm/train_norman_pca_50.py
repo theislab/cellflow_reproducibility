@@ -1,3 +1,4 @@
+print("start imports")
 import functools
 import os
 import sys
@@ -5,6 +6,7 @@ import traceback
 from typing import Dict, Literal, Optional, Tuple
 
 import cfp
+from cfp import preprocessing as cfpp
 import scanpy as sc
 import numpy as np
 import functools
@@ -14,11 +16,45 @@ from omegaconf import OmegaConf
 from typing import NamedTuple, Any
 import hydra
 import wandb
+import pandas as pd
+import time
+import anndata as ad
+
+from numpy.typing import ArrayLike
+
+class SavePredictionsCallback(cfp.training.ComputationCallback):
+    
+    def __init__(self):
+        self.log_counter = 0
+        
+    def on_train_begin(self) -> Any:
+        self.path = wandb.run
+        os.makedirs(self.path, exist_ok=True)
+        print(f"Saving predictions to {self.path}")
+            
+        
+    def on_train_end(
+        self,
+        validation_data: dict[str, dict[str, ArrayLike]],
+        predicted_data: dict[str, dict[str, ArrayLike]],
+    ) -> dict[str, float]:
+        return {}
+    
+    def on_log_iteration(
+        self,
+        validation_data: dict[str, dict[str, ArrayLike]],
+        predicted_data: dict[str, dict[str, ArrayLike]],
+    ) -> dict[str, float]:
+        
+        for key in validation_data.keys():
+            pd.to_pickle(validation_data, os.path.join(self.path, f"{key}_validation_data_{self.log_counter}.pickle"))
+            pd.to_pickle(predicted_data, os.path.join(self.path, f"{key}_predicted_data_{self.log_counter}.pickle"))
+        
+        self.log_counter += 1
+        return {}
 
 
-
-
-@hydra.main(config_path="conf", config_name="train")
+@hydra.main(config_path="conf", config_name="train", version_base="1.1")
 def run(config):
     config_dict  = OmegaConf.to_container(config, resolve=True)
     print(config_dict)
@@ -97,9 +133,14 @@ def run(config):
     
     metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
     decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_train, metrics=["r_squared", "mmd", "e_distance"])
-    wandb_callback = cfp.training.WandbLogger(project="cfp_otfm_norman", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
-
+    wandb_callback = cfp.training.WandbLogger(
+        project="cfp_otfm_norman2", 
+        out_dir="/home/haicu/soeren.becker/repos/ot_pert_reproducibility", 
+        config=config_dict,
+    )
     callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
+    # save_preds_callback = SavePredictionsCallback()
+    # callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback, save_preds_callback]
     
     cf.train(
         num_iterations=config_dict["training"]["num_iterations"],
@@ -107,11 +148,42 @@ def run(config):
         callbacks=callbacks,
         valid_freq=config_dict["training"]["valid_freq"],
     )
-    
+
     if config_dict["training"]["save_model"]:
         cf.save(config_dict["training"]["out_dir"], file_prefix=wandb.run.name)
 
-    
+    if config_dict["training"]["save_predictions"]:
+
+        adata_ood_ctrl = adata_ood[adata_ood.obs.control.values.to_numpy(dtype=bool)]
+        covariate_data_test = adata_ood.obs.drop_duplicates(subset=["gene_1", "gene_2"])
+        print("predict: start.")
+        preds_test = cf.predict(adata=adata_ood_ctrl, sample_rep="X_pca", condition_id_key="condition", covariate_data=covariate_data_test)
+        print("predict: done.")
+        all_data = []
+        conditions = []
+
+        for condition, array in preds_test.items():
+            all_data.append(array)
+            conditions.extend([condition] * array.shape[0])
+
+        # Stack all data vertically to create a single array
+        all_data_array = np.vstack(all_data)
+
+        # Create a DataFrame for the .obs attribute
+        obs_data = pd.DataFrame({
+            'condition': conditions
+        })
+
+        # Create the Anndata object
+        adata_test_result = ad.AnnData(X=np.empty((len(all_data_array), adata_train.shape[1])), obs=obs_data)
+        adata_test_result.obsm["X_pca_pred"] = all_data_array
+        print("start reconstruct_pca.")
+        cfpp.reconstruct_pca(query_adata=adata_test_result, use_rep="X_pca_pred", ref_adata=adata_train, layers_key_added="X_recon_pred")
+        print("start done.")
+        adata_save_path = os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_adata_test_with_predictions_{split}.h5ad")
+        print(f"Saving results at: {adata_save_path}")
+        adata_test_result.write(adata_save_path)
+
     return 1.0
 
 if __name__ == "__main__":

@@ -2,5 +2,5 @@ offline: False
 id: Null
 anonymous: Null
 project: otfm_norman
-group: hparam_search
+group: hparam_search2
 log_model: True
