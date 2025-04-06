@@ -14,6 +14,41 @@ from omegaconf import OmegaConf
 from typing import NamedTuple, Any
 import hydra
 import wandb
+import pandas as pd
+import time
+
+from numpy.typing import ArrayLike
+
+class SavePredictionsCallback(cfp.training.ComputationCallback):
+    
+    def __init__(self):
+        self.log_counter = 0
+        
+    def on_train_begin(self) -> Any:
+        self.path = wandb.run
+        os.makedirs(self.path, exist_ok=True)
+        print(f"Saving predictions to {self.path}")
+            
+        
+    def on_train_end(
+        self,
+        validation_data: dict[str, dict[str, ArrayLike]],
+        predicted_data: dict[str, dict[str, ArrayLike]],
+    ) -> dict[str, float]:
+        return {}
+    
+    def on_log_iteration(
+        self,
+        validation_data: dict[str, dict[str, ArrayLike]],
+        predicted_data: dict[str, dict[str, ArrayLike]],
+    ) -> dict[str, float]:
+        
+        for key in validation_data.keys():
+            pd.to_pickle(validation_data, os.path.join(self.path, f"{key}_validation_data_{self.log_counter}.pickle"))
+            pd.to_pickle(predicted_data, os.path.join(self.path, f"{key}_predicted_data_{self.log_counter}.pickle"))
+        
+        self.log_counter += 1
+        return {}
 
 
 
@@ -97,9 +132,14 @@ def run(config):
     
     metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
     decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_train, metrics=["r_squared", "mmd", "e_distance"])
-    wandb_callback = cfp.training.WandbLogger(project="cfp_otfm_norman", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
-
+    wandb_callback = cfp.training.WandbLogger(
+        project="cfp_otfm_norman", 
+        out_dir="/home/haicu/soeren.becker/repos/ot_pert_reproducibility", 
+        config=config_dict,
+    )
     callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
+    # save_preds_callback = SavePredictionsCallback()
+    # callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback, save_preds_callback]
     
     cf.train(
         num_iterations=config_dict["training"]["num_iterations"],
