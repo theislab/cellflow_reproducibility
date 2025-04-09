@@ -37,3 +37,4 @@ runs_otfm/bash_scripts/wandb/
 
 **/*.err
 **/*.out
+**/.ipynb_checkpoints/
