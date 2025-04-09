@@ -1,0 +1,67 @@
+# run this in your CellOT environment
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-cisplatin/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-cisplatin_olaparib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-crizotinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-dabrafenib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-dacarbazine/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-dasatinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-decitabine/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-dexamethasone/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-erlotinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-everolimus/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-hydroxyurea/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-imatinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-ixazomib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-ixazomib_lenalidomide_dexamethasone/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-lenalidomide/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-melphalan/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-midostaurin/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-mln2480/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-olaparib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-paclitaxel/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-palbociclib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-panobinostat/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-pomalidomide_carfilzomib_dexamethasone/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-regorafenib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-staurosporine/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-temozolomide/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-trametinib_dabrafenib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-trametinib_erlotinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-trametinib_midostaurin/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-trametinib_panobinostat/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-ulixertinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-vemurafenib_cobimetinib/model-cellot --setting iid --where data_space
+
+python ./scripts/evaluate.py --outdir ./results/4i/drug-vindesine/model-cellot --setting iid --where data_space

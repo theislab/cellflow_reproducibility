@@ -1,0 +1,12 @@
+
+hidden_dims: [1024, 1024, 1024]
+hidden_dropout: 0.0
+decoder_dims: [1024, 1024, 1024]
+decoder_dropout: 0.2
+flow_noise: 0.2
+lr: 5e-5
+epsilon: 0.005
+tau_a: 1.0
+tau_b: 1.0
+
+
