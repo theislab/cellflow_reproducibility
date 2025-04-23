@@ -7,33 +7,29 @@ import os
 
 os.environ["RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES"] = "1"
 
-import yaml
-import cloudpickle
-import numpy as np
-
-import jax
-import jax.tree as jt
-import jax.numpy as jnp
-import flax.linen as nn
-import optax
-import scanpy as sc
-import pandas as pd
-import anndata as ad
-import matplotlib.pyplot as plt
 from functools import partial
 
+import anndata as ad
 import cfp
-from cfp.utils import match_linear
-from cfp.metrics._metrics import compute_metrics
-
-import wandb
+import cloudpickle
+import jax.numpy as jnp
+import jax.tree as jt
+import matplotlib.pyplot as plt
+import numpy as np
+import optax
+import pandas as pd
 import ray
-from ray import tune, train
+import scanpy as sc
+import wandb
+import yaml
+from cfp.metrics._metrics import compute_metrics
+from cfp.utils import match_linear
+from ray import train, tune
 from ray.tune.search.optuna import OptunaSearch
 
 #### Project name & dir ####
 PROJECT_NAME = "psweep_organoids_common"
-RESULTS_DIR = f"/home/fleckj/projects/cellflow/results/"
+RESULTS_DIR = "/home/fleckj/projects/cellflow/results/"
 
 #### Define splits ####
 SPLIT_DATA = {
@@ -43,10 +39,9 @@ SPLIT_DATA = {
     },
 }
 
-
 #### Read config ####
 config_path = sys.argv[1]
-with open(config_path, "r") as f:
+with open(config_path) as f:
     config = yaml.safe_load(f)
 print(config)
 
