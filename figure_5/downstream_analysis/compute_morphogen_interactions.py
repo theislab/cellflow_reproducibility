@@ -1,12 +1,13 @@
+import itertools
 import os
+import warnings
+
+import anndata as ad
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import scanpy as sc
-import anndata as ad
-import warnings
-import itertools
+import seaborn as sns
 from cfp.metrics import compute_scalar_mmd
 
 warnings.filterwarnings("ignore")
@@ -120,8 +121,8 @@ for ap_mol, ap_concs in ap_conc_dict.items():
                 if TRIPLE_FROM_THREE_SINGLE:
                     ap_cond_1 = f"{ap_mol}_{ap_conc_idx}"
                     ap_cond_pred_1 = f"{ap_mol}_{ap_conc_idx}+ctrl"
-                    ap_cond_2 = f"CHIR_4"
-                    ap_cond_pred_2 = f"CHIR_4+ctrl"
+                    ap_cond_2 = "CHIR_4"
+                    ap_cond_pred_2 = "CHIR_4+ctrl"
                     ap_1_latent = adata[adata.obs.condition == ap_cond_1].obsm["X_pca"]
                     ap_2_latent = adata[adata.obs.condition == ap_cond_2].obsm["X_pca"]
 
@@ -172,7 +173,7 @@ interact_df.to_csv(os.path.join(OUTPUT_DIR, "interactions.csv"), index=False)
 
 # change from _CHIR at the end of ap_cond to CHIR_ at the beginning for plotting
 interact_df["ap_cond"] = interact_df["ap_cond"].str.replace(
-    "^(.*)\+(CHIR_4)$", r"\2_\1", regex=True
+    r"^(.*)\+(CHIR_4)$", r"\2_\1", regex=True
 )
 
 # deviation from both AP and DV
