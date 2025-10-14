@@ -1,6 +1,6 @@
-source('~/scripts/R/master.R')
-source('~/scripts/R/colors.R')
+source('~/scripts/R/main.R')
 
+library(Pando)
 library(ggbeeswarm)
 library(yaml)
 library(tidygraph)
@@ -233,7 +233,7 @@ condition_meta_subregion <- read_tsv(str_c(DATA_DIR, "organoid_cond_preds_subreg
 condition_meta_region <- read_tsv(str_c(DATA_DIR, "organoid_cond_preds_region_transfer.tsv"))
 condition_meta_cluster <- read_tsv(str_c(DATA_DIR, "organoid_cond_preds_cluster_transfer.tsv"))
 
-3*(condition_meta_subregion$condition %>% unique() %>% length())
+n_condition <- 3*(condition_meta_subregion$condition %>% unique() %>% length())
 
 condition_meta_region$Region_transfer %>% unique()
 condition_meta_subregion$Subregion_transfer %>% unique()
@@ -454,7 +454,7 @@ model_all <- map_dfr(1:ncol(model_features), function(i){
         t() %>% apply(1, function(x) str_c(x, collapse=':'))
     formula_str <- reformulate(
         str_c(
-            # "dataset + ",
+            "dataset + ",
             paste(mol_names, collapse=' + '),
             " + ",
             paste(mol_int, collapse=' + ')
@@ -485,13 +485,16 @@ model_all_mat <- model_all %>%
 coef_order <- model_all_mat %>% t() %>% dist() %>% hclust(method="ward.D2") %>% {.$labels[.$order]}
 coef_dendro <- model_all_mat %>% t() %>% dist() %>% hclust(method="ward.D2")
 
+
+clip_val <- 0.1
 plot_df <- model_all %>% 
+    filter(!str_detect(term, "dataset")) %>%
     mutate(term=str_replace(term, ":", "\\+")) %>%
     filter(region_coarse%in%names(region_colors)) %>% 
     mutate(
         term=factor(term, levels=coef_order), region_coarse=factor(region_coarse, levels=rev(names(region_colors))),
         single=factor(ifelse(str_detect(term, "\\+"), "Combination", "Single"), levels=c("Single", "Combination")),
-        coef_clip=pmin(pmax(coef, -0.1), 0.1)
+        coef_clip=pmin(pmax(coef, -clip_val), clip_val)
         # coef_clip=coef
     ) 
 
@@ -500,7 +503,7 @@ ggplot(plot_df, aes(term, region_coarse, fill=coef_clip)) +
     geom_tile() +
     geom_vline(xintercept=0) +
     facet_grid(~single, scales="free", space="free") +
-    scale_fill_gradientn(colors=rev(colgrad), limits=c(-0.1, 0.1)) +
+    scale_fill_gradientn(colors=rev(colgrad), limits=c(-clip_val, clip_val)) +
     rotate_x_text(90) 
 
 
@@ -508,7 +511,7 @@ ggplot(plot_df, aes(term, region_coarse, fill=coef_clip)) +
     geom_tile() +
     geom_vline(xintercept=0) +
     facet_grid(~single, scales="free", space="free") +
-    scale_fill_gradientn(colors=rev(colgrad), limits=c(-0.1, 0.1)) +
+    scale_fill_gradientn(colors=rev(colgrad), limits=c(-clip_val, clip_val)) +
     article_text() +
     rotate_x_text(90) +
     no_legend() +
@@ -521,7 +524,7 @@ ggplot(plot_df, aes(term, region_coarse, fill=coef_clip)) +
         panel.spacing = unit(0.1, "lines")
     ) +
     labs(fill="Coefficient", x="Morphogen pathway modulators", y="Region")
-ggsave(filename = str_c(PLOT_DIR, "predictions/lm_subregion_composition_coefs_heatmap.pdf"), bg="white", width=18, height=4.5, dpi=300, units="cm")
+ggsave(filename = str_c(PLOT_DIR, "predictions/lm_subregion_composition_coefs_heatmap_v2.pdf"), bg="white", width=18, height=4.5, dpi=300, units="cm")
 
 
 
@@ -610,6 +613,8 @@ plot_df <- pred_mean_ref_dist %>%
         T ~ "Far"
     )) %>% 
     mutate(ds_cond=str_c(dataset, "_", condition)) 
+
+plot_df %>% write_tsv(str_c(PLOT_DIR, "ref_cluster_dist/pred_mean_ref_dist.tsv"))
 
 gradient <- rev(pals::ocean.curl(10))
 logfc_colors <- colorRampPalette(c(gradient[1:3], "lightgrey", gradient[8:10]))(100)
@@ -980,6 +985,528 @@ pred_missing_ref_dist <- pred_mean_ref_dist %>%
     filter(edist==min(edist))
 
 pred_dist_missing %>% View()
+
+
+
+
+#### Plot regional "domains" of morph combinations ####
+
+#### Data ####
+adata <- anndata::read_h5ad("/home/fleckj/projects/cellflow/results/organoid_annots/organoids_combined_full_v6_annot.h5ad")
+vox_adata <- anndata::read_h5ad("/home/fleckj/projects/cellflow/results/organoid_annots/voxhunt/aba_vox_braun_scanvi.h5ad")
+ref_adata <- anndata::read_h5ad("/home/fleckj/projects/cellflow/results/organoid_annots/braun_2022_fetal_brain_v3.1_annot.h5ad")
+condition_meta_cluster <- read_tsv(str_c(DATA_DIR, "organoid_cond_preds_cluster_transfer.tsv"))
+spatial_coords <- read_tsv("/home/fleckj/projects/cellflow/results/voxhunt_mapping/spatial_coords.tsv")
+ref_cluster_dist <- read_tsv(str_c(DATA_DIR, "organoid_cond_preds_ref_cluster_dists.tsv")) %>% 
+    mutate(cluster=factor(cluster, levels=unique(.$cluster)))
+pred_ref_dist <- read_tsv(str_c(PLOT_DIR, "ref_cluster_dist/pred_mean_ref_dist.tsv"))
+comb_meta <- read_tsv(str_c(DATA_DIR, "morphogen_interaction_meta.tsv")) %>% 
+    select(condition, condition_new, n_mols, comb, comb_sorted, time_comb, dataset) %>% 
+    distinct()
+
+comb_meta$time_comb %>% unique()
+
+condition_meta_cluster$condition %>% str_detect("early-mid") %>% sum()
+condition_meta_cluster$cluster <- condition_meta_cluster$Clusters_transfer
+
+pred_ref_dist <- pred_ref_dist %>% 
+    inner_join(comb_meta, by=c("condition"="condition", "dataset"="dataset")) %>% 
+    mutate(ds_cond = str_c(dataset, "_", condition))
+
+pred_ref_dist %>% filter(dataset=="neal", gates=="OOD") %>% pull(comb) %>% sort() %>% unique()
+
+#### Format metadata ####
+ref_cluster_meta <- ref_adata$obs %>% 
+    as_tibble() %>% 
+    group_by(Clusters) %>%
+    summarize(
+        Region=mode(Region),
+        Subregion=factor(mode(Subregion), levels=names(region_colors)),
+        CellClass=mode(CellClass),
+        cluster=first(Clusters),
+        ap_score=mean(Subregion_AP_value_pred),
+        dv_score=mean(Subregion_DV_value_pred),
+    ) 
+
+condition_annot_meta <- condition_meta_cluster %>% 
+    select(-1) %>% 
+    rename(Clusters=Clusters_transfer) %>%
+    inner_join(ref_cluster_meta) %>% 
+    inner_join(comb_meta, by=c("condition"="condition", "dataset"="dataset")) %>% 
+    mutate(region=Subregion) %>% 
+    mutate(
+        region=case_when(
+            region %in% c("Midbrain dorsal", "Midbrain ventral") ~ "Midbrain",
+            TRUE ~ region
+        )
+    ) %>% 
+    filter(!region%in%c("Hindbrain")) %>%
+    mutate(
+        time_comb_simple=case_when(
+            time_comb %in% c("early-late+early-late+early-late", "early-late+early-late", "early-late") ~ "early-late",
+            time_comb %in% c("mid-late+mid-late+mid-late", "mid-late+mid-late", "mid-late") ~ "mid-late",
+            time_comb %in% c("early-mid+early-mid+early-mid", "early-mid+early-mid", "early-mid") ~ "early-mid",
+            time_comb %in% c("late+late+late", "late+late", "late") ~ "late",
+            time_comb %in% c("early+early+early", "early+early", "early") ~ "early",
+            time_comb %in% c("mid+mid+mid", "mid+mid", "mid") ~ "mid",
+            T ~ "different"
+        ),
+        time_comb_simple=factor(time_comb_simple, levels=c("early", "mid", "late", "early-late", "different", "early-mid", "mid-late")),
+    ) %>% 
+    mutate(region=factor(region, levels=names(region_colors))) %>%
+    arrange(region) %>% 
+    mutate(cluster=factor(cluster, levels=unique(.$cluster)))
+
+
+
+#### Plot ref map ####
+plot_df <- ref_cluster_meta %>% 
+    filter(!CellClass%in%c("Vascular", "Oligo", "Immune", "Gliolast", "Erythrocyte")) %>%
+    filter(!Region%in%c("Hindbrain")) %>%
+    filter(!Subregion%in%c("Forebrain", "Diencephalon")) %>%
+    mutate(
+        region_plot = factor(case_when(
+            Subregion %in% c("Midbrain ventral", "Midbrain dorsal") ~ "Midbrain",
+            Subregion %in% c("Striatum") ~ "Subcortex",
+            # Subregion %in% c("Subcortex") ~ "Striatum",
+            TRUE ~ Subregion
+        ), levels=rev(names(region_colors)))
+    )
+
+plot_df$Region %>% table()
+plot_df$Subregion %>% table()
+plot_df$region_plot %>% table()
+
+ggplot(plot_df, aes(ap_score, dv_score, color=region_plot)) +
+    geom_point(size=5, alpha=0.3) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Cortex"), bins=9, geom="polygon", alpha=0.15) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Thalamus"), bins=8, geom="polygon", alpha=0.15) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Hypothalamus"), bins=7, geom="polygon", alpha=0.15) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Subcortex"), bins=6, geom="polygon", alpha=0.15) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Pons"), bins=3, geom="polygon", alpha=0.2) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Cerebellum"), bins=7, geom="polygon", alpha=0.15) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Medulla"), bins=5, geom="polygon", alpha=0.15) +
+    stat_density_2d(aes(fill=region_plot), data=filter(plot_df, region_plot=="Midbrain"), bins=10, geom="polygon", alpha=0.15) +
+    # geom_hline(yintercept=0.5, color="grey80") +
+    geom_hline(yintercept=0.5, linetype="dashed", color="grey80") +
+    geom_hline(yintercept=1, color="grey80") +
+    geom_hline(yintercept=0, color="grey80") +
+    geom_vline(xintercept=0, color="grey80") +
+    geom_vline(xintercept=1, linetype="dashed", color="grey80") +
+    geom_vline(xintercept=2, linetype="dashed", color="grey80") +
+    geom_vline(xintercept=3, linetype="dashed", color="grey80") +
+    geom_vline(xintercept=4, linetype="dashed", color="grey80") +
+    geom_vline(xintercept=5, color="grey80") +
+    lims(x=c(-0.5,5.5), y=c(-0.3, 1.4)) +
+    scale_color_manual(values=region_colors) +
+    scale_fill_manual(values=region_colors) +
+    no_legend() +
+    theme(
+        panel.grid = element_blank(),
+    ) +
+    labs(x="AP score", y="DV score", color="Region")
+ggsave(str_c(PLOT_DIR, "morphogen_regions/ref_map_ap_dv.pdf"), width=9, height=5)
+
+
+
+#### Plot all combinations with density over time ####
+ds <- "neal"
+
+combs_dataset <- condition_annot_meta %>% 
+    filter(dataset==ds) %>% 
+    # filter(!time_comb_simple%in%c("different", "early-late"), n_mols<=2) %>%
+    filter(!time_comb_simple%in%c("different", "early-late", "mid-late", "early-mid"), n_mols<=2) %>%
+    inner_join(spatial_coords) %>% 
+    inner_join(ref_cluster_dist)
+
+cluster_counts_mat <- combs_dataset %>% 
+    filter(n_mols==1) %>% 
+    group_by(comb_sorted, cluster) %>% 
+    summarize(n_cells=sum(n_cells)) %>%
+    pivot_wider(names_from=comb_sorted, values_from=n_cells, values_fill=0) %>% 
+    column_to_rownames("cluster") %>% 
+    as.matrix()
+
+comb_order <- cluster_counts_mat %>% t() %>% dist() %>% hclust(method="ward.D2") %>% {.$labels[.$order]}
+comb_order <- c("", comb_order)
+
+combs_dataset$mol1 <- combs_dataset$comb_sorted %>% str_split_fixed("\\+", n=2) %>% .[,1]
+combs_dataset$mol2 <- combs_dataset$comb_sorted %>% str_split_fixed("\\+", n=2) %>% .[,2]
+
+combs_dataset$mol1 <- factor(combs_dataset$mol1, levels=comb_order)
+combs_dataset$mol2 <- factor(combs_dataset$mol2, levels=comb_order)
+
+combs_dataset1 <- combs_dataset %>% filter(mol2!="")
+combs_dataset2 <- combs_dataset %>% filter(mol2!="")
+combs_dataset3 <- combs_dataset %>% filter(mol2=="")
+
+combs_dataset2$mol1 <- combs_dataset1$mol2
+combs_dataset2$mol2 <- combs_dataset1$mol1
+combs_dataset3$mol2 <- combs_dataset3$mol1
+
+
+plot_df <- bind_rows(combs_dataset1, combs_dataset2, combs_dataset3) %>% 
+    # filter(ap_score>2) %>% 
+    filter(!is.na(mol1), !is.na(mol2)) %>% 
+    mutate(
+        mol1=factor(mol1, levels=comb_order),
+        mol2=factor(mol2, levels=rev(comb_order)),
+    ) %>% 
+    arrange(mol1, mol2) %>% 
+    mutate(region=factor(region, levels=names(region_colors))) %>%
+    arrange(region) %>% 
+    mutate(cluster=factor(cluster, levels=unique(.$cluster)))
+
+
+timing_colors2 <- c(
+    "early"="#46ECD5",
+    "mid"="#2B7FFF",
+    "late"="#7008E7"
+)
+
+
+ggplot(plot_df, aes(ap_score, dv_score, color=time_comb_simple)) +
+    # geom_point(data=ref_cluster_meta_use, mapping=aes(ap_score, dv_score), color="grey95", size=2, alpha=1) +
+    geom_hline(yintercept=0.5, linetype="dashed", color="grey80", linewidth=0.2) +
+    geom_hline(yintercept=1, color="grey80", linewidth=0.2) +
+    geom_hline(yintercept=0, color="grey80", linewidth=0.2) +
+    geom_vline(xintercept=0, color="grey80", linewidth=0.2) +
+    geom_vline(xintercept=1, linetype="dashed", color="grey80", linewidth=0.2) +
+    geom_vline(xintercept=2, linetype="dashed", color="grey80", linewidth=0.2) +
+    geom_vline(xintercept=3, linetype="dashed", color="grey80", linewidth=0.2) +
+    geom_vline(xintercept=4, linetype="dashed", color="grey80", linewidth=0.2) +
+    geom_vline(xintercept=5, color="grey80", linewidth=0.2) +
+    lims(x=c(-0.5,5.5), y=c(-0.3, 1.4)) +
+    geom_point(size=0.2, shape=16) +
+    geom_density_2d(bins=100, linewidth=0.1) +
+    scale_color_manual(values=timing_colors2) +
+    scale_alpha_continuous(range=c(0.1, 1), limits=c(-5,0)) +
+    facet_grid(mol1~mol2) +
+    theme_article() +
+    article_text() +
+    no_x_text() +
+    no_y_text() +
+    no_margin() +
+    no_legend() +
+    theme(
+        panel.grid = element_blank(),
+        panel.border = element_rect(fill=NA, color="black"),
+        panel.spacing = unit(0.05, "lines"),
+    ) +
+    labs(x="AP score", y="DV score", color="Time window", size="Number of cells")
+ggsave(str_c(PLOT_DIR, "morphogen_regions/all_combs_clusters_", ds, "_ap_dv_contour.pdf"), units="cm", width=17.5, height=11)
+
+
+
+#### Plot timepoint sensitivity of morphogen interactions ####
+timing_edist <- read_tsv(str_c(DATA_DIR, "morphogen_timepoint_e_distance.tsv"))
+
+timing_score <- timing_edist %>% 
+    filter(dataset=="neal") %>%
+    filter(!timepoint_1%in%c("early-late", "mid-late", "early-mid")) %>%
+    filter(!timepoint_2%in%c("early-late", "mid-late", "early-mid")) %>%
+    group_by(dataset, comb) %>% 
+    summarize(
+        e_distance=mean(e_distance),
+    ) %>% 
+    arrange(e_distance) %>%
+    mutate(
+        comb=factor(comb, levels=unique(.$comb)),
+        n_mols=str_count(comb, "\\+") + 1
+    )
+
+timing_score %>% View()
+
+ggplot(timing_score, aes(comb, e_distance, fill=n_mols)) +
+    geom_bar(stat="identity") +
+    coord_flip() +
+    theme_article() +
+    theme(
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+    ) +
+    labs(x="Morphogen combination", y="Mean E-distance\nbetween timepoint variants")
+
+ggplot(timing_score, aes(comb, e_distance)) +
+    geom_bar(stat="identity", fill="darkgrey") +
+    coord_flip() +
+    scale_y_continuous(expand=c(0,0)) +
+    theme_article() +
+    article_text() +
+    no_y_text() +
+    theme(
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+    ) +
+    labs(x="Morphogen combination", y="Mean E-distance\nbetween timepoint variants")
+ggsave(str_c(PLOT_DIR, "morphogen_timepoint_sensitivity/morph_comb_timing_edist_barplot.pdf"), width=2.2, height=2.7, units="cm")
+
+
+morph_pw_df <- morph_pathways %>% 
+    enframe(name="mol", value="pathway") 
+
+plot_df <- map_dfr(colnames(cluster_counts_mat), function(mol_check){
+    plot_df <- timing_score %>% 
+        filter(str_detect(comb, mol_check)) %>%
+        filter(dataset=="neal") %>%
+        mutate(mol=mol_check) %>% 
+        return()
+}) %>% 
+    group_by(dataset, mol) %>%
+    mutate(mean_edist=mean(e_distance)) %>%
+    arrange(mean_edist) %>%
+    inner_join(morph_pw_df) %>% 
+    mutate(mol=factor(mol, levels=unique(.$mol)))
+
+ggplot(plot_df, aes(mol, e_distance, fill=pathway)) +
+    geom_boxplot(size=0.1, outlier.size = 0.1, outlier.shape=16) +
+    scale_fill_manual(values=pathway_colors) +
+    coord_flip() +
+    theme_article() +
+    article_text() +
+    no_legend() +
+    theme(
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+    ) +
+    labs(x="Morphogen", y="E-distance\nbetween time windows")
+ggsave(str_c(PLOT_DIR, "morphogen_timepoint_sensitivity/morphogen_timing_edist_boxplot.pdf"), width=2.8, height=3.3, units="cm")
+
+plot_df %>% ungroup() %>% filter(dataset=="neal", n_mols==2) %>% top_n(20, -e_distance) %>% pull(comb) %>% unique()
+plot_df %>% ungroup() %>% filter(dataset=="neal", n_mols==2) %>% top_n(50, e_distance) %>% pull(comb) %>% unique()
+plot_df$e_distance %>% mean()
+plot_df %>% ungroup() %>% filter(dataset=="neal", e_distance<5.4 & e_distance>4.8) %>% pull(comb) %>% unique()
+
+plot_df %>% filter(comb=="CHIR")
+
+plot_df %>% ungroup() %>% filter(dataset=="neal", n_mols==2) %>% top_n(50, e_distance) %>% arrange(e_distance) %>% View()
+
+
+#### Plot individual existing protocols ####
+get_comb_order <- function(comb){
+    comb_split <- str_split(comb, "\\+")[[1]]
+    comb_set <- str_c(sort(comb_split), collapse="+")
+    return(comb_set)
+}
+
+plot_protocol_regions <- function(ds, comb, protocol_timing=NULL, path=NULL){
+    comb_split <- str_split(comb, "\\+")[[1]]
+    comb_set <- str_c(sort(comb_split), collapse="+")
+
+    comb_timing <- condition_annot_meta %>% 
+        filter(dataset==ds) %>% 
+        filter(comb_sorted==comb_set) 
+    
+    if (!is.null(protocol_timing)){
+        comb_timing <- comb_timing %>% filter(time_comb==protocol_timing)
+    }
+    
+    comb_timing <- comb_timing %>% 
+        inner_join(spatial_coords) %>% 
+        inner_join(ref_cluster_dist) %>% 
+        group_by(cluster) %>% 
+        mutate(
+            max_cells=max(n_cells),
+        )
+
+    p <- ggplot(comb_timing, aes(ap_score, dv_score, color=region, size=n_cells)) +
+        geom_hline(yintercept=0.5, linetype="dashed", color="grey80", linewidth=0.2) +
+        geom_hline(yintercept=1, color="grey80", linewidth=0.2) +
+        geom_hline(yintercept=0, color="grey80", linewidth=0.2) +
+        geom_vline(xintercept=0, color="grey80", linewidth=0.2) +
+        geom_vline(xintercept=1, linetype="dashed", color="grey80", linewidth=0.2) +
+        geom_vline(xintercept=2, linetype="dashed", color="grey80", linewidth=0.2) +
+        geom_vline(xintercept=3, linetype="dashed", color="grey80", linewidth=0.2) +
+        geom_vline(xintercept=4, linetype="dashed", color="grey80", linewidth=0.2) +
+        geom_vline(xintercept=5, color="grey80", linewidth=0.2) +
+        lims(x=c(-0.5,5.5), y=c(-0.3, 1.4)) +
+        geom_point() +
+        no_x_text() +
+        no_y_text() +
+        scale_color_manual(values=region_colors) +
+        scale_size_continuous(range=c(0.1, 1.5)) +
+        no_label() +
+        no_legend() +
+        theme(
+            panel.grid = element_blank(),
+            panel.border = element_rect(fill=NA, color="black", linewidth=0.5),
+            axis.line = element_blank()
+        ) +
+        labs(x="AP score", y="DV score", color="Region", size="Number of cells")
+    
+    if (is.null(protocol_timing)){
+        p <- p + facet_wrap(~time_comb)
+    }
+    
+    if (!is.null(path)){
+        ggsave(str_c(PLOT_DIR, "morphogen_regions/", path, "/", comb, "_clusters_", ds, "_ap_dv_protocol.pdf"), units="cm", width=4, height=2.2)
+    }
+    
+    return(p)
+}
+
+### Cerebellum: https://pmc.ncbi.nlm.nih.gov/articles/PMC8336229/ -> FGF2+CHIR+RA(+FGF19)
+plot_protocol_regions("neal", "FGF2+CHIR+RA", "early-mid+early-mid+early-mid", path="cerebellum")
+plot_protocol_regions("neal", "FGF19+CHIR+RA", "early-late+early-late+early-late", path="cerebellum")
+
+plot_protocol_regions("neal", "CHIR+FGF8+Insulin", "early-mid+early-mid+early-mid", path="cerebellum")
+
+
+### Ventral midbrain: https://currentprotocols.onlinelibrary.wiley.com/doi/10.1002/cpz1.555 -> SAG+CHIR+FGF8
+get_comb_order("SAG+CHIR+FGF8")
+plot_protocol_regions("neal", "SAG+CHIR+FGF8", "early+mid+early", path="ventral_midbrain")
+
+### Ventral thalamus: https://www.sciencedirect.com/science/article/pii/S1934590923000784 -> Insulin+LDN+BMP7+SAG
+get_comb_order("Insulin+SAG+BMP7")
+plot_protocol_regions("neal", "BMP7+Insulin+SAG", "mid+mid+mid", path="ventral_thalamus")
+
+get_comb_order("LDN+SAG+BMP7")
+plot_protocol_regions("neal", "BMP7+LDN+SAG", "mid+early+late", path="ventral_thalamus")
+
+
+### Hypothalamus: https://pmc.ncbi.nlm.nih.gov/articles/PMC10460991/ -> LDN+XAV+SAG (all early)
+plot_protocol_regions("neal", "LDN+SAG+XAV", "early+early+early", path="hypothalamus")
+
+### Hypothalamus: https://pmc.ncbi.nlm.nih.gov/articles/PMC8419002/ -> LDN+SAG+SHH
+get_comb_order("LDN+SAG+SHH")
+plot_protocol_regions("neal", "LDN+SAG+SHH", "early-mid+early-mid+early-mid", path="hypothalamus")
+plot_protocol_regions("neal", "LDN+SAG", "early-mid+early-mid", path="hypothalamus")
+
+### Medulla: https://www.sciencedirect.com/science/article/pii/S193459092400290X -> LDN+CHIR+RA
+get_comb_order("LDN+CHIR+RA")
+plot_protocol_regions("neal", "LDN+CHIR+RA", "early-mid+early-mid+early-mid", path="medulla")
+plot_protocol_regions("neal", "LDN+CHIR+RA", "early+early+early", path="medulla")
+
+### Pons: FGF8+SAG+RA
+get_comb_order("FGF8+SAG+RA")
+plot_protocol_regions("neal", "FGF8+SAG+RA", "mid+mid+mid", path="pons")
+plot_protocol_regions("neal", "FGF8+SAG+RA", "early-mid+early-mid+early-mid", path="pons")
+
+
+plot_protocol_regions("neal", "FGF8+SAG+RA", ood_time_combs, path="pons")
+plot_protocol_regions("neal", "FGF8+SAG+RA", ood_time_combs[2], path="pons")
+
+
+pred_ref_dist %>% filter(gates=="OOD & close to reference")
+ood_conds <- pred_ref_dist %>% filter(gates=="OOD & close to reference", dataset=="neal") %>% pull(condition) %>% unique()
+
+pons_ood_conds <- condition_annot_meta %>% 
+    filter(condition%in% ood_conds, dataset=="neal") %>% 
+    group_by(condition, Subregion, comb, comb_sorted, time_comb) %>% 
+    summarize(n_cells=sum(n_cells)) %>%
+    filter(Subregion=="Pons", n_cells>400) %>% 
+    arrange(desc(n_cells))
+    
+View(pons_ood_conds)    
+
+condition_annot_meta <- condition_annot_meta %>% arrange(Subregion=="Pons")
+
+plot_protocol_regions("neal", "RA+SAG+CHIR", "early+early-late+early-late", path="pons")
+plot_protocol_regions("neal", "RA+Insulin+CHIR", "mid-late+mid-late+mid-late", path="pons")
+plot_protocol_regions("neal", "BMP7+CHIR+RA", "early-late+mid+mid", path="pons")
+plot_protocol_regions("neal", "FGF8+RA+SAG", "early-late+early-late+early", path="pons")
+plot_protocol_regions("neal", "RA+SAG+BMP4", "early+early-late+early", path="pons")
+plot_protocol_regions("neal", "FGF2+RA+CHIR", "mid+early-late+early", path="pons")
+
+
+
+pons_ood_conds %>% filter(
+    comb=="BMP7+FGF8+RA",
+    time_comb=="mid+mid+early"
+)
+
+#### Check protocols with most pons ####
+train_cond_meta <- condition_meta %>% 
+    select(condition, train_dataset=dataset)
+
+region_probs <- ref_cluster_dist %>% 
+    mutate(cluster=as.numeric(as.character(cluster))) %>% 
+    inner_join(ref_cluster_meta) %>% 
+    inner_join(condition_meta_cluster) %>% 
+    distinct() %>% 
+    group_by(condition, dataset) %>%
+    mutate(
+        n_cells_cond=sum(n_cells),
+    ) %>% 
+    filter(Subregion=="Pons") %>% 
+    group_by(condition, dataset, Subregion, n_cells_cond) %>%
+    summarize(
+        n_cells_region=sum(n_cells),
+        prop_region=n_cells_region/n_cells_cond[1],
+        mean_edist=mean(edist),
+    )
+
+region_probs %>% 
+    inner_join(train_cond_meta) %>% 
+    group_by(train_dataset) %>% 
+    View()
+
+train_pons_meta <- region_probs %>% 
+    inner_join(train_cond_meta) %>% 
+    group_by(train_dataset) %>%
+    # filter(prop_region==max(prop_region)) %>% 
+    summarize(
+        mean_edist=min(mean_edist),
+        prop_region=max(prop_region),
+    ) %>%
+    select(dataset=train_dataset, train_edist=mean_edist, train_prop=prop_region)
+
+region_probs_comp <- region_probs %>% 
+    inner_join(train_pons_meta) %>% 
+    mutate(
+        edist_logfc=log2(mean_edist/train_edist),
+        prop_enrich=log2(prop_region/train_prop),
+    )
+    
+    
+ggplot(region_probs_comp, aes(edist_logfc, prop_enrich, color=dataset)) +
+    geom_hline(yintercept=0, color="grey60", linetype="dashed", size=0.5) +
+    geom_vline(xintercept=0, color="grey60", linetype="dashed", size=0.5) +
+    geom_point(data=filter(region_probs_comp, !condition%in%ood_conds), shape=4, alpha=0.1, size=0.3) +
+    geom_point(data=filter(region_probs_comp, condition%in%ood_conds), mapping=aes(fill=dataset), color="black", shape=21, stroke=0.1, size=0.6) +
+    scale_color_manual(values=dataset_colors) +
+    scale_fill_manual(values=dataset_colors) +
+    article_text() +
+    no_legend() +
+    labs(x="Log2 E-distance fold change", y="Log2 Pons proportion fold change", color="Dataset")
+ggsave(str_c(PLOT_DIR, "morphogen_regions/pons_enrichment/pons_enrichment_edist_logfc_vs_prop_logfc.pdf"), bg="white", units="cm", width=4.8, height=3.9)
+
+
+
+region_probs_comp %>% filter(condition%in% ood_conds) %>% View()        
+region_probs %>% filter(Subregion=="Pons", prop_region>0.25) %>% View()
+
+region_probs %>% filter(Subregion=="Pons", dataset=="observed") %>% View()
+
+region_probs %>% filter(Subregion=="Pons", dataset%in%c("observed", "neal"), prop_region>0.3) %>% View()
+region_probs %>% filter(Subregion=="Pons", condition=="SAG_6.0_early_FGF8_5.4_early-late_RA_5.7_early-late")
+   
+
+ggplot(region_probs_comp, aes(edist_logfc, prop_enrich, color=dataset)) +
+    geom_hline(yintercept=0, color="grey60", linetype="dashed", size=0.5) +
+    geom_vline(xintercept=0, color="grey60", linetype="dashed", size=0.5) +
+    geom_point(data=filter(region_probs_comp, !condition%in%ood_conds), shape=4, alpha=0.1, size=0.3) +
+    geom_point(data=filter(region_probs_comp, condition%in%ood_conds, condition=="SAG_6.0_early_FGF8_5.4_early-late_RA_5.7_early-late"), mapping=aes(fill=dataset), color="black", shape=21) +
+    scale_color_manual(values=dataset_colors) +
+    scale_fill_manual(values=dataset_colors) +
+    labs(x="Log2 E-distance fold change", y="Log2 Pons proportion fold change", color="Dataset")
+ggsave(str_c(PLOT_DIR, "morphogen_regions/pons_enrichment/pons_enrichment_edist_logfc_vs_prop_logfc.pdf"), bg="white", units="cm", width=4.8, height=3.9)
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,22 +4,13 @@ warnings.filterwarnings("ignore")
 
 import os
 
-import matplotlib.pyplot as plt
-import numpy as np
-import jax.tree as jt
-import jax.numpy as jnp
+import anndata as ad
+import cfp
 import cloudpickle
+import numpy as np
 import pandas as pd
 import scanpy as sc
-import anndata as ad
 from scipy.sparse import csr_matrix, vstack
-from plotnine import *
-import itertools
-import tqdm
-
-from cfp.metrics import compute_scalar_mmd
-import cfp
-
 
 PLOT_DIR = "/home/fleckj/projects/cellflow/plots/organoid_cond_search/predictions/"
 RESULTS_DIR = "/home/fleckj/projects/cellflow/results/organoid_cond_search/predictions/"
@@ -27,8 +18,6 @@ os.makedirs(PLOT_DIR, exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 DATA_DIR = "/home/fleckj/projects/cellflow/data/datasets/organoids_combined/"
-FULL_DATA_PATH = f"{DATA_DIR}/organoids_combined_full.h5ad"
-adata = sc.read_h5ad(FULL_DATA_PATH)
 
 #### Define trial name ####
 # TRIAL_NAME = sys.argv[1]
@@ -36,8 +25,8 @@ TRIAL_NAME = "cellflow_0a37dcb9"
 RESULTS_DIR = f"{RESULTS_DIR}/{TRIAL_NAME}/"
 
 #### Load predictions ####
-adata_v1 = sc.read(f"{RESULTS_DIR}/v1/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
-adata_v2 = sc.read(f"{RESULTS_DIR}/v2/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
+adata_v1 = sc.read_h5ad(f"{RESULTS_DIR}/v1/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
+adata_v2 = sc.read_h5ad(f"{RESULTS_DIR}/v2/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
 
 wknn_v1 = cloudpickle.load(
     open(f"{RESULTS_DIR}/v1/wknn/organoid_cond_preds_{TRIAL_NAME}_wknn_full.pkl", "rb")
@@ -95,17 +84,17 @@ cloudpickle.dump(
     open(f"{RESULTS_DIR}/v1+2/organoid_cond_preds_{TRIAL_NAME}_wknn_full.pkl", "wb"),
 )
 
+
 #### New annotations ####
-adata_ref = sc.read(
-    f"/projects/site/pred/organoid-atlas/data/public_datasets/scg/human_brain/BraunLinnarsson2022/braun_2022_fetal_brain_v3.1umap_common_hv2k_wknn.h5ad"
+adata_v12 = sc.read_h5ad(
+    f"{RESULTS_DIR}/v1+2/organoid_cond_preds_{TRIAL_NAME}_full.h5ad"
 )
-
-selection_ref = adata_ref.obs["Region"] != "Forebrain"
-adata_ref_use = adata_ref[selection_ref]
-wknn_use = wknn_v12[:, selection_ref.values]
-adata_ref_use.uns["wknn"] = wknn_use
-
-cfp.pp.transfer_labels(adata_v12, adata_ref_use, label_key="Region", wknn_key="wknn")
+wknn_v12 = cloudpickle.load(
+    open(f"{RESULTS_DIR}/v1+2/organoid_cond_preds_{TRIAL_NAME}_wknn_full.pkl", "rb")
+)
+adata_ref = sc.read_h5ad(
+    "/projects/site/pred/organoid-atlas/data/public_datasets/scg/human_brain/BraunLinnarsson2022/braun_2022_fetal_brain_v3.1umap_common_hv2k_wknn.h5ad"
+)
 
 selection_ref = ~adata_ref.obs["Subregion"].isin(["Forebrain", "Telencephalon"])
 adata_ref_use = adata_ref[selection_ref]
@@ -115,6 +104,8 @@ adata_ref_use.obs["Subregion"][
 wknn_use = wknn_v12[:, selection_ref.values]
 adata_ref_use.uns["wknn"] = wknn_use
 
+cfp.pp.transfer_labels(adata_v12, adata_ref_use, label_key="Clusters", wknn_key="wknn")
+cfp.pp.transfer_labels(adata_v12, adata_ref_use, label_key="Region", wknn_key="wknn")
 cfp.pp.transfer_labels(adata_v12, adata_ref_use, label_key="Subregion", wknn_key="wknn")
 
 adata_v12.write_h5ad(f"{RESULTS_DIR}/v1+2/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
@@ -148,5 +139,3 @@ dists_v12.to_csv(
     sep="\t",
     index=False,
 )
-
-# %%

@@ -3,19 +3,15 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os
-import numpy as np
-import jax
-import jax.tree as jt
-import jax.numpy as jnp
+
 import cloudpickle
+import jax
+import jax.numpy as jnp
+import jax.tree as jt
+import numpy as np
 import pandas as pd
 import scanpy as sc
-from plotnine import *
-import itertools
 import tqdm
-
-from cfp.metrics import compute_e_distance, compute_scalar_mmd
-import cfp
 
 
 def pairwise_distances(x, y):
@@ -57,6 +53,7 @@ RESULTS_DIR = f"{RESULTS_DIR}/{TRIAL_NAME}/v1+2/"
 adata_pred = sc.read(f"{RESULTS_DIR}/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
 cond_meta = pd.read_csv(f"{RESULTS_DIR}/condition_meta_annot.tsv", sep="\t")
 
+
 #### Prepare full distributions ####
 pred_conds = cond_meta["condition"][cond_meta["dataset"] != "observed"].unique()
 ds_latents = {}
@@ -95,8 +92,7 @@ for cond in tqdm.tqdm(obs_conds):
         np.random.choice(cond_latent.shape[0], 1000, replace=True), :
     ]
 
-    dist_func = lambda x: compute_dists(x, cond_latent)
-    dists = jt.map(dist_func, ds_latents)
+    dists = jt.map(lambda x: compute_dists(x, cond_latent), ds_latents)
     dists_df = pd.concat({k: pd.DataFrame(v).T for k, v in dists.items()}, axis=0)
     dists_df.index = dists_df.index.rename(["dataset", "condition"])
     dists_df.reset_index(inplace=True)
@@ -130,8 +126,7 @@ for cond in tqdm.tqdm(obs_conds):
         np.random.choice(cond_latent.shape[0], 500, replace=True), :
     ]
 
-    dist_func = lambda x: compute_dists(x, cond_latent)
-    dists = jt.map(dist_func, obs_latents)
+    dists = jt.map(lambda x: compute_dists(x, cond_latent), obs_latents)
     dists_df = pd.DataFrame(dists).T
     dists_df.index = dists_df.index.rename("condition")
     dists_df.reset_index(inplace=True)
@@ -146,24 +141,10 @@ obs_dist_df.to_csv(
 )
 
 
-#### Transfer cluster labels ####
-adata_ref = sc.read(
-    f"/projects/site/pred/organoid-atlas/data/public_datasets/scg/human_brain/BraunLinnarsson2022/braun_2022_fetal_brain_v3.1umap_common_hv2k_wknn.h5ad"
-)
-wknn = cloudpickle.load(
-    open(f"{RESULTS_DIR}/organoid_cond_preds_{TRIAL_NAME}_wknn_full.pkl", "rb")
-)
-
-adata_ref.uns["wknn"] = wknn
-cfp.pp.transfer_labels(adata_pred, adata_ref, label_key="Clusters", wknn_key="wknn")
-
-adata_pred.write(f"{RESULTS_DIR}/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
-
-
 #### Compute distances of transferred clusters to reference ####
 adata_pred = sc.read(f"{RESULTS_DIR}/organoid_cond_preds_{TRIAL_NAME}_full.h5ad")
 adata_ref = sc.read(
-    f"/projects/site/pred/organoid-atlas/data/public_datasets/scg/human_brain/BraunLinnarsson2022/braun_2022_fetal_brain_v3.1umap_common_hv2k_wknn.h5ad"
+    "/projects/site/pred/organoid-atlas/data/public_datasets/scg/human_brain/BraunLinnarsson2022/braun_2022_fetal_brain_v3.1umap_common_hv2k_wknn.h5ad"
 )
 
 all_clusters = adata_pred.obs["Clusters_transfer"].unique().tolist()
@@ -201,7 +182,9 @@ cluster_latents = cloudpickle.load(
 for dataset in ["neal", "fatima", "nadya"]:
     for cluster in tqdm.tqdm(all_clusters):
         cluster_latent = cluster_latents[dataset][cluster]
-        cluster_latent = {c: l for c, l in cluster_latent.items() if l.shape[0] > 30}
+        cluster_latent = {
+            c: lat for c, lat in cluster_latent.items() if lat.shape[0] > 30
+        }
         if len(cluster_latent) == 0:
             del cluster_latents[dataset][cluster]
         else:
@@ -211,7 +194,7 @@ for cluster in tqdm.tqdm(all_clusters):
     cluster_latent = cluster_latents["observed"][cluster]
     if len(cluster_latent) == 0:
         del cluster_latents["observed"][cluster]
-    cluster_latent = {c: l for c, l in cluster_latent.items() if l.shape[0] > 0}
+    cluster_latent = {c: lat for c, lat in cluster_latent.items() if lat.shape[0] > 0}
     cluster_latents["observed"][cluster] = cluster_latent
 
 
@@ -222,17 +205,16 @@ for dataset in ["neal", "fatima", "nadya", "observed"]:
     ds_clusters = list(ds_latents.keys())
     for cluster in tqdm.tqdm(ds_clusters):
         cluster_ref = jnp.array(
-            adata_ref.obsm["X_scANVI"][adata_ref.obs["Clusters"] == cluster, :]
+            adata_ref.obsm["X_scANVI"][adata_ref.obs["Clusters"] == int(cluster), :]
         )
         cluster_latent = ds_latents[cluster]
         # Sample 300 cells from each cluster
         cluster_latent = {
-            c: l[np.random.choice(l.shape[0], 300, replace=True), :]
-            for c, l in cluster_latent.items()
+            c: lst[np.random.choice(lst.shape[0], 300, replace=True), :]
+            for c, lst in cluster_latent.items()
         }
 
-        dist_func = lambda x: compute_dists(x, cluster_ref)
-        dists = jt.map(dist_func, cluster_latent)
+        dists = jt.map(lambda x: compute_dists(x, cluster_ref), cluster_latent)
         dists_df = pd.DataFrame(dists).T
         dists_df.index = dists_df.index.rename("condition")
         dists_df.reset_index(inplace=True)
