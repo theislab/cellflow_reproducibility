@@ -1,0 +1,44 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 25
+
+    n_trials: 25
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+
+    # define hyperparameter search space
+    params: 
+      model.condition_embedding_dim: choice(256, 512, 1024)
+      model.time_encoder_dims: choice([512, 512, 512], [1024, 1024, 1024])
+      model.time_encoder_dropout: choice(0.0, 0.1, 0.2)
+      model.hidden_dims: choice([1024, 1024, 1024], [2048, 2048, 2048])
+      model.decoder_dropout: choice(0.0, 0.2)
+      model.layers_before_pool.gene.dims: choice([512, 512], [1024, 1024])
+      model.layers_before_pool.gene.dropout: choice(0.0, 0.5)
+      model.layers_before_pool.pathway.dims: choice([512, 512], [1024, 1024])
+      model.layers_before_pool.pathway.dropout: choice(0.0, 0.5)
+      model.layers_before_pool.cell_type.dims: choice([512, 512], [1024, 1024])
+      model.layers_before_pool.cell_type.dropout: choice(0.0, 0.5)
+      model.layers_after_pool.layer_type: choice(mlp)
+      model.layers_after_pool.dims: choice([512, 512], [1024, 1024])
+      model.cond_output_dropout: choice(0.0, 0.2, 0.5, 0.9)
+      model.flow_noise: choice(0.0, 0.5, 1.0)
+      model.epsilon: choice(0.5, 1.0)
+      model.tau_a: choice(1.0, 0.98)
+      model.tau_b: choice(1.0, 0.98)
+      training.multi_steps: choice(10, 20, 50)
+      training.batch_size: choice(1024)
+      

@@ -1,0 +1,10 @@
+# dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/hvg-1000_pca-30_cell_type-BXPC3_pathway-IFNG_IFNB_norm
+# file_suffix: '_IFNG_BXPC3_emb'
+
+# dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/IFNG_IFNB_ct-BXPC3_hvg-1000_pca-30_counts_ms_0.5/
+dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/IFNG_IFNB_TNFA_TGFB_INS_ct-BXPC3_hvg-500_pca-100_counts_ms_0.5/
+file_suffix: '_IFNG_BXPC3'
+
+# dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/ood_cell_type/IFNG_IFNB_ct-BXPC3_hvg-1000_pca-30_counts
+# file_suffix: '_IFNG_BXPC3'
+# vae_path: /lustre/groups/ml01/workspace/ot_pert_satija/models/vaes/32_1024

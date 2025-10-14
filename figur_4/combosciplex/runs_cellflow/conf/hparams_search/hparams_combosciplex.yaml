@@ -1,0 +1,40 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 300
+
+    n_trials: 300
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+
+    params:
+      dataset.split: choice(3)
+      model.pooling: choice(attention_token, attention_seed, mean)
+      model.decoder_dropout: choice(0.0, 0.2, 0.5)
+      model.condition_embedding_dim: choice(32, 64, 128, 256, 1024)
+      model.multi_steps: choice(20, 50)
+      model.flow_noise: choice(1.0, 1.5)
+      model.tau_b: choice(1.0, 0.95)
+      model.layer_norm_before_concatenation: choice(True, False)
+      model.linear_projection_before_concatenation: choice(True, False)
+      model.layers_before_pool.drugs.layer_type: choice(mlp)
+      model.layers_before_pool.drugs.dims: choice([256, 256], [1024, 1024])
+      model.layers_before_pool.drugs.dropout_rate: choice(0.0, 0.5)
+      model.layers_after_pool.layer_type: choice(mlp)
+      model.layers_after_pool.dims: choice([256, 256], [1024, 1024], [2048, 2048])
+      model.layers_after_pool.dropout_rate: choice(0.0, 0.5)
+      
+      
+      

@@ -1,0 +1,13 @@
+dataset_path: /lustre/groups/ml01/workspace/100mil/100m_int_indices.h5ad
+perturbation_covariates:
+  drug: [drug]
+  dose: [dosage]
+perturbation_covariate_reps:
+  drug: drug_embeddings
+sample_covariates: 
+  -  cell_line
+sample_covariate_reps: 
+  cell_line: cell_line_embeddings
+split_covariates: 
+  - cell_line
+wandb_project: tahoe

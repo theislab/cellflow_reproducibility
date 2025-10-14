@@ -1,0 +1,7 @@
+split: 0 # idx
+sample_rep: X
+perturbation_covariates:
+  target_gene: [gene_1, gene_2]
+perturbation_covariate_reps:
+  target_gene: nargab #esm2 # nargab
+wandb_project: cf_norman

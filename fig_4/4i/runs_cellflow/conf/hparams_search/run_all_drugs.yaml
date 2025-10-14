@@ -1,0 +1,7 @@
+# @package _global_
+
+
+hydra:
+  sweeper:
+    params:
+      dataset.drug: choice('ixazomib','everolimus','olaparib','paclitaxel','vemurafenib_cobimetinib','decitabine','control','palbociclib','trametinib_panobinostat','dacarbazine','panobinostat','sorafenib','trametinib_dabrafenib','erlotinib','crizotinib','cisplatin_olaparib','trametinib_erlotinib','imatinib','regorafenib','pomalidomide_carfilzomib_dexamethasone','trametinib_midostaurin','mln2480','vindesine','midostaurin','cisplatin','staurosporine','temozolomide','dabrafenib','lenalidomide','trametinib','dexamethasone','hydroxyurea','ixazomib_lenalidomide_dexamethasone','melphalan','ulixertinib','dasatinib')

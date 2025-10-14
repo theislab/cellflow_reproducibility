@@ -1,0 +1,52 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 1000
+
+    n_trials: 1000
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+
+
+    # define hyperparameter search space
+    params:
+      training.num_iterations: choice(500000, 1000000)
+      training.batch_size: choice(1024, 2048)
+      dataset.sample_rep: choice(X_aligned)
+      model.pooling: choice(attention_token, attention_seed)
+      model.condition_embedding_dim: choice(1024)
+      model.time_encoder_dims: choice([1024, 1024, 1024])
+      model.time_encoder_dropout: choice(0.0)
+      model.hidden_dims: choice([2048, 2048, 2048])
+      model.decoder_dims: choice([2048, 2048, 2048], [4096, 4096, 4096])
+      model.decoder_dropout: choice(0.0, 0.2, 0.5)
+      model.layers_before_pool.gene_knockout.layer_type: choice(mlp)
+      model.layers_before_pool.gene_knockout.dims: choice([1024, 1024], [512, 512], [256, 256], [64, 64])
+      model.layers_before_pool.gene_knockout.dropout_rate: choice(0.0, 0.5)
+      model.layers_before_pool.logtime.layer_type: choice(mlp)
+      model.layers_before_pool.logtime.dims: choice([1024, 1024], [256, 256], [64, 64])
+      model.layers_before_pool.logtime.dropout_rate: choice(0.0, 0.5)
+      model.layers_after_pool.layer_type: choice(mlp)
+      model.layers_after_pool.dims: choice([1024, 1024], [256, 256], [64, 64])
+      model.layers_after_pool.dropout_rate: choice(0.0, 0.5)
+      model.cond_output_dropout: choice(0.0, 0.5, 0.9)
+      model.multi_steps: choice(1, 10, 50, 100)
+      model.tau_a: choice(1.0, 0.98)
+      model.tau_b: choice(1.0, 0.98)
+      model.flow_noise: choice(0.0, 0.1, 0.5, 1.0)
+      model.epsilon: choice(1.0, 0.1, 0.5)
+      model.layer_norm_before_concatenation: choice(True, False)
+      model.linear_projection_before_concatenation: choice(True, False)
+      

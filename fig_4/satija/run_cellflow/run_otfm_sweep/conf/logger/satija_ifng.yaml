@@ -1,0 +1,9 @@
+project: 'satija_ifng_otfm_0.5_full'
+out_dir: '/lustre/groups/ml01/workspace/ot_perturbation/data/satija/out'
+
+metrics: ['r_squared', "mmd", "sinkhorn_div", "e_distance"]
+calc_decoded_metrics: True
+decoded_metrics: ['r_squared', "mmd", "sinkhorn_div", "e_distance"]
+
+save_model: True
+save_model_path: /lustre/groups/ml01/workspace/ot_pert_satija/output_ifng/

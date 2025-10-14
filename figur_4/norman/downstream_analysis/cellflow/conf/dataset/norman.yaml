@@ -1,0 +1,7 @@
+split: 0 # idx
+sample_rep: X_pca
+perturbation_covariates:
+  target_gene: [gene_1, gene_2]
+perturbation_covariate_reps:
+  target_gene: esm2
+wandb_project: otfm_norman

@@ -1,0 +1,11 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - ae_hparams: cpa
+  - generic_params: cpa
+  - trainer_hparams: cpa
+  - hydra: conf
+  - launcher: gpu_normal
+  - logger: cpa

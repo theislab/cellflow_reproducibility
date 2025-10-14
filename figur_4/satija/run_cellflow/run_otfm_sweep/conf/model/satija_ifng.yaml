@@ -1,0 +1,30 @@
+hidden_dims: [1024, 1024, 1024]
+decoder_dims: [4096, 4096, 4096]
+condition_embedding_dim: 4096
+time_encoder_dims: [512, 512, 512]
+time_encoder_dropout: 0.0
+cond_output_dropout: 0.5
+flow:
+  constant_noise: 0.5
+hidden_dropout: 0.0
+decoder_dropout: 0.0
+layers_before_pool:
+  gene:
+    layer_type: "mlp"
+    dims: [512, 512]
+    dropout: 0.0
+  pathway:
+    layer_type: "mlp"
+    dims: [1024, 1024]
+    dropout: 0.0
+  cell_type:
+    layer_type: "mlp"
+    dims: [512, 512]
+    dropout: 0.0
+layers_after_pool: 
+    layer_type: "mlp"
+    dims: [4096, 4096]
+match_kwargs: 
+  epsilon: 1.0
+  tau_a: 1.0
+  tau_b: 1.0

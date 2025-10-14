@@ -1,0 +1,4 @@
+run:
+  dir: /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/hydra_logs/${now:%Y-%m-%d}_${now:%H-%M-%S}
+sweep:
+  dir: /lustre/groups/ml01/workspace/alessandro.palma/ot_pert/out/hydra_logs/${now:%Y-%m-%d}_${now:%H-%M-%S}

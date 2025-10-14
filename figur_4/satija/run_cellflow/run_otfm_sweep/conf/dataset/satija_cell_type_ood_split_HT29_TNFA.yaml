@@ -1,0 +1,2 @@
+dataset_path: /lustre/groups/ml01/workspace/ot_perturbation/data/satija/datasets/adata_ood_final_pathway_cell_type/HT29_TNFA
+file_suffix: '_HT29_TNFA'

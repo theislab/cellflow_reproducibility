@@ -1,0 +1,3 @@
+split: 3
+use_counts: False
+use_deg_stopping_criterion: False

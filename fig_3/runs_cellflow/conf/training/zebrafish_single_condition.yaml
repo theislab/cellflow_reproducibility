@@ -1,0 +1,13 @@
+valid_freq: 250_000_000
+num_iterations: 1_000_000
+batch_size: 2048
+train_fraction_for_validation: 0
+test_n_conditions_on_log_iteration: 0
+test_n_conditions_on_train_end: 0
+ood_n_conditions_on_log_iteration: 0
+ood_n_conditions_on_train_end: null
+n_cells_max_in_source_ood_at_log_iteration: 30000
+n_cells_max_in_source_ood_at_train_end: 30000
+out_dir: /lustre/groups/ml01/workspace/cell_flow_zebrafish/results/zebrafish_single_condition
+save_model: True
+save_preds: True

@@ -1,0 +1,57 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: grid
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 10000
+
+    n_trials: 10000
+
+    sampler:
+      _target_: optuna.samplers.GridSampler
+      
+
+    # define hyperparameter search space
+    params:
+      dataset.split: choice(10)
+      dataset.sample_covariates: choice([cell_line])
+      model.condition_embedding_dim: choice(32, 64, 256, 1024)
+      model.time_encoder_dims: choice([1024, 1024, 1024])
+      model.time_encoder_dropout: choice(0.0)
+      model.hidden_dims: choice([2048, 2048, 2048], [1024, 1024, 1024])
+      model.decoder_dropout: choice(0.0, 0.2)
+      model.decoder_dims: choice([2048, 2048], [4096, 4096, 4096])
+      model.layers_before_pool.drugs.layer_type: choice(mlp)
+      model.layers_before_pool.drugs.dims: choice([1024, 1024])
+      model.layers_before_pool.drugs.dropout_rate: choice(0.0, 0.5)
+      model.layers_before_pool.dose.dims: choice([256, 256])
+      model.layers_before_pool.dose.dropout_rate: choice(0.0)
+      model.layers_before_pool.cell_line.layer_type: choice(mlp)
+      model.layers_before_pool.cell_line.dims: choice([1024, 1024])
+      model.layers_before_pool.cell_line.dropout_rate: choice(0.0, 0.2)
+      model.layers_after_pool.layer_type: choice(mlp)
+      model.layers_after_pool.dims: choice([1024, 1024], [512, 512])
+      model.layers_after_pool.dropout_rate: choice(0.0, 0.2)
+      model.cond_output_dropout: choice(0.5, 0.9)
+      model.multi_steps: choice(1, 20, 50)
+      model.tau_a: choice(1.0)
+      model.tau_b: choice(1.0)
+      model.epsilon: choice(0.5, 1.0)
+      model.pooling: choice(attention_token, mean)
+      model.learning_rate: choice(0.0001, 0.00005, 0.00001)
+      model.flow_noise: choice(0.1, 0.5, 1.0, 1.5)
+      model.flow_type: choice(constant_noise, bridge)
+      model.conditioning: choice(concatenation, resnet, film)
+      model.condition_mode: choice(deterministic)
+      model.regularization: choice(0.0, 0.1, 0.2)
+      model.ema: choice(1.0, 0.1, 0.001, 0.0001)
+      model.time_max_period: choice(0, 10000)

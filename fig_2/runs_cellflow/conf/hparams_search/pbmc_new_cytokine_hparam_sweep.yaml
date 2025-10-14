@@ -1,0 +1,50 @@
+# @package _global_
+
+defaults:
+  #- override /hydra/sweeper/sampler: grid
+  - override /hydra/sweeper/sampler: random
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    #_target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+
+    direction: minimize
+
+    n_jobs: 10000
+
+    n_trials: 10000
+
+    sampler:
+      _target_: optuna.samplers.RandomSampler
+    
+      
+    params:
+      dataset.cytokine_embedding: choice('esm2_embeddings', 'nargab')
+      dataset.cytokine_held_out: choice('IFN-epsilon','CD27L', '4-1BBL','ADSF','APRIL','BAFF', 'OX40L', 'IL-13','IL-15')
+      dataset.idx_given_cytokine: choice(0) #choice(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41)
+      model.condition_embedding_dim: choice(64, 256)
+      model.time_encoder_dims: choice([256, 256, 256], [1024, 1024, 124])
+      model.time_encoder_dropout: choice(0.0)
+      model.time_max_period: choice(10000, 0)
+      model.hidden_dims: choice([256, 256, 256], [2048, 1024, 256], [2048, 2048, 2048])
+      model.decoder_dropout: choice(0.0)
+      model.decoder_dims: choice([2048,2048, 2048])
+      model.layers_after_pool.layer_type: choice(mlp)
+      model.layers_after_pool.dims: choice([1024, 1024], [256,256])
+      model.layers_after_pool.dropout_rate: choice(0.0)
+      model.cond_output_dropout: choice(0.5, 0.9)
+      model.multi_steps: choice(1, 20, 50)
+      model.tau_a: choice(1.0)
+      model.tau_b: choice(1.0)
+      model.epsilon: choice(1.0)
+      model.pooling: choice(attention_token, mean)
+      model.learning_rate: choice(0.00005)
+      model.flow_noise: choice(0.1, 0.5, 1.0)
+      model.conditioning: choice(concatenation, film, resnet)
+      model.ema: choice(0.001, 0.01, 1.0)
+      model.regularization: choice(0.0, 0.1, 0.5)
+      training.num_iterations: choice(300_000)
+  

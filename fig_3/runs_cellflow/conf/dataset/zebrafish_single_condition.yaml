@@ -1,0 +1,9 @@
+ood_condition: epha4a_control_36 #wnt3a_wnt8_18
+perturbation_covariates:
+  gene_knockout: [gene_target_1, gene_target_2]
+perturbation_covariate_reps:
+  gene_knockout: gene_embeddings
+wandb_project: zebrafish_otfm
+sample_rep: X_aligned 
+control_key: is_control # or is_control
+split_covariates: [timepoint] #[tissue_adapted] or [timepoint, tissue_adapted] or null

@@ -1,0 +1,8 @@
+# @package _global_
+
+
+hydra:
+  sweeper:
+    params:
+      dataset.ood_condition: choice('zc4h2_control','met_control','tfap2a_control','hgfa_control','tfap2a_foxd3','noto_control','cdx4_cdx1a','epha4a_control','mafba_control','tbx16_msgn1','smo_control','hand2_control','egr2b_control','cdx4_control','foxi1_control','hoxb1a_control','tbx16_tbx16l','tbx16_control','tbx1_control','wnt3a_wnt8','phox2a_control','foxd3_control','tbxta_control')
+      

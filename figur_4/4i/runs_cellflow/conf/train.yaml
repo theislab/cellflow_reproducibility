@@ -1,0 +1,11 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: 4i
+  - hydra: conf
+  - model: 4i
+  - launcher: gpu_normal
+  - logger: 4i
+  - training: training_sciplex

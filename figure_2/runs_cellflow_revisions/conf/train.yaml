@@ -1,0 +1,11 @@
+# @package _global_
+
+# Default configurations
+defaults:
+  - _self_
+  - dataset: sciplex
+  - hydra: conf
+  - model: sciplex
+  - launcher: gpu_normal
+  - logger: default
+  - training: training_sciplex

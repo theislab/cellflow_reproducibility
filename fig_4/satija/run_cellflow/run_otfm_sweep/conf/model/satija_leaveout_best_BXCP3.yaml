@@ -1,0 +1,51 @@
+cond_output_dropout: 0.5
+condition_embedding_dim: 256
+decoder_dims:
+    - 4096
+    - 4096
+    - 4096
+decoder_dropout: 0.2
+epsilon: 0.5
+flow_noise: 1
+flow_type: constant_noise
+hidden_dims:
+    - 2048
+    - 2048
+    - 2048
+hidden_dropout: 0
+layer_norm_before_concatenation: false
+layers_after_pool:
+    dims:
+        - 512
+        - 512
+    layer_type: mlp
+layers_before_pool:
+    cell_type:
+        dims:
+            - 512
+            - 512
+        dropout: 0.5
+        layer_type: mlp
+    gene:
+        dims:
+            - 512
+            - 512
+        dropout: 0.5
+        layer_type: mlp
+    pathway:
+        dims:
+            - 512
+            - 512
+        dropout: 0
+        layer_type: mlp
+linear_projection_before_concatenation: false
+multi_steps: 20
+pooling: attention_token
+tau_a: 1
+tau_b: 0.98
+time_encoder_dims:
+    - 1024
+    - 1024
+    - 1024
+time_encoder_dropout: 0
+time_freqs: 1024

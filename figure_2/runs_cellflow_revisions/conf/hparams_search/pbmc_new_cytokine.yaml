@@ -1,0 +1,32 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper/sampler: grid
+  - override /hydra/sweeper: optuna
+
+optimized_metric: r_squared
+
+hydra:
+  sweeper:
+    direction: minimize
+
+    n_jobs: 1000
+
+    n_trials: 1000
+
+    sampler:
+      _target_: optuna.samplers.GridSampler
+      
+    params:
+      dataset.cytokine_held_out: choice('IFN-beta','IFN-epsilon','C5a', '4-1BBL','ADSF','APRIL','BAFF', 'Noggin','OSM','OX40L', 'IL-13','IL-15')
+      dataset.idx_given_cytokine: choice(42) #choice(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41)
+      model.epsilon: choice(0.5, 1.0)
+      model.pooling: choice(attention_token, mean)
+      model.learning_rate: choice(0.0001, 0.00005, 0.00001)
+      model.flow_noise: choice(0.5, 1.0, 1.5, 2.0)
+      model.flow_type: choice(constant_noise, bridge)
+      model.conditioning: choice(concatenation, resnet, film)
+      model.condition_mode: choice(deterministic, stochastic)
+      model.regularization: choice(0.0, 0.01, 0.1)
+  
+# already run: choice('IFN-beta','IFN-epsilon','C5a','CD27L', '4-1BBL','ADSF','APRIL','BAFF', 'Noggin','OSM','OX40L', 'IL-13','IL-15')
