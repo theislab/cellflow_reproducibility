@@ -7,5 +7,5 @@ defaults:
   - hydra: conf
   - model: sciplex
   - launcher: gpu_normal
-  - logger: pbmc
+  - logger: default
   - training: training_sciplex

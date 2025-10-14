@@ -12,4 +12,4 @@ hydra:
     gres: gpu:1
     constraint: h100_80gb|a100_40gb|a100_80gb
     timeout_min: 5750
-    array_parallelism: 20 # max num of tasks to run in parallel (via job array)
+    array_parallelism: 3 # max num of tasks to run in parallel (via job array)

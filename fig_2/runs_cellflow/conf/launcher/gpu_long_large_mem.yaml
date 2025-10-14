@@ -9,6 +9,6 @@ hydra:
     qos: gpu_long
     mem_gb: 400
     gres: gpu:1
-    constraint: h100_80gb
+    constraint: h100_80gb|a100_80gb
     timeout_min: 1440
     array_parallelism: 1000

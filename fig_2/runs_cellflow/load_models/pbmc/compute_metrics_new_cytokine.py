@@ -3,7 +3,7 @@ import os
 import sys
 import traceback
 from typing import Dict, Literal, Optional, Tuple
-import cellflow
+import cfp
 import scanpy as sc
 import numpy as np
 import functools
@@ -17,13 +17,14 @@ import anndata as ad
 import pandas as pd
 import os
 import pickle
-from cellflow.training import ComputationCallback
-from cellflow.preprocessing import transfer_labels, compute_wknn
-from cellflow.training import ComputationCallback
+from cfp.training import ComputationCallback
+from cfp.preprocessing import transfer_labels, compute_wknn
+from cfp.training import ComputationCallback
 from numpy.typing import ArrayLike
-from cellflow.metrics import compute_r_squared, compute_e_distance, compute_scalar_mmd, compute_sinkhorn_div
-from cellflow.metrics import compute_r_squared, compute_e_distance, compute_metrics_fast
-from cellflow.preprocessing import transfer_labels, compute_wknn, centered_pca, project_pca
+from cfp.metrics import compute_r_squared, compute_e_distance, compute_scalar_mmd, compute_sinkhorn_div
+from cfp.metrics import compute_r_squared, compute_e_distance, compute_metrics_fast
+from cfp.preprocessing import transfer_labels, compute_wknn, centered_pca, project_pca
+
 
 
 
@@ -55,8 +56,8 @@ def compute_metrics(adata_ref: ad.AnnData, adata_pred: ad.AnnData, donor_deg_dic
         r_sq[f"decoded_r_squared_{cell_type}"] = compute_r_squared(dist_true_decoded, dist_pred_decoded)
         e_distance[f"e_distance_{cell_type}"] = compute_e_distance(dist_true, dist_pred)
         mmd[f"mmd_{cell_type}"] = compute_scalar_mmd(dist_true, dist_pred)
-        sdiv_10[f"div_10_{cell_type}"] = np.nan
-        sdiv_100[f"div_100_{cell_type}"] = np.nan
+        sdiv_10[f"div_10_{cell_type}"] = compute_sinkhorn_div(dist_true, dist_pred, epsilon=10.0)
+        sdiv_100[f"div_100_{cell_type}"] = compute_sinkhorn_div(dist_true, dist_pred, epsilon=100.0)
 
         deg_mask = [True if el in donor_deg_dict[ct_cyto] else False for el in adata_ood_true.var_names]
         deg_true_decoded = adata_true_ct[:,deg_mask].X.toarray()
@@ -64,8 +65,8 @@ def compute_metrics(adata_ref: ad.AnnData, adata_pred: ad.AnnData, donor_deg_dic
         deg_r_sq[f"deg_decoded_r_squared_{cell_type}"] = compute_r_squared(deg_true_decoded, deg_pred_decoded)
         deg_e_distance[f"deg_e_distance_{cell_type}"] = compute_e_distance(deg_true_decoded, deg_pred_decoded)
         deg_mmd[f"deg_mmd_{cell_type}"] = compute_scalar_mmd(deg_true_decoded, deg_pred_decoded)
-        deg_sdiv_10[f"deg_div_10_{cell_type}"] = np.nan #compute_sinkhorn_div(deg_true_decoded, deg_pred_decoded, epsilon=10.0)
-        deg_sdiv_100[f"deg_div_100_{cell_type}"] = np.nan #compute_sinkhorn_div(deg_true_decoded, deg_pred_decoded, epsilon=100.0)
+        deg_sdiv_10[f"deg_div_10_{cell_type}"] = compute_sinkhorn_div(deg_true_decoded, deg_pred_decoded, epsilon=10.0)
+        deg_sdiv_100[f"deg_div_100_{cell_type}"] = compute_sinkhorn_div(deg_true_decoded, deg_pred_decoded, epsilon=100.0)
 
     adata_concat = ad.concat([adata_ctrl, adata_pred], join="inner", label="all")
     sc.tl.rank_genes_groups(
@@ -75,27 +76,28 @@ def compute_metrics(adata_ref: ad.AnnData, adata_pred: ad.AnnData, donor_deg_dic
             rankby_abs=True,
             n_genes=50,
             use_raw=False,
-            method="wilcoxon")
+            method="wilcoxon",
+        )
     predicted_deg_genes = [el[0] for el in list(adata_concat.uns["rank_genes_groups"]["names"])]
 
     # standard metrics
     decoded_ood_r_squared = compute_r_squared(adata_ood_true.X.toarray(), adata_pred.X)
     ood_e_distance = compute_e_distance(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"])
     ood_mmd = compute_scalar_mmd(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"])
-    ood_sdiv_10 = np.nan # compute_sinkhorn_div(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"], epsilon=10.0)
-    ood_sdiv_100 = np.nan #compute_sinkhorn_div(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"], epsilon=100.0)
+    ood_sdiv_10 = compute_sinkhorn_div(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"], epsilon=10.0)
+    ood_sdiv_100 = compute_sinkhorn_div(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"], epsilon=100.0)
     
     # metrics to return
     dict_to_log["mean_decoded_r_sq_per_cell_type"] = np.mean(list(r_sq.values()))
     dict_to_log["mean_e_distance_per_cell_type"] = np.mean(list(e_distance.values()))
     dict_to_log["mean_mmd_per_cell_type"] = np.mean(list(mmd.values()))
-    dict_to_log["mean_sdiv_10_per_cell_type"] = np.nan #np.mean(list(sdiv_10.values()))
-    dict_to_log["mean_sdiv_100_per_cell_type"] = np.nan #np.mean(list(sdiv_100.values()))
+    dict_to_log["mean_sdiv_10_per_cell_type"] = np.mean(list(sdiv_10.values()))
+    dict_to_log["mean_sdiv_100_per_cell_type"] = np.mean(list(sdiv_100.values()))
     dict_to_log["mean_deg_r_sq_per_cell_type"] = np.mean(list(deg_r_sq.values()))
     dict_to_log["mean_deg_e_distance_per_cell_type"] = np.mean(list(deg_e_distance.values()))
     dict_to_log["mean_deg_mmd_per_cell_type"] = np.mean(list(deg_mmd.values()))
-    dict_to_log["mean_deg_sdiv_10_per_cell_type"] = np.nan #np.mean(list(deg_sdiv_10.values()))
-    dict_to_log["mean_deg_sdiv_100_per_cell_type"] = np.nan #np.mean(list(deg_sdiv_100.values()))
+    dict_to_log["mean_deg_sdiv_10_per_cell_type"] = np.mean(list(deg_sdiv_10.values()))
+    dict_to_log["mean_deg_sdiv_100_per_cell_type"] = np.mean(list(deg_sdiv_100.values()))
     
     dict_to_log.update(r_sq)
     dict_to_log.update(e_distance)
@@ -117,15 +119,14 @@ def compute_metrics(adata_ref: ad.AnnData, adata_pred: ad.AnnData, donor_deg_dic
 
 
 
-
 if __name__ == "__main__":
     pred_file = sys.argv[1]
-    complete_pred_file = os.path.join("/lustre/groups/ml01/workspace/ot_perturbation/models/cellflow/pbmc_new_cytokine_new", pred_file)
+    complete_pred_file = os.path.join("/lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_cytokine", pred_file)
     adata_pred = sc.read_h5ad(complete_pred_file)
     adata_pred.X = adata_pred.layers["X_recon"]
-    cytokine = pred_file.split("_")[-4]
-    donor = pred_file.split("_")[-5]
-    out_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/metrics_new"
+    cytokine = pred_file.split("_")[-3]
+    donor = pred_file.split("_")[-4]
+    out_dir = "/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/metrics"
     adata_full = sc.read_h5ad("/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/pbmc_with_pca.h5ad")
     adata_ood_true = adata_full[(adata_full.obs["donor"] == donor) & (adata_full.obs["cytokine"]==cytokine)]
     adata_ctrl = adata_full[(adata_full.obs["cytokine"]=="PBS") & (adata_full.obs["donor"]==donor)]
@@ -148,4 +149,6 @@ if __name__ == "__main__":
     cond = f'{donor}_{cytokine}'
     expr = "_".join(pred_file.split("_")[:-1])
     pd.DataFrame.from_dict(out, columns=[cond], orient="index").to_csv(os.path.join(out_dir, f"{expr}_metrics.csv"))
+    
+    # see whether we can concat with original metrics
 
