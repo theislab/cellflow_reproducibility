@@ -2,21 +2,19 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+import argparse
 import os
-
-import jax.tree as jt
-import jax.numpy as jnp
 from functools import partial
+
+import anndata as ad
+import cfp
+import jax.numpy as jnp
+import jax.tree as jt
 import numpy as np
 import pandas as pd
-import anndata as ad
 import scanpy as sc
-from plotnine import *
 from cuml import UMAP
-import argparse
-
-import cfp
-
+from plotnine import *
 
 #### Parse arguments ####
 parser = argparse.ArgumentParser()
@@ -28,7 +26,7 @@ args = parser.parse_args()
 
 #### Project name & dir ####
 PROJECT_NAME = "train_eval_organoids_common"
-RESULTS_DIR = f"/home/fleckj/projects/cellflow/results/"
+RESULTS_DIR = "/home/fleckj/projects/cellflow/results/"
 OUT_DIR = os.path.join(RESULTS_DIR, PROJECT_NAME, args.trial_name, args.name)
 
 
@@ -80,9 +78,7 @@ adata_pred.obsm["X_umap"] = np.clip(
     adata_full.obsm["X_umap"].max(),
 )
 
-adata_gt_pred = ad.concat(
-    {"pred": adata_pred, "gt": adata_full}, join="outer", label="split"
-)
+adata_gt_pred = ad.concat({"pred": adata_pred, "gt": adata_full}, join="outer", label="split")
 
 adata_gt_pred.write_h5ad(f"{OUT_DIR}/gt_test_predictions.h5ad")
 
@@ -118,27 +114,17 @@ thresholds = np.arange(1, 20, 0.5) / 100
 precrec_results = {}
 for label_key in ["leiden_2", "leiden_3", "leiden_4"]:
     pred_cluster_data = {
-        cond: jnp.array(
-            adata_pred.obs[f"{label_key}_transfer"][
-                adata_pred.obs["condition"] == cond
-            ].values.astype(int)
-        )
+        cond: jnp.array(adata_pred.obs[f"{label_key}_transfer"][adata_pred.obs["condition"] == cond].values.astype(int))
         for cond in test_conds
     }
 
     gt_cluster_data = {
-        cond: jnp.array(
-            adata_full.obs[label_key][
-                adata_full.obs["condition"] == cond
-            ].values.astype(int)
-        )
+        cond: jnp.array(adata_full.obs[label_key][adata_full.obs["condition"] == cond].values.astype(int))
         for cond in test_conds
     }
     precrec_func = partial(precision_recall, y_thresholds=thresholds)
     precrec = jt.map(precrec_func, gt_cluster_data, pred_cluster_data)
-    precrec_df = pd.concat(
-        {cond: pd.DataFrame(precrec[cond]) for cond in precrec}, names=["condition"]
-    ).reset_index()
+    precrec_df = pd.concat({cond: pd.DataFrame(precrec[cond]) for cond in precrec}, names=["condition"]).reset_index()
     precrec_df["threshold"] = np.concatenate([thresholds for _ in test_conds], axis=0)
     precrec_df["cluster_key"] = label_key
     precrec_df = precrec_df.drop(columns="level_1")
@@ -150,12 +136,10 @@ precrec_df.to_csv(f"{OUT_DIR}/precrec_metrics.tsv", sep="\t")
 
 #### Compute other cluster metrics ####
 from scipy.spatial.distance import cosine
-from scipy.stats import pearsonr, wasserstein_distance, entropy
+from scipy.stats import entropy, pearsonr, wasserstein_distance
 
 
-def compute_cluster_metrics(
-    true_props: np.ndarray, pred_props: np.ndarray
-) -> dict[str, float]:
+def compute_cluster_metrics(true_props: np.ndarray, pred_props: np.ndarray) -> dict[str, float]:
     metrics = {
         "cosine": cosine(true_props, pred_props),
         "pcorr": pearsonr(true_props, pred_props)[0],
@@ -170,17 +154,11 @@ def compute_cluster_metrics(
 cluster_metrics_results = {}
 for label_key in ["leiden_2", "leiden_3", "leiden_4"]:
     pred_cluster_data = {
-        cond: jnp.array(
-            adata_pred.obs[f"{label_key}_transfer"][
-                adata_pred.obs["condition"] == cond
-            ].values.astype(int)
-        )
+        cond: jnp.array(adata_pred.obs[f"{label_key}_transfer"][adata_pred.obs["condition"] == cond].values.astype(int))
         for cond in test_conds
     }
     true_props = {
-        cond: adata_full[adata_full.obs["condition"] == cond]
-        .obs[label_key]
-        .value_counts(normalize=True)
+        cond: adata_full[adata_full.obs["condition"] == cond].obs[label_key].value_counts(normalize=True)
         for cond in conditions
     }
     pred_props = {
