@@ -16,9 +16,7 @@ import wandb
 import anndata as ad
 import pandas as pd
 import os
-from cfp.training import ComputationCallback
 from cfp.preprocessing import transfer_labels, compute_wknn
-from cfp.training import ComputationCallback
 from numpy.typing import ArrayLike
 from cfp.metrics import compute_r_squared, compute_e_distance
 from cfp.metrics import compute_r_squared, compute_e_distance, compute_scalar_mmd, compute_sinkhorn_div
@@ -136,7 +134,7 @@ def run(config):
     
     metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
     decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_train, metrics=["r_squared"])
-    wandb_callback = cfp.training.WandbLogger(project="cfp_pbmc_new_donor", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
+    wandb_callback = cfp.training.WandbLogger(project=config_dict["training"]["wandb_project"], out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
     callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
     
     cf.train(

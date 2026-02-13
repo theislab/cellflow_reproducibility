@@ -4,12 +4,18 @@ import seaborn as sns
 import jax
 import functools
 import matplotlib.pyplot as plt
+from omegaconf import OmegaConf
 import anndata as ad
 import scanpy as sc
 import rapids_singlecell as rsc
 import flax.linen as nn
+import pickle
 import optax
+import hydra
+import wandb
+import os
 import cellflow
+from cellflow.utils import match_linear
 from cellflow.model import CellFlow
 import cellflow.preprocessing as cfpp
 from cellflow.utils import match_linear
@@ -28,9 +34,13 @@ def compute_frechet_var(x: dict[int, np.ndarray]):
 
 def compute_metrics(adata_ref: ad.AnnData, adata_pred_all_samples: ad.AnnData, donor_deg_dict: dict, adata_ood_true: ad.AnnData, adata_ctrl: ad.AnnData, n_neighbors: int=1, cell_type_col: str = "cell_type_new", min_cells_for_dist_metrics: int = 50) -> dict:
     dict_to_log = {}
-    compute_wknn(ref_adata=adata_ref, query_adata=adata_pred, n_neighbors=n_neighbors, ref_rep_key="X_pca", query_rep_key="X_pca_for_ct_transfer")
-    transfer_labels(query_adata=adata_pred, ref_adata=adata_ref, label_key=cell_type_col)
     
+    compute_wknn(ref_adata=adata_ref, query_adata=adata_pred_all_samples, n_neighbors=n_neighbors, ref_rep_key="X_pca", query_rep_key="X_pca_for_ct_transfer")
+    transfer_labels(query_adata=adata_pred_all_samples, ref_adata=adata_ref, label_key=cell_type_col)
+    
+    if adata_ood_true.n_obs > 5000:
+        sc.pp.subsample(adata_ood_true, n_obs=5000)
+
     ood_e_distances = []
     decoded_ood_r_squareds = []
     mean_decoded_r_sq_per_cell_types = []
@@ -40,9 +50,17 @@ def compute_metrics(adata_ref: ad.AnnData, adata_pred_all_samples: ad.AnnData, d
     for i in range(10):
 
         adata_pred = adata_pred_all_samples[adata_pred_all_samples.obs["sample"]==i]
+
+        print("adata_pred n obs: ", adata_pred.n_obs)
+        print("adata_ood_true n obs: ", adata_ood_true.n_obs)
+        
         # standard metrics
         ood_e_distance = compute_e_distance(adata_ood_true.obsm["X_pca"], adata_pred.obsm["X_pca"])
         decoded_ood_r_squared = compute_r_squared(adata_ood_true.X.toarray(), adata_pred.layers["X_recon"])
+
+        r_sq = {}
+        e_distance = {}
+        deg_r_sq = {}
         
         for ct_cyto in donor_deg_dict.keys(): 
             cell_type = ct_cyto.split("_")[1]
@@ -83,13 +101,13 @@ def compute_metrics(adata_ref: ad.AnnData, adata_pred_all_samples: ad.AnnData, d
     deg_gex_per_cell_type = {}
     for sample_idx in range(10):
         adata_pred = adata_pred_all_samples[adata_pred_all_samples.obs["sample"]==sample_idx]
-        distr_dict[sample_idx] = adata_pred.obsm["X_pca"]
+        distr_dict[sample_idx] = adata_pred.obsm["X_pca_train"]
         gex_dict[sample_idx] = np.mean(adata_pred.X, axis=0)
         for ct in adata_pred.obs[f"{cell_type_col}_transfer"].unique():
             adata_pred_ct = adata_pred[adata_pred.obs[f"{cell_type_col}_transfer"]==ct]
             if ct not in distr_dict_per_cell_type:
                 distr_dict_per_cell_type[ct] = {}
-            distr_dict_per_cell_type[ct][sample_idx] = adata_pred_ct.obsm["X_pca"]
+            distr_dict_per_cell_type[ct][sample_idx] = adata_pred_ct.obsm["X_pca_train"]
             if ct not in gex_dict_per_cell_type:
                 gex_dict_per_cell_type[ct] = {}
             gex_dict_per_cell_type[ct][sample_idx] = np.mean(adata_pred_ct.X, axis=0)
@@ -139,8 +157,8 @@ def run(config):
 
     adata_base = sc.read_h5ad(f"/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/new_cytokine/adata_base_{cytokine_held_out}.h5ad")
     adata_rest = sc.read_h5ad(f"/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/new_cytokine/adata_rest_{cytokine_held_out}.h5ad")
-    cfp.preprocessing.centered_pca(adata_base, n_comps=100, method="rapids", keep_centered_data=False)
-    cfp.preprocessing.project_pca(query_adata=adata_rest, ref_adata=adata_base)
+    cellflow.preprocessing.centered_pca(adata_base, n_comps=100, method="rapids", keep_centered_data=False)
+    cellflow.preprocessing.project_pca(query_adata=adata_rest, ref_adata=adata_base)
     donors_to_impute = adata_rest.uns["split_info"][idx_given_cytokine]["donors_to_impute"]
     donors_to_train_data = adata_rest.uns["split_info"][idx_given_cytokine]["donors_to_train_data"]
     adata_to_append = adata_rest[adata_rest.obs["donor"].isin(donors_to_train_data)]
@@ -153,8 +171,8 @@ def run(config):
     adata_ctrl_subsetted = []
     for donor in adata_ctrl.obs["donor"].unique():
         adata_tmp = adata_ctrl[adata_ctrl.obs["donor"]==donor]
-        if adata_tmp.n_obs > 10000:
-            sc.pp.subsample(adata_tmp, n_obs=10000)
+        if adata_tmp.n_obs > 5000:
+            sc.pp.subsample(adata_tmp, n_obs=5000)
         adata_ctrl_subsetted.append(adata_tmp)
     adata_ctrl = ad.concat(adata_ctrl_subsetted)
 
@@ -180,14 +198,14 @@ def run(config):
     )
 
     match_fn = functools.partial(
-        solver_utils.match_linear,
+        match_linear,
         epsilon=config_dict["model"]["epsilon"],
         scale_cost="mean",
         tau_a=config_dict["model"]["tau_a"],
         tau_b=config_dict["model"]["tau_b"]
     )
     optimizer = optax.MultiSteps(optax.adam(config_dict["model"]["learning_rate"]), config_dict["model"]["multi_steps"])
-    flow = {config_dict["model"]["flow_type"]: config_dict["model"]["flow_noise"]}
+    probability_path = {config_dict["model"]["flow_type"]: config_dict["model"]["flow_noise"]}
 
     layers_before_pool = config_dict["model"]["layers_before_pool"]
     layers_after_pool = config_dict["model"]["layers_after_pool"]
@@ -211,7 +229,7 @@ def run(config):
         time_freqs=config_dict["model"]["time_freqs"],
         match_fn=match_fn,
         optimizer=optimizer,
-        flow=flow,
+        probability_path=probability_path,
         layer_norm_before_concatenation=config_dict["model"]["layer_norm_before_concatenation"],
         linear_projection_before_concatenation=config_dict["model"]["linear_projection_before_concatenation"],
     )
@@ -219,13 +237,13 @@ def run(config):
     adata_ood = ad.concat((adata_ctrl, adata_ood_perturbed))
     adata_ood.uns = adata_train.uns.copy()
     
-    metrics_callback = cfp.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
-    decoded_metrics_callback = cfp.training.PCADecodedMetrics(ref_adata=adata_base, metrics=["r_squared"])
-    wandb_callback = cfp.training.WandbLogger(project="pbmc_with_uncertainty", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
+    metrics_callback = cellflow.training.Metrics(metrics=["r_squared", "mmd", "e_distance"])
+    decoded_metrics_callback = cellflow.training.PCADecodedMetrics(ref_adata=adata_base, metrics=["r_squared"])
+    wandb_callback = cellflow.training.WandbLogger(project="pbmc_with_uncertainty", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
     callbacks = [metrics_callback, decoded_metrics_callback, wandb_callback]
     
     cf.train(
-        num_iterations=config_dict["training"]["num_iterations"],
+        num_iterations=1000, #config_dict["training"]["num_iterations"],
         batch_size=config_dict["training"]["batch_size"],
         callbacks=callbacks,
         valid_freq=config_dict["training"]["valid_freq"],
@@ -236,6 +254,7 @@ def run(config):
     
     covariate_data = adata_ood_perturbed.obs.drop_duplicates(subset=["condition"])
 
+    preds = []
     for i in range(10):
         preds.append(cf.predict(adata=adata_ctrl, sample_rep="X_pca", condition_id_key="condition", rng=jax.random.PRNGKey(i), covariate_data=covariate_data))
 
@@ -266,26 +285,60 @@ def run(config):
 
     with open("/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/idcs_to_keep.pkl", "rb") as pickle_file:
         idcs_to_keep = pickle.load(pickle_file)
-    
+
     adata_full = sc.read_h5ad("/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/pbmc_with_pca.h5ad")
-    adata_ood_true = adata_full[(adata_full.obs["donor"] == donor) & (adata_full.obs["cytokine"]==cytokine)]
+    adata_ref = adata_full[adata_full.obs_names.isin(idcs_to_keep)]
+    
+    cellflow.preprocessing.reconstruct_pca(query_adata=adata_pred_all, ref_adata=adata_base, use_rep="X_pca", layers_key_added = "X_recon")
+    adata_pred_all.X = adata_pred_all.layers["X_recon"]
+    adata_pred_all.obsm["X_pca_train"] = adata_pred_all.obsm["X_pca"].copy()
+    project_pca(query_adata=adata_pred_all, ref_adata=adata_ref, obsm_key_added="X_pca_for_ct_transfer")
+    project_pca(query_adata=adata_pred_all, ref_adata=adata_full, obsm_key_added="X_pca")
+
+
+    adata_pred_all.write_h5ad(os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_all_preds.h5ad"))
+    adata_pred.write_h5ad(os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_{condition}_all_preds.h5ad"))
+        
+        
+    #out_dicts = {}
+    #for condition in adata_pred_all.obs["condition"].unique():
+    #    cytokine=cytokine_held_out
+    #    donor=condition.split("_")[0]
+    #    adata_ood_true_red = adata_full[(adata_full.obs["donor"] == donor) & (adata_full.obs["cytokine"]==cytokine)]
+    #    donor_deg_dict = {k: v for k, v in deg_genes.items() if (k.startswith(donor) and k.endswith(f"_{cytokine}"))}
+    #    adata_pred = adata_pred_all[adata_pred_all.obs["condition"]==condition]
+    #    adata_pred.uns["donors_in_train"] = list(adata_to_append.obs["donor"].unique())
+    #    cond_orig = condition
+    #    adata_pred.write_h5ad(os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_{condition}_preds.h5ad"))
+    #    out = compute_metrics(adata_ref=adata_ref, adata_pred_all_samples=adata_pred_all, donor_deg_dict=donor_deg_dict, adata_ood_true=adata_ood_true_red, adata_ctrl=adata_ctrl)
+    #    out_dicts[condition] = out
+    #    pd.DataFrame.from_dict(out, columns=[condition], orient="index").to_csv(os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_{condition}.csv"))
+        
+        
+    #df = pd.DataFrame(columns=["e_distance", "e_distance_var", "r_sq_per_cell_type", "r_sq_per_cell_type_var", "deg_r_sq", "deg_r_sq_var"])
+    #cal_log_dict = {}
+    #for i, (k, v) in enumerate(out_dicts.items()):
+    #    df.loc[i, :] = {
+    #        "e_distance": v["ood_e_distance"],
+    #        "e_distance_var": v["frechet_variance"],
+    #        "r_sq_per_cell_type": v["mean_decoded_r_sq_per_cell_type"],
+    #        "r_sq_per_cell_type_var": v["mean_var_mean_gex_per_cell_type"],
+    #        "deg_r_sq": v["mean_deg_r_sq_per_cell_type"],
+    #        "deg_r_sq_var": v["mean_var_mean_deg_gex_per_cell_type"],
+    #    }
+    #df["neg_deg_r_sq"] = 1-df["deg_r_sq"]
+    #df["neg_r_sq_per_cell_type"] = 1-df["r_sq_per_cell_type_var"]
+    #cal_log_dict = {}
+    #cal_log_dict["e_dist_calibration"] = df[["e_distance", "e_distance_var"]].corr(method="spearman").iloc[0,1]
+    #cal_log_dict["gex_calibration"] = df[["r_sq_per_cell_type", "r_sq_per_cell_type_var"]].corr(method="spearman").iloc[0,1]
+    #cal_log_dict["deg_calibration"] = df[["neg_deg_r_sq", "deg_r_sq_var"]].corr(method="spearman").iloc[0,1]
+    #cal_log_dict["mean_e_distance"] = df["e_distance"].mean()
+    #cal_log_dict["mean_r_sq_per_cell_type"] = df["r_sq_per_cell_type"].mean()
+    #cal_log_dict["mean_deg_r_sq"] = df["deg_r_sq"].mean()
+
     
 
-    for condition in adata_pred_all.obs["condition"].unique():
-        cytokine=cytokine_held_out
-        donor=condition.split("_")[0]
-        adata_ood_true = adata_ood_true[(adata_ood_true.obs["donor"] == donor) & (adata_ood_true.obs["cytokine"]==cytokine)]
-        donor_deg_dict = {k: v for k, v in deg_genes.items() if (k.startswith(donor) and k.endswith(f"_{cytokine}"))}
-        adata_pred = adata_pred_all[adata_pred_all.obs["condition"]==condition]
-        adata_pred.uns["donors_in_train"] = list(adata_to_append.obs["donor"].unique())
-        cfp.preprocessing.reconstruct_pca(query_adata=adata_pred, ref_adata=adata_base, use_rep="X_pca", layers_key_added = "X_recon")
-        adata_pred.X = adata_pred.layers["X_recon"]
-        cond_orig = condition
-        adata_pred.write_h5ad(os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_{condition}_preds.h5ad"))
-        out = compute_metrics(adata_ref=adata_ref, adata_pred=adata_pred, donor_deg_dict=donor_deg_dict, adata_ood_true=adata_ood_true, adata_ctrl=adata_ctrl)
-    
-        pd.DataFrame.from_dict(out, columns=[condition], orient="index").to_csv(os.path.join(config_dict["training"]["out_dir"], f"{wandb.run.name}_{condition}.csv"))
-        wandb.log({condition: out})
+    #wandb.log({condition: cal_log_dict})
     
     
     return 1.0

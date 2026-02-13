@@ -150,7 +150,9 @@ if __name__ == "__main__":
     adata_ood_perturbed  = sc.read_h5ad(f"/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/new_donor/{donor_held_out}/{str(idx_given_donor)}/adata_ood_{donor_held_out}.h5ad")
     cytokines_to_impute = adata_train.uns["split_info"][idx_given_donor]["cytokines_to_impute"]
     cytokines_to_train_data = adata_train.uns["split_info"][idx_given_donor]["cytokines_to_train_data"]
-    
+    if len(cytokines_to_train_data) != 65:
+        sys.exit(0)
+        
     adata_ctrl = adata_train[adata_train.obs[control_key].to_numpy()]
 
 

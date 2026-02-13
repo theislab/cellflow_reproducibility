@@ -7,7 +7,7 @@ hydra:
   launcher:
     partition: gpu_p
     qos: gpu_normal
-    mem_gb: 400
+    mem_gb: 500
     gres: gpu:1
     constraint: h100_80gb|a100_80gb
     timeout_min: 1440
