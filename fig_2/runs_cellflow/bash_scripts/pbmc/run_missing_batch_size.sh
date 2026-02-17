@@ -2,20 +2,13 @@
 
 # Define the specific combinations as "index:tau_list"
 declare -a tasks=(
-    "0:1.0,0.99,0.95,0.8"
-    "1:1.0,0.99,0.95,0.9,0.8"
-    "2:0.99,0.95,0.9,0.8"
-    "3:1.0,0.99,0.95,0.9,0.8"
-    "4:0.95,0.9,0.8"
-    "5:1.0,0.8"
-    "7:0.99"
-    "9:0.95,0.8"
-    "10:1.0"
-    "16:0.99"
-    "17:0.99,0.95"
-    "19:0.99,0.9"
-    "21:0.99,0.95"
-    "22:0.99,0.95"
+    "0:16,32,2048,4096"
+    "1:16,32,64,128,2048,4096"
+    "3:64,128,256,2048,4096"
+    "6:2048,4096"
+    "8:16,32,64,128"
+    "9:64,128,256,512,1024"
+    "10:256,512"
 )
 
 # Loop through each task group
@@ -31,8 +24,8 @@ for task in "${tasks[@]}"; do
         # Note: -m is removed from the python command
         sbatch <<EOF
 #!/bin/bash
-#SBATCH -o logs/pbmc_idx${index}_tau${tau}_%j.out
-#SBATCH -e logs/pbmc_idx${index}_tau${tau}_%j.err
+#SBATCH -o logs_bs_missing/pbmc_idx${index}_tau${tau}_%j.out
+#SBATCH -e logs_bs_missing/pbmc_idx${index}_tau${tau}_%j.err
 #SBATCH -J pbmc_${index}_${tau}
 #SBATCH -p gpu_p
 #SBATCH --qos=gpu_normal
@@ -55,7 +48,7 @@ python /home/icb/dominik.klein/git_repos/ot_pert_new/fig_2/runs_cellflow/train_p
     logger=zebrafish \
     dataset.donor_held_out='Donor1' \
     dataset.idx_given_donor=$index \
-    model.tau_a=$tau
+    training.batch_size=$tau
 EOF
         # Brief sleep to avoid hitting the scheduler too fast
         sleep 0.1

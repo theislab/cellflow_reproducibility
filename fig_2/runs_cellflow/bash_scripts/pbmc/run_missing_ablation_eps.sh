@@ -3,22 +3,26 @@
 # Define the specific combinations as "index:epsilon_list"
 # Extracted from the provided wandb_export CSV
 declare -a tasks=(
-    "0:0.01,0.1,1,10,100,1000000"
-    "1:0.01,0.1,1,10,100,1000000"
-    "2:0.01,0.1,1,10,100,1000000"
-    "3:0.01,0.1,1,10,100,1000000"
-    "4:0.01,0.1,1,10,100"
-    "5:0.1,10"
-    "6:0.01,10,1000000"
-    "7:1000000"
-    "10:1,1000000"
-    "13:0.01,0.1,10"
-    "18:0.01,1,10,100"
-    "19:0.01,0.1,10,100,1000000"
+    "3:0.001"
+    "4:1000000"
+    "5:0.001,0.01,1,100,1000000"
+    "6:0.001,0.1,1,100"
+    "7:0.001,0.01,0.1,1,10,100"
+    "8:0.001,0.01,0.1,1,10,100,1000000"
+    "9:0.001,0.01,0.1,1,10,100,1000000"
+    "10:0.001,0.01,0.1,,10,100"
+    "11:0.001,0.01,0.1,1,10,100,1000000"
+    "12:0.01,0.1,1,10,100,1000000"
+    "13:1.0,100,1000000"
+    "14:0.001,0.01,0.1,1,10,100,1000000"
+    "15:0.001,0.01,0.1,1,10,100,1000000"
+    "16:0.01,0.1,1,10,100,1000000"
+    "17:0.01,0.1,1,10,100,1000000"
+    "18:0.1,1000000"
+    "19:1.0"
     "20:0.01,0.1,1,10,100,1000000"
     "21:0.01,0.1,1,10,100,1000000"
-    "22:0.01,0.1,100,1000000"
-    "23:0.01,100,1000000"
+    "22:1.0,100"
 )
 
 # Loop through each task group
@@ -33,8 +37,8 @@ for task in "${tasks[@]}"; do
         # Submit an individual SLURM job per epsilon value
         sbatch <<EOF
 #!/bin/bash
-#SBATCH -o logs2/pbmc_idx${index}_eps${eps}_%j.out
-#SBATCH -e logs2/pbmc_idx${index}_eps${eps}_%j.err
+#SBATCH -o logs_eps/pbmc_idx${index}_eps${eps}_%j.out
+#SBATCH -e logs_eps/pbmc_idx${index}_eps${eps}_%j.err
 #SBATCH -J pbmc_${index}_${eps}
 #SBATCH -p gpu_p
 #SBATCH --qos=gpu_normal
@@ -43,6 +47,9 @@ for task in "${tasks[@]}"; do
 #SBATCH --mem=500G
 #SBATCH -t 1-00:00:00
 #SBATCH --nice=1
+
+export TMPDIR=$HOME/tmp
+mkdir -p $TMPDIR
 
 # Environment setup
 source ${HOME}/.bashrc_new
@@ -60,7 +67,7 @@ mkdir -p $WANDB_DIR
 python /home/icb/dominik.klein/git_repos/ot_pert_new/fig_2/runs_cellflow/train_pbmc_new_donor.py \
     dataset=pbmc_new_donor \
     model=pbmc_new_donor \
-    training=pbmc_new_donor_ablation_batch_size \
+    training=pbmc_new_donor_ablation_epsilon \
     logger=zebrafish \
     dataset.donor_held_out='Donor1' \
     dataset.idx_given_donor=$index \

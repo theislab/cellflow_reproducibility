@@ -2,17 +2,14 @@
 
 # Define the specific combinations as "index:tau_list"
 declare -a tasks=(
-    "0:1.0,0.99,0.95,0.8"
+    "0:1.0,0.95,0.8"
     "1:1.0,0.99,0.95,0.9,0.8"
     "2:0.99,0.95,0.9,0.8"
-    "3:1.0,0.99,0.95,0.9,0.8"
-    "4:0.95,0.9,0.8"
-    "5:1.0,0.8"
+    "3:1.0,0.99,0.95"
+    "5:0.8"
     "7:0.99"
     "9:0.95,0.8"
     "10:1.0"
-    "16:0.99"
-    "17:0.99,0.95"
     "19:0.99,0.9"
     "21:0.99,0.95"
     "22:0.99,0.95"
@@ -31,8 +28,8 @@ for task in "${tasks[@]}"; do
         # Note: -m is removed from the python command
         sbatch <<EOF
 #!/bin/bash
-#SBATCH -o logs/pbmc_idx${index}_tau${tau}_%j.out
-#SBATCH -e logs/pbmc_idx${index}_tau${tau}_%j.err
+#SBATCH -o logs_u/pbmc_idx${index}_tau${tau}_%j.out
+#SBATCH -e logs_u/pbmc_idx${index}_tau${tau}_%j.err
 #SBATCH -J pbmc_${index}_${tau}
 #SBATCH -p gpu_p
 #SBATCH --qos=gpu_normal
@@ -41,6 +38,9 @@ for task in "${tasks[@]}"; do
 #SBATCH --mem=500G
 #SBATCH -t 1-00:00:00
 #SBATCH --nice=1
+
+export TMPDIR=$HOME/tmp
+mkdir -p $TMPDIR
 
 # Environment setup
 source ${HOME}/.bashrc_new
