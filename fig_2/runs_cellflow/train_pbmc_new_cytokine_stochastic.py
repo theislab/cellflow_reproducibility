@@ -244,7 +244,7 @@ def run(config):
 
     cb = VarCallback({"ood": ValidationSampler(cf.validation_data["ood"])}, ref_adata = adata_base, n_draws=10)
 
-    wandb_callback = cellflow.training.WandbLogger(project="pbmc_with_uncertainty_2", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
+    wandb_callback = cellflow.training.WandbLogger(project="pbmc_with_uncertainty_partially_seen", out_dir="/home/icb/dominik.klein/tmp", config=config_dict)
     callbacks = [cb, wandb_callback]
 
     cf.train(

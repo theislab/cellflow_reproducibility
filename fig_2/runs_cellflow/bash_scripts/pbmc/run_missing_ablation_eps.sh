@@ -1,28 +1,13 @@
 #!/bin/bash
 
 # Define the specific combinations as "index:epsilon_list"
-# Extracted from the provided wandb_export CSV
 declare -a tasks=(
-    "3:0.001"
-    "4:1000000"
-    "5:0.001,0.01,1,100,1000000"
-    "6:0.001,0.1,1,100"
-    "7:0.001,0.01,0.1,1,10,100"
-    "8:0.001,0.01,0.1,1,10,100,1000000"
-    "9:0.001,0.01,0.1,1,10,100,1000000"
-    "10:0.001,0.01,0.1,,10,100"
-    "11:0.001,0.01,0.1,1,10,100,1000000"
-    "12:0.01,0.1,1,10,100,1000000"
-    "13:1.0,100,1000000"
-    "14:0.001,0.01,0.1,1,10,100,1000000"
-    "15:0.001,0.01,0.1,1,10,100,1000000"
-    "16:0.01,0.1,1,10,100,1000000"
-    "17:0.01,0.1,1,10,100,1000000"
-    "18:0.1,1000000"
-    "19:1.0"
-    "20:0.01,0.1,1,10,100,1000000"
-    "21:0.01,0.1,1,10,100,1000000"
-    "22:1.0,100"
+    "14:0.001,1000000"
+    "15:100,1000000"
+    "16:0.01,0.1,10,1000000"
+    "17:0.01"
+    "22:10"
+    "23:0.1,1"
 )
 
 # Loop through each task group
@@ -48,22 +33,22 @@ for task in "${tasks[@]}"; do
 #SBATCH -t 1-00:00:00
 #SBATCH --nice=1
 
-export TMPDIR=$HOME/tmp
-mkdir -p $TMPDIR
+# Use a job-local temp directory to prevent wandb port file errors
+export TMPDIR=\$HOME/tmp/\${SLURM_JOB_ID}
+mkdir -p \$TMPDIR
 
 # Environment setup
 source ${HOME}/.bashrc_new
 source ~/miniconda3/etc/profile.d/conda.sh
 conda activate /home/icb/dominik.klein/mambaforge/envs/cfp
 
-
 export WANDB_SERVICE_WAIT=300
 
-# 2. Set a stable directory for wandb (replaces /tmp)
+# Set a stable directory for wandb (replaces /tmp)
 export WANDB_DIR=/home/icb/dominik.klein/tmp3
-mkdir -p $WANDB_DIR
+mkdir -p \$WANDB_DIR
 
-# Run Hydra with a single configuration (removed -m)
+# Run Hydra with a single configuration
 python /home/icb/dominik.klein/git_repos/ot_pert_new/fig_2/runs_cellflow/train_pbmc_new_donor.py \
     dataset=pbmc_new_donor \
     model=pbmc_new_donor \

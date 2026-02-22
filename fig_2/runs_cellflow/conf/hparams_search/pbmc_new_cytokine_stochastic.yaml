@@ -5,6 +5,6 @@ hydra:
   sweeper:
       
     params:
-      dataset.cytokine_held_out: choice('IL-13') #choice('IFN-beta','IFN-epsilon','C5a', '4-1BBL','ADSF','APRIL','BAFF', 'Noggin','OSM','OX40L', 'IL-13','IL-15')
-      dataset.idx_given_cytokine: choice(0) #, 1, 2, 3)
+      dataset.cytokine_held_out: choice('IFN-beta','IFN-epsilon','C5a', '4-1BBL','ADSF','APRIL','BAFF', 'Noggin','OSM','OX40L', 'IL-13','IL-15')
+      dataset.idx_given_cytokine: choice(1, 2, 3)
       model.regularization: choice(0.1) #, 0.01, 0.001, 0.0001)

@@ -136,7 +136,8 @@ def compute_frechet_var(x: dict[int, np.ndarray]):
 
 if __name__ == "__main__":
     pred_file = sys.argv[1]
-    complete_pred_file = os.path.join("/lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_cytokine_stochastic_2", pred_file)
+    src_dir = sys.argv[2] if len(sys.argv) > 2 else "/lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_cytokine_stochastic_2"
+    complete_pred_file = os.path.join(src_dir, pred_file)
     adata_pred = sc.read_h5ad(complete_pred_file)
     with open("/lustre/groups/ml01/workspace/ot_perturbation/data/pbmc/idcs_to_keep.pkl", "rb") as pickle_file:
         idcs_to_keep = pickle.load(pickle_file)

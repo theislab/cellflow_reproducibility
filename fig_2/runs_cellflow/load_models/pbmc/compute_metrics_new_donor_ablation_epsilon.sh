@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # now for completely unseen donors
-mapfile -t list_preds < <(jq -r '.[]' /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_donor_ablation_epsilon.json)
+mapfile -t list_preds < <(jq -r '.[]' /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_donor_ablation_epsilon_missing.json)
 
 # Loop through each split and submit a job
 for split in "${list_preds[@]}"; do

@@ -2,17 +2,29 @@
 
 # Define the specific combinations as "index:tau_list"
 declare -a tasks=(
-    "0:1.0,0.95,0.8"
-    "1:1.0,0.99,0.95,0.9,0.8"
-    "2:0.99,0.95,0.9,0.8"
-    "3:1.0,0.99,0.95"
-    "5:0.8"
-    "7:0.99"
-    "9:0.95,0.8"
-    "10:1.0"
-    "19:0.99,0.9"
-    "21:0.99,0.95"
-    "22:0.99,0.95"
+    "0:0.9"
+    "2:1.0"
+    "3:0.95"
+    "4:0.99,1.0"
+    "5:0.9,0.95,0.99"
+    "6:0.8,0.9,0.95,0.99,1.0"
+    "7:0.8,0.9,0.95,1.0"
+    "8:0.8,0.9,0.95,0.99,1.0"
+    "9:0.9,0.99,1.0"
+    "10:0.8,0.9,0.95,0.99"
+    "11:0.8,0.9,0.95,0.99,1.0"
+    "12:0.8,0.9,0.95,0.99,1.0"
+    "13:0.8,0.9,0.95,0.99,1.0"
+    "14:0.8,0.9,0.95,0.99,1.0"
+    "15:0.8,0.9,0.95,0.99,1.0"
+    "16:0.8,0.9,0.95,1.0"
+    "17:0.8,0.9,1.0"
+    "18:0.8,0.9,0.95,0.99,1.0"
+    "19:0.8,0.95,1.0"
+    "20:0.8,0.9,0.95,0.99,1.0"
+    "21:0.8,0.9,0.95,0.99,1.0"
+    "22:0.8,0.9,1.0"
+    "23:0.8,0.9,0.95,0.99,1.0"
 )
 
 # Loop through each task group
@@ -25,7 +37,6 @@ for task in "${tasks[@]}"; do
 
     for tau in "${tau_array[@]}"; do
         # Construct and submit an individual SLURM job per tau value
-        # Note: -m is removed from the python command
         sbatch <<EOF
 #!/bin/bash
 #SBATCH -o logs_u/pbmc_idx${index}_tau${tau}_%j.out
@@ -39,8 +50,9 @@ for task in "${tasks[@]}"; do
 #SBATCH -t 1-00:00:00
 #SBATCH --nice=1
 
-export TMPDIR=$HOME/tmp
-mkdir -p $TMPDIR
+# Use a job-local temp directory to prevent wandb port file errors
+export TMPDIR=\$HOME/tmp/\${SLURM_JOB_ID}
+mkdir -p \$TMPDIR
 
 # Environment setup
 source ${HOME}/.bashrc_new
