@@ -1,0 +1,11 @@
+# @package _global_
+
+hydra:
+  sweeper:
+    params:
+      dataset.donor_held_out: 'Donor1'
+      # Paired parameters: each string represents one specific (idx, batch_size) experiment.
+      dataset.idx_given_donor,training.batch_size: choice([
+        "9,32",
+        "1,2048"
+        ])

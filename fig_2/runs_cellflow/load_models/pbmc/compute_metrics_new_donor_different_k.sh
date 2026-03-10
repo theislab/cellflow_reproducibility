@@ -8,9 +8,9 @@ for file in "${list_preds[@]}"; do
     # Construct a SLURM job script and submit
     sbatch <<EOF
 #!/bin/bash
-#SBATCH -o d_metrics_${file}.out
-#SBATCH -e d_metrics_${file}.err
-#SBATCH -J d_metrics_${file}
+#SBATCH -o diff_k/d_metrics_${file}.out
+#SBATCH -e diff_k/d_metrics_${file}.err
+#SBATCH -J diff_k/d_metrics_${file}
 #SBATCH -p cpu_p
 #SBATCH --qos=cpu_normal
 #SBATCH --mem=400G

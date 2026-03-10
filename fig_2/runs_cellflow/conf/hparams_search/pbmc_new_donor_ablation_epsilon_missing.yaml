@@ -1,0 +1,16 @@
+# @package _global_
+
+hydra:
+  sweeper:
+    params:
+      dataset.donor_held_out: 'Donor1'
+      # Paired parameters: each string represents one specific (idx, epsilon) experiment.
+      dataset.idx_given_donor,model.epsilon: choice([
+        "14,0.001",
+        "16,0.01", "17,0.01",
+        "16,0.1", "23,0.1",
+        "23,1",
+        "16,10", "22,10",
+        "15,100",
+        "14,1000000", "15,1000000", "16,1000000"
+        ])

@@ -78,9 +78,8 @@ if __name__ == "__main__":
 
     out = compute_metrics(adata_ref=adata_ref, adata_pred=adata_pred, deg_dict=deg_genes, adata_ood_true=adata_ood_true, adata_ctrl=adata_ctrl)
     df = pd.DataFrame.from_dict(out)
-    df["condition"]=condition
-    df["num_cytokines_in_train"] = len(cytokines_to_train_data)
     condition = f"{donor_held_out}_{cytokine}"
+    df["condition"]=condition
     df.to_csv(os.path.join(out_dir, f"{pred_file}_{condition}.csv"))
 
     

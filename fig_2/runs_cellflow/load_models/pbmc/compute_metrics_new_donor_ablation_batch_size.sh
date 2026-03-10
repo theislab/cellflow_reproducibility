@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mapfile -t list_preds < <(jq -r '.[]' /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_donor_ablation_batch_size/pbmc_new_donor_ablation_batch_size_missing.json)
+mapfile -t list_preds < <(jq -r '.[]' /lustre/groups/ml01/workspace/ot_perturbation/models/otfm/pbmc_new_donor_ablation_batch_size_sa276.json)
 
 # Loop through each split and submit a job
 for split in "${list_preds[@]}"; do

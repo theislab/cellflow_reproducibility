@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//ictstr01/groups/ml01/workspace/ot_perturbation/data/pbmc/metrics_new_donor_batch_size/**)"
+    ]
+  }
+}
